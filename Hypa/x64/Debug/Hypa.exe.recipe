@@ -2,10 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\Hypa\ExampleProject\vendor\Hypa\Hypa.dll</FullPath>
-    </ProjectOutput>
-    <ProjectOutput>
-      <FullPath>D:\Hypa\x64\Debug\ExampleProject.exe</FullPath>
+      <FullPath>D:\Hypa\ExampleProject\vendor\Hypa\Hypa.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

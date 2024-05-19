@@ -1,5 +1,9 @@
-#include "base.h"
+#include "App.h"
 
-HYPA_API int fnHypa() {
-    return 90;
+int main() {
+	Hypa::App application;
+
+	while (application.Update()) {
+
+	}
 }

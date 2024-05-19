@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{983a135c-014f-4c26-9999-1e5344378586}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\Hypa">
+      <UniqueIdentifier>{a1492623-035e-4b19-bfb9-88423ae70109}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -20,8 +26,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Hypa.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="vendor\Hypa\Hypa.h">
+      <Filter>vendor\Hypa</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
