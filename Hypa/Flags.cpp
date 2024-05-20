@@ -5,31 +5,50 @@ namespace Hypa {
 
     }
 
-	void Flags::AddFlag(const std::string& name, bool& pointer) {
-		flagMap[name] = &pointer;
-	}
+	void Flags::AddFlag(const std::string& name, std::variant<int*, double*, std::string*, bool*> variable) {
+        flags[name] = variable;
+    }
 
-    void Flags::ChangeFlag(const std::string& name, const bool newValue) {
-        if (flagMap.find(name) != flagMap.end()) {
-            try {
-                *flagMap[name] = newValue;
+    void Flags::ChangeFlag(const std::string& name, std::variant<int, double, std::string, bool> value) {
+        auto it = flags.find(name);
+        if (it != flags.end()) {
+            if (std::holds_alternative<int>(value)) {
+                *(std::get<int*>(flags[name])) = std::get<int>(value);
             }
-            catch (const std::bad_any_cast& e) {
-                log.Error("Failed to cast to the correct type: " + (std::string)e.what() + "\n");
+            else if (std::holds_alternative<double>(value)) {
+                *(std::get<double*>(flags[name])) = std::get<double>(value);
+            }
+            else if (std::holds_alternative<std::string>(value)) {
+                *(std::get<std::string*>(flags[name])) = std::get<std::string>(value);
+            }
+            else if (std::holds_alternative<bool>(value)) {
+                *(std::get<bool*>(flags[name])) = std::get<bool>(value);
             }
         }
         else {
-            log.Error("Flag with name " + name + " not found.\n");
+            std::cout << "Flag '" << name << "' not found." << std::endl;
         }
     }
 
-    bool Flags::GetFlag(const std::string& name) {
-        if (flagMap.find(name) != flagMap.end()) {
-            return *flagMap[name];
+    std::variant<int, double, std::string, bool> Flags::GetFlag(const std::string& name) {
+        auto it = flags.find(name);
+        if (it != flags.end()) {
+            if (std::holds_alternative<int*>(it->second)) {
+                return *std::get<int*>(it->second);
+            }
+            else if (std::holds_alternative<double*>(it->second)) {
+                return *std::get<double*>(it->second);
+            }
+            else if (std::holds_alternative<std::string*>(it->second)) {
+                return *std::get<std::string*>(it->second);
+            }
+            else if (std::holds_alternative<bool*>(it->second)) {
+                return *std::get<bool*>(it->second);
+            }
         }
         else {
-            log.Error("Flag with name " + name + " not found.\n");
-            return false; 
+            std::cout << "Flag '" << name << "' not found." << std::endl;
+            return std::variant<int, double, std::string, bool>();
         }
     }
 }

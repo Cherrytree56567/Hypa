@@ -2,11 +2,17 @@
 
 namespace Hypa {
 	Window::Window() {
+		flags->AddFlag("Width", &width);
+		flags->AddFlag("Height", &height);
+		flags->AddFlag("Title", &title);
+		flags->AddFlag("WindowX", &WindowX);
+		flags->AddFlag("WindowY", &WindowY);
+
 		if (!glfwInit()) {
 			log.Error("Failed to Initialize GLFW");
 		}
 
-		window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+		window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 		if (!window) {
 			glfwTerminate();
 			log.Error("Failed to create GLFW window");
@@ -16,29 +22,8 @@ namespace Hypa {
 		glfwSetWindowUserPointer(window, this);
 	}
 
-	void Window::ChangeWidth(int wid) {
-		width = wid;
-		glfwSetWindowSize(window, width, height);
-	}
-
-	void Window::ChangeHeight(int wid) {
-		height = wid;
-		glfwSetWindowSize(window, width, height);
-	}
-
-	void Window::ChangeTitle(char* wid) {
-		title = wid;
-		glfwSetWindowTitle(window, title);
-	}
-
-	void Window::ChangeWindowX(int wid) {
-		WindowX = wid;
-		glfwSetWindowPos(window, WindowX, WindowY);
-	}
-
-	void Window::ChangeWindowY(int wid) {
-		WindowY = wid;
-		glfwSetWindowPos(window, WindowX, WindowY);
+	std::shared_ptr<Flags> Window::GetFlags() {
+		return flags;
 	}
 
 	GLFWwindow* Window::GetWindow() {
@@ -47,6 +32,10 @@ namespace Hypa {
 
 	void Window::Update() {
 		glfwSwapBuffers(window);
+		glfwSetWindowSize(window, width, height);
+		glfwSetWindowTitle(window, title.c_str());
+		glfwSetWindowPos(window, WindowX, WindowY);
+		std::cout << width << std::endl;
 	}
 
 	void Window::ProcessEvents() {

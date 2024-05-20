@@ -10,4 +10,8 @@ namespace Hypa {
 		window->ProcessEvents();
 		return !window->shouldClose();
 	}
+
+	std::shared_ptr<Window> App::GetWindow() {
+		return window;
+	}
 }

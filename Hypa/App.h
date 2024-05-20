@@ -4,9 +4,11 @@
 namespace Hypa {
 	class App {
 	public:
-		App();
+		HYPA_API App();
 
-		bool Update();
+		HYPA_API bool Update();
+
+		HYPA_API std::shared_ptr<Window> GetWindow();
 
 	private:
 		std::shared_ptr<Window> window;
