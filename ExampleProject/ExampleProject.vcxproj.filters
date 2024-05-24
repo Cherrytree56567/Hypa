@@ -20,8 +20,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HypaEngine.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="vendor\Hypa\HypaEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

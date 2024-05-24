@@ -1,5 +1,5 @@
 #include <iostream>
-#include "HypaEngine.h"
+#include <HypaEngine.h>
 
 int main() {
 	Hypa::App app;

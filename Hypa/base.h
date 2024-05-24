@@ -1,3 +1,4 @@
+#pragma once
 #define HYPA_EXPORTS
 #ifdef HYPA_EXPORTS
 #define HYPA_API __declspec(dllexport)
