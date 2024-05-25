@@ -25,6 +25,9 @@
     <Filter Include="Source Files\App">
       <UniqueIdentifier>{d8f98638-0555-45ea-80b8-90065ac758bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EventSystem">
+      <UniqueIdentifier>{d9ee5684-5298-4792-ba75-bf74afd5e8e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -45,6 +48,9 @@
     <ClCompile Include="App.cpp">
       <Filter>Source Files\App</Filter>
     </ClCompile>
+    <ClCompile Include="EventSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="App.h">
       <Filter>Source Files\App</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystem.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
