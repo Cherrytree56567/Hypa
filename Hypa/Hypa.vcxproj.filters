@@ -28,6 +28,15 @@
     <Filter Include="Source Files\EventSystem">
       <UniqueIdentifier>{d9ee5684-5298-4792-ba75-bf74afd5e8e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EventSystem\App">
+      <UniqueIdentifier>{cc893059-aa32-440d-8f01-27ca47cf269b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EventSystem\Keyboard">
+      <UniqueIdentifier>{4a59ae27-9681-4a3d-a278-04a8335642a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EventSystem\Mouse">
+      <UniqueIdentifier>{c4e6dfa8-6e6e-4a04-8e9f-1cd896345030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -70,6 +79,21 @@
     </ClInclude>
     <ClInclude Include="EventSystem.h">
       <Filter>Source Files\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="AppEvent.h">
+      <Filter>Source Files\EventSystem\App</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardEvent.h">
+      <Filter>Source Files\EventSystem\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyCodes.h">
+      <Filter>Source Files\EventSystem\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseEvents.h">
+      <Filter>Source Files\EventSystem\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseCodes.h">
+      <Filter>Source Files\EventSystem\Mouse</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

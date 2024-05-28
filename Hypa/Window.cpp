@@ -40,6 +40,20 @@ namespace Hypa {
 
 	void Window::ProcessEvents() {
 		glfwPollEvents();
+
+		if (glfwWindowShouldClose(window)) {
+			std::unique_ptr<WindowCloseEvent> at = std::make_unique<WindowCloseEvent>();
+			Events->AddEvent(std::move(at));
+		}
+
+		if (glfwGetWindowAttrib(window, GLFW_FOCUSED) == GLFW_TRUE) {
+			std::unique_ptr<WindowFocusEvent> at = std::make_unique<WindowFocusEvent>(true);
+			Events->AddEvent(std::move(at));
+		}
+		else {
+			std::unique_ptr<WindowFocusEvent> at = std::make_unique<WindowFocusEvent>(false);
+			Events->AddEvent(std::move(at));
+		}
 	}
 
 	bool Window::shouldClose() {

@@ -4,6 +4,9 @@
 #include "Logging.h"
 #include "Flags.h"
 #include "EventSystem.h"
+#include "AppEvent.h"
+#include "KeyboardEvent.h"
+#include "MouseEvents.h"
 
 namespace Hypa {
 	class Window {

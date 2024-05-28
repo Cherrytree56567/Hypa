@@ -179,10 +179,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="AppEvent.h" />
     <ClInclude Include="base.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="Flags.h" />
+    <ClInclude Include="KeyboardEvent.h" />
+    <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="Logging.h" />
+    <ClInclude Include="MouseEvents.h" />
+    <ClInclude Include="MouseCodes.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
