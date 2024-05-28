@@ -3,11 +3,12 @@
 #include "base.h"
 #include "Logging.h"
 #include "Flags.h"
+#include "EventSystem.h"
 
 namespace Hypa {
 	class Window {
 	public:
-		HYPA_API Window();
+		HYPA_API Window(std::shared_ptr<EventSystem> EvSys);
 
 		HYPA_API GLFWwindow* GetWindow();
 
@@ -25,5 +26,6 @@ namespace Hypa {
 		GLFWwindow* window;
 		Logging log;
 		std::shared_ptr<Flags> flags = std::make_shared<Flags>();
+		std::shared_ptr<EventSystem> Events = NULL;
 	};
 }

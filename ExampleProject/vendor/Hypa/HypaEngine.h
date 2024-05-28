@@ -16,6 +16,10 @@ typedef struct GLFWwindow GLFWwindow;
 
 namespace Hypa {
 
+	/*
+	* Logging
+	*/
+
 	class Logging {
 	public:
 		HYPA_API Logging();
@@ -24,6 +28,10 @@ namespace Hypa {
 		HYPA_API void Warning(std::string message, std::string who = "[Hypa::Core] ");
 		HYPA_API void Info(std::string message, std::string who = "[Hypa::Core] ");
 	};
+
+	/*
+	* Flags
+	*/
 
 	class Flags {
 	public:
@@ -40,9 +48,56 @@ namespace Hypa {
 		Logging log;
 	};
 
+	/*
+	* Event System
+	*/
+
+	enum EventType {
+		None = 0,
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+		AppTick, AppUpdate, AppRender,
+		KeyPressed, KeyReleased,
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		ObjectMoved
+	};
+
+	class Event {
+	public:
+		HYPA_API virtual ~Event() = default;
+
+		bool Handled = false;
+
+		HYPA_API virtual EventType GetEventType() = 0;
+	};
+
+	class EventSystem {
+	public:
+		HYPA_API EventSystem();
+
+		typedef void (*EventCallback)(std::shared_ptr<Event> events, std::any);
+
+		HYPA_API void AddEvent(std::shared_ptr<Event> newEvent);
+		HYPA_API std::shared_ptr<Event> GetEvent(EventType eventType);
+		HYPA_API void RemoveHandledEvents();
+		HYPA_API bool isUnhandledEvent(EventType eventType);
+		HYPA_API void ResetEvents() { events.clear(); }
+		HYPA_API void AddEventListener(EventType eventType, EventCallback callback, std::any a = NULL);
+		HYPA_API void RemoveEventListener(EventType eventType, EventCallback callback);
+		HYPA_API void DispatchEvent();
+
+
+	private:
+		std::vector<std::shared_ptr<Event>> events;
+		std::unordered_map<EventType, std::vector<std::pair<EventCallback, std::any>>> eventCallbacks;
+	};
+
+	/*
+	* Window
+	*/
+
 	class Window {
 	public:
-		HYPA_API Window();
+		HYPA_API Window(std::shared_ptr<EventSystem> EvSys);
 
 		HYPA_API GLFWwindow* GetWindow();
 
@@ -60,7 +115,12 @@ namespace Hypa {
 		GLFWwindow* window;
 		Logging log;
 		std::shared_ptr<Flags> flags = std::make_shared<Flags>();
+		std::shared_ptr<EventSystem> Events = NULL;
 	};
+
+	/*
+	* App
+	*/
 
 	class App {
 	public:
@@ -69,8 +129,10 @@ namespace Hypa {
 		HYPA_API bool Update();
 
 		HYPA_API std::shared_ptr<Window> GetWindow();
+		HYPA_API std::shared_ptr<EventSystem> GetEventSystem();
 
 	private:
 		std::shared_ptr<Window> window;
+		std::shared_ptr<EventSystem> Events;
 	};
 }

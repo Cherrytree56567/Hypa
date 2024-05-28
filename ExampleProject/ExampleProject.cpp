@@ -4,11 +4,10 @@
 int main() {
 	Hypa::App app;
 
-	int wid = 0;
+	app.GetWindow()->GetFlags()->ChangeFlag("Width", 800);
+	app.GetWindow()->GetFlags()->ChangeFlag("Height", 400);
 
 	while (app.Update()) {
-		wid += 1;
-		app.GetWindow()->GetFlags()->ChangeFlag("Width", wid);
-		app.GetWindow()->GetFlags()->ChangeFlag("Height", wid);
+
 	}
 }

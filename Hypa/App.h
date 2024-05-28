@@ -9,8 +9,10 @@ namespace Hypa {
 		HYPA_API bool Update();
 
 		HYPA_API std::shared_ptr<Window> GetWindow();
+		HYPA_API std::shared_ptr<EventSystem> GetEventSystem();
 
 	private:
 		std::shared_ptr<Window> window;
+		std::shared_ptr<EventSystem> Events;
 	};
 }

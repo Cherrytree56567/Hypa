@@ -49,7 +49,7 @@
       <Filter>Source Files\App</Filter>
     </ClCompile>
     <ClCompile Include="EventSystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\EventSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,7 +69,7 @@
       <Filter>Source Files\App</Filter>
     </ClInclude>
     <ClInclude Include="EventSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\EventSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,7 +2,8 @@
 
 namespace Hypa {
 	App::App() {
-		window = std::make_shared<Window>();
+		Events = std::make_shared<EventSystem>();
+		window = std::make_shared<Window>(Events);
 	}
 
 	bool App::Update() {
@@ -13,5 +14,9 @@ namespace Hypa {
 
 	std::shared_ptr<Window> App::GetWindow() {
 		return window;
+	}
+
+	std::shared_ptr<EventSystem> App::GetEventSystem() {
+		return Events;
 	}
 }

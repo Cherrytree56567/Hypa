@@ -1,7 +1,7 @@
 #include "Window.h"
 
 namespace Hypa {
-	Window::Window() {
+	Window::Window(std::shared_ptr<EventSystem> EvSys) : Events(EvSys) {
 		flags->AddFlag("Width", &width);
 		flags->AddFlag("Height", &height);
 		flags->AddFlag("Title", &title);
