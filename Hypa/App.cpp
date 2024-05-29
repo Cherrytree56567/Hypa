@@ -7,8 +7,13 @@ namespace Hypa {
 	}
 
 	bool App::Update() {
+		Events->ResetEvents();
 		window->Update();
+		Events->AddEvent(std::make_shared<AppTickEvent>());
+		Events->AddEvent(std::make_shared<AppUpdateEvent>());
+		Events->DispatchEvent();
 		window->ProcessEvents();
+		Events->AddEvent(std::make_shared<AppRenderEvent>());
 		return !window->shouldClose();
 	}
 

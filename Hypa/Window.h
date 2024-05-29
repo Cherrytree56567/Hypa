@@ -30,5 +30,14 @@ namespace Hypa {
 		Logging log;
 		std::shared_ptr<Flags> flags = std::make_shared<Flags>();
 		std::shared_ptr<EventSystem> Events = NULL;
+
+		std::vector<int> key_codes;
+		std::vector<int> keyRel_codes;
+		bool wasLeftMouseButtonPressed = false;
+		bool wasRightMouseButtonPressed = false;
+		double lastMouseX = 0.0;
+		double lastMouseY = 0.0;
+		double lastSMouseX = 0.0;
+		double lastSMouseY = 0.0;
 	};
 }

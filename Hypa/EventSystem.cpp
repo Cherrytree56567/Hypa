@@ -7,7 +7,7 @@ namespace Hypa {
     }
 
     void EventSystem::AddEvent(std::shared_ptr<Event> newEvent) {
-        events.push_back(std::move(newEvent));
+        events.push_back(newEvent);
     }
 
     std::shared_ptr<Event> EventSystem::GetEvent(EventType eventType) {
