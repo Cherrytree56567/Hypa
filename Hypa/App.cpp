@@ -4,6 +4,7 @@ namespace Hypa {
 	App::App() {
 		Events = std::make_shared<EventSystem>();
 		window = std::make_shared<Window>(Events);
+		rAPIsystem = std::make_shared<RenderingAPISystem>();
 	}
 
 	bool App::Update() {
@@ -23,5 +24,9 @@ namespace Hypa {
 
 	std::shared_ptr<EventSystem> App::GetEventSystem() {
 		return Events;
+	}
+
+	std::shared_ptr<RenderingAPISystem> App::GetRenderingAPISystem() {
+		return rAPIsystem;
 	}
 }
