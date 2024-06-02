@@ -189,6 +189,7 @@
     <ClInclude Include="MouseEvents.h" />
     <ClInclude Include="MouseCodes.h" />
     <ClInclude Include="RenderingAPI.h" />
+    <ClInclude Include="Vulkan.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +199,7 @@
     <ClCompile Include="Hypa.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
+    <ClCompile Include="Vulkan.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

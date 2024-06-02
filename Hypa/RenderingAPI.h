@@ -24,8 +24,12 @@ namespace Hypa {
 
 		HYPA_API void AddAPI(std::shared_ptr<RenderingAPI> API);
 		HYPA_API void RemoveAPIByName(const std::string& name);
+		HYPA_API std::shared_ptr<RenderingAPI> GetCurrentRenderingAPI();
+		HYPA_API void SwitchRenderingAPI(std::string name);
+		HYPA_API std::string GetCurrentRenderingAPIName();
 
 	private:
 		std::vector<std::shared_ptr<RenderingAPI>> renderingAPIS;
+		std::string CurrentRenderingAPI;
 	};
 }

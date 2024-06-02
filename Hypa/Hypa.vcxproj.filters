@@ -40,6 +40,9 @@
     <Filter Include="Source Files\RenderingAPI">
       <UniqueIdentifier>{203b7f47-8aa6-4b11-8741-930f3b588b7b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Vulkan">
+      <UniqueIdentifier>{dd9e2436-3bcf-44ec-92cd-7e3f829fc75b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="RenderingAPI.cpp">
       <Filter>Source Files\RenderingAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="Vulkan.cpp">
+      <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="RenderingAPI.h">
       <Filter>Source Files\RenderingAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="Vulkan.h">
+      <Filter>Source Files\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
