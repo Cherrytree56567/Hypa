@@ -8,6 +8,9 @@ namespace Hypa {
 		VulkanAPI = std::make_shared<Vulkan>();
 		rAPIsystem->AddAPI(VulkanAPI);
 		rAPIsystem->SwitchRenderingAPI("Vulkan");
+		Layerdispatch = std::make_shared<LayerDispatch>();
+
+		Layerdispatch->DispatchLayerAttach();
 	}
 
 	bool App::Update() {

@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "RenderingAPI.h"
 #include "Vulkan.h"
+#include "Layer.h"
 
 namespace Hypa {
 	class App {
@@ -19,5 +20,6 @@ namespace Hypa {
 		std::shared_ptr<EventSystem> Events;
 		std::shared_ptr<RenderingAPISystem> rAPIsystem;
 		std::shared_ptr<Vulkan> VulkanAPI;
+		std::shared_ptr<LayerDispatch> Layerdispatch;
 	};
 }
