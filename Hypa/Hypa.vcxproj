@@ -185,6 +185,7 @@
     <ClInclude Include="Flags.h" />
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="KeyCodes.h" />
+    <ClInclude Include="Layer.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="MouseEvents.h" />
     <ClInclude Include="MouseCodes.h" />
@@ -197,6 +198,7 @@
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="Flags.cpp" />
     <ClCompile Include="Hypa.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
     <ClCompile Include="Vulkan.cpp" />

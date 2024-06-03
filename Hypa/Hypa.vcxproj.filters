@@ -43,6 +43,9 @@
     <Filter Include="Source Files\Vulkan">
       <UniqueIdentifier>{dd9e2436-3bcf-44ec-92cd-7e3f829fc75b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Layer">
+      <UniqueIdentifier>{3ed23183-521a-45e8-be90-2e2849c1b57b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -71,6 +74,9 @@
     </ClCompile>
     <ClCompile Include="Vulkan.cpp">
       <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Source Files\Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="Vulkan.h">
       <Filter>Source Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Source Files\Layer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

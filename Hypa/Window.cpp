@@ -31,6 +31,9 @@ namespace Hypa {
 		glfwSetWindowUserPointer(window, this);
 		glfwGetWindowPos(window, &WindowX, &WindowY);
 		glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	}
 
 	std::shared_ptr<Flags> Window::GetFlags() {

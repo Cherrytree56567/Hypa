@@ -5,7 +5,7 @@ namespace Hypa {
 		Events = std::make_shared<EventSystem>();
 		window = std::make_shared<Window>(Events);
 		rAPIsystem = std::make_shared<RenderingAPISystem>();
-		VulkanAPI = std::make_shared<Vulkan>();
+		VulkanAPI = std::make_shared<Vulkan>(window, Events);
 		rAPIsystem->AddAPI(VulkanAPI);
 		rAPIsystem->SwitchRenderingAPI("Vulkan");
 		Layerdispatch = std::make_shared<LayerDispatch>();

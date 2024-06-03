@@ -1,7 +1,32 @@
-﻿  RenderingAPI.cpp
+﻿  App.cpp
 D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'RenderingAPI.cpp')
+  (compiling source file 'App.cpp')
   D:\Hypa\Hypa\base.h(2,1):
   'HYPA_EXPORTS' previously declared on the command line
   
+  Hypa.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Hypa.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Layer.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Layer.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Vulkan.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Vulkan.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Window.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Window.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Generating Code...
   Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll
