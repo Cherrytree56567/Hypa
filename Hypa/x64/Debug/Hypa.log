@@ -1,29 +1,7 @@
-﻿  App.cpp
+﻿  Window.cpp
 D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'App.cpp')
+  (compiling source file 'Window.cpp')
   D:\Hypa\Hypa\base.h(2,1):
   'HYPA_EXPORTS' previously declared on the command line
   
-  Hypa.cpp
-D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'Hypa.cpp')
-  D:\Hypa\Hypa\base.h(2,1):
-  'HYPA_EXPORTS' previously declared on the command line
-  
-  Layer.cpp
-D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'Layer.cpp')
-  D:\Hypa\Hypa\base.h(2,1):
-  'HYPA_EXPORTS' previously declared on the command line
-  
-  Rendering3D.cpp
-D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'Rendering3D.cpp')
-  D:\Hypa\Hypa\base.h(2,1):
-  'HYPA_EXPORTS' previously declared on the command line
-  
-  Generating Code...
-D:\Hypa\Hypa\Layer.cpp(96,1): warning C4715: 'Hypa::LayerDispatch::GetLayer': not all control paths return a value
-     Creating library D:\Hypa\x64\Debug\Hypa.lib and object D:\Hypa\x64\Debug\Hypa.exp
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll

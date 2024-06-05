@@ -21,6 +21,7 @@ namespace Hypa {
 			log.Error("Failed to Initialize GLFW");
 		}
 
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 		if (!window) {
 			glfwTerminate();
@@ -33,7 +34,6 @@ namespace Hypa {
 		glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	}
 
 	std::shared_ptr<Flags> Window::GetFlags() {
