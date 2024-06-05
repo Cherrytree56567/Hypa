@@ -11,6 +11,10 @@ namespace Hypa {
 		HYPA_API virtual void OnDetach() { }
 		HYPA_API virtual void Render() { }
 
+		HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
+		HYPA_API virtual void RemoveShader(std::string name) {}
+		HYPA_API virtual void ChangeShader(std::string name) {}
+
 		HYPA_API virtual const std::string& GetName() const { return name; }
 
 	private:
@@ -20,7 +24,7 @@ namespace Hypa {
 
 	class RenderingAPISystem {
 	public:
-		HYPA_API RenderingAPISystem() {}
+		HYPA_API RenderingAPISystem();
 
 		HYPA_API void AddAPI(std::shared_ptr<RenderingAPI> API);
 		HYPA_API void RemoveAPIByName(const std::string& name);

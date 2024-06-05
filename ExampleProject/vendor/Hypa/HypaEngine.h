@@ -476,100 +476,401 @@ namespace Hypa {
 	* Event System
 	*/
 
-	enum EventType {
-		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
-		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
-		ObjectMoved
-	};
+    enum EventType {
+        None = 0,
+        WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+        AppTick, AppUpdate, AppRender,
+        KeyPressed, KeyReleased,
+        MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+        ObjectMoved
+    };
 
-	class Event {
-	public:
-		HYPA_API virtual ~Event() = default;
+    class Event {
+    public:
+        HYPA_API virtual ~Event() = default;
 
-		bool Handled = false;
+        bool Handled = false;
 
-		HYPA_API virtual EventType GetEventType() = 0;
-	};
+        HYPA_API virtual EventType GetEventType() = 0;
+    };
 
-	class EventSystem {
-	public:
-		HYPA_API EventSystem();
+    class EventSystem {
+    public:
+        HYPA_API EventSystem();
 
-		typedef void (*EventCallback)(std::shared_ptr<Event> events, std::any);
+        typedef void (*EventCallback)(std::shared_ptr<Event> events, std::any);
 
-		HYPA_API void AddEvent(std::shared_ptr<Event> newEvent);
-		HYPA_API std::shared_ptr<Event> GetEvent(EventType eventType);
-		HYPA_API void RemoveHandledEvents();
-		HYPA_API bool isUnhandledEvent(EventType eventType);
-		HYPA_API void ResetEvents() { events.clear(); }
-		HYPA_API void AddEventListener(EventType eventType, EventCallback callback, std::any a = NULL);
-		HYPA_API void RemoveEventListener(EventType eventType, EventCallback callback);
-		HYPA_API void DispatchEvent();
+        HYPA_API void AddEvent(std::shared_ptr<Event> newEvent);
+        HYPA_API std::shared_ptr<Event> GetEvent(EventType eventType);
+        HYPA_API void RemoveHandledEvents();
+        HYPA_API bool isUnhandledEvent(EventType eventType);
+        HYPA_API void ResetEvents() { events.clear(); }
+        HYPA_API void AddEventListener(EventType eventType, EventCallback callback, std::any a = NULL);
+        HYPA_API void RemoveEventListener(EventType eventType, EventCallback callback);
+        HYPA_API void DispatchEvent();
 
 
-	private:
-		std::vector<std::shared_ptr<Event>> events;
-		std::unordered_map<EventType, std::vector<std::pair<EventCallback, std::any>>> eventCallbacks;
-	};
+    private:
+        std::vector<std::shared_ptr<Event>> events;
+        std::unordered_map<EventType, std::vector<std::pair<EventCallback, std::any>>> eventCallbacks;
+    };
+
+    /*
+    * Events
+    */
+
+    class WindowResizeEvent : public Event {
+    public:
+        HYPA_API WindowResizeEvent(unsigned int width, unsigned int height) : m_Width(width), m_Height(height) {}
+
+        HYPA_API unsigned int GetWidth() const { return m_Width; }
+        HYPA_API unsigned int GetHeight() const { return m_Height; }
+
+        HYPA_API EventType GetEventType() override { return EventType::WindowResize; }
+    private:
+        unsigned int m_Width, m_Height;
+    };
+
+    class WindowMoveEvent : public Event {
+    public:
+        HYPA_API WindowMoveEvent(unsigned int x, unsigned int y) : m_x(x), m_y(y) {}
+
+        HYPA_API unsigned int GetWidth() const { return m_x; }
+        HYPA_API unsigned int GetHeight() const { return m_y; }
+        HYPA_API EventType GetEventType() override { return EventType::WindowMoved; }
+    private:
+        unsigned int m_x, m_y;
+    };
+
+    class WindowFocusEvent : public Event {
+    public:
+        HYPA_API WindowFocusEvent(bool isFocused) : m_is_focused(isFocused) {}
+
+        HYPA_API bool IsFocused() const { return m_is_focused; }
+        HYPA_API EventType GetEventType() override { return EventType::WindowFocus; }
+    private:
+        bool m_is_focused;
+    };
+
+    class WindowCloseEvent : public Event {
+    public:
+        HYPA_API WindowCloseEvent() = default;
+
+        HYPA_API EventType GetEventType() override { return EventType::WindowClose; }
+    };
+
+    class AppTickEvent : public Event {
+    public:
+        HYPA_API AppTickEvent() = default;
+
+        HYPA_API EventType GetEventType() override { return EventType::AppTick; }
+    };
+
+    class AppUpdateEvent : public Event {
+    public:
+        HYPA_API AppUpdateEvent() = default;
+
+        HYPA_API EventType GetEventType() override { return EventType::AppUpdate; }
+    };
+
+    class AppRenderEvent : public Event {
+    public:
+        HYPA_API AppRenderEvent() = default;
+
+        HYPA_API EventType GetEventType() override { return EventType::AppRender; }
+    };
+
+    /*
+    * From GLFW.
+    */
+    enum KeyCode {
+        Space = 32,
+        Apostrophe = 39,
+        Comma = 44,
+        Minus = 45,
+        Period = 46,
+        Slash = 47,
+
+        D0 = 48,
+        D1 = 49,
+        D2 = 50,
+        D3 = 51,
+        D4 = 52,
+        D5 = 53,
+        D6 = 54,
+        D7 = 55,
+        D8 = 56,
+        D9 = 57,
+
+        Semicolon = 59,
+        Equal = 61,
+
+        A = 65,
+        B = 66,
+        C = 67,
+        D = 68,
+        E = 69,
+        F = 70,
+        G = 71,
+        H = 72,
+        I = 73,
+        J = 74,
+        K = 75,
+        L = 76,
+        M = 77,
+        N = 78,
+        O = 79,
+        P = 80,
+        Q = 81,
+        R = 82,
+        S = 83,
+        T = 84,
+        U = 85,
+        V = 86,
+        W = 87,
+        X = 88,
+        Y = 89,
+        Z = 90,
+
+        LeftBracket = 91,
+        Backslash = 92,
+        RightBracket = 93,
+        GraveAccent = 96,
+
+        World1 = 161,
+        World2 = 162,
+
+        Escape = 256,
+        Enter = 257,
+        Tab = 258,
+        Backspace = 259,
+        Insert = 260,
+        Delete = 261,
+        Right = 262,
+        Left = 263,
+        Down = 264,
+        Up = 265,
+        PageUp = 266,
+        PageDown = 267,
+        Home = 268,
+        End = 269,
+        CapsLock = 280,
+        ScrollLock = 281,
+        NumLock = 282,
+        PrintScreen = 283,
+        Pause = 284,
+        F1 = 290,
+        F2 = 291,
+        F3 = 292,
+        F4 = 293,
+        F5 = 294,
+        F6 = 295,
+        F7 = 296,
+        F8 = 297,
+        F9 = 298,
+        F10 = 299,
+        F11 = 300,
+        F12 = 301,
+        F13 = 302,
+        F14 = 303,
+        F15 = 304,
+        F16 = 305,
+        F17 = 306,
+        F18 = 307,
+        F19 = 308,
+        F20 = 309,
+        F21 = 310,
+        F22 = 311,
+        F23 = 312,
+        F24 = 313,
+        F25 = 314,
+
+        KP0 = 320,
+        KP1 = 321,
+        KP2 = 322,
+        KP3 = 323,
+        KP4 = 324,
+        KP5 = 325,
+        KP6 = 326,
+        KP7 = 327,
+        KP8 = 328,
+        KP9 = 329,
+        KPDecimal = 330,
+        KPDivide = 331,
+        KPMultiply = 332,
+        KPSubtract = 333,
+        KPAdd = 334,
+        KPEnter = 335,
+        KPEqual = 336,
+
+        LeftShift = 340,
+        LeftControl = 341,
+        LeftAlt = 342,
+        LeftSuper = 343,
+        RightShift = 344,
+        RightControl = 345,
+        RightAlt = 346,
+        RightSuper = 347,
+        Menu = 348
+    };
+
+    class KeyPressedEvent : public Event {
+    public:
+        HYPA_API KeyPressedEvent(const KeyCode keycode) : m_KeyCode(keycode) {}
+
+        HYPA_API KeyCode GetKeyCode() { return m_KeyCode; }
+
+        HYPA_API EventType GetEventType() override { return EventType::KeyPressed; }
+    private:
+        KeyCode m_KeyCode;
+    };
+
+    class KeyReleasedEvent : public Event {
+    public:
+        HYPA_API KeyReleasedEvent(const KeyCode keycode) : m_KeyCode(keycode) {}
+
+        HYPA_API KeyCode GetKeyCode() { return m_KeyCode; }
+
+        HYPA_API EventType GetEventType() override { return EventType::KeyReleased; }
+    private:
+        KeyCode m_KeyCode;
+    };
+
+    enum MouseCode {
+        Button1 = 0,
+        Button2 = 1,
+        Button3 = 2,
+        Button4 = 3,
+        Button5 = 4,
+        Button6 = 5,
+        Button7 = 6,
+        Button8 = 7,
+
+        ButtonLast = Button8,
+        ButtonLeft = Button1,
+        ButtonRight = Button2,
+        ButtonMiddle = Button3
+    };
+
+    class MouseMovedEvent : public Event {
+    public:
+        HYPA_API MouseMovedEvent(const float x, const float y) : m_MouseX(x), m_MouseY(y) {}
+
+        HYPA_API float GetX() const { return m_MouseX; }
+        HYPA_API float GetY() const { return m_MouseY; }
+
+        HYPA_API EventType GetEventType() override { return EventType::MouseMoved; }
+    private:
+        float m_MouseX, m_MouseY;
+    };
+
+    class MouseScrolledEvent : public Event {
+    public:
+        HYPA_API MouseScrolledEvent(const float xOffset, const float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) {}
+
+        HYPA_API float GetXOffset() const { return m_XOffset; }
+        HYPA_API float GetYOffset() const { return m_YOffset; }
+
+        HYPA_API EventType GetEventType() override { return EventType::MouseScrolled; }
+    private:
+        float m_XOffset, m_YOffset;
+    };
+
+    class MouseButtonPressedEvent : public Event {
+    public:
+        HYPA_API MouseButtonPressedEvent(const MouseCode button) : m_Button(button) {}
+
+        HYPA_API MouseCode GetMouseButton() const { return m_Button; }
+
+        HYPA_API EventType GetEventType() override { return EventType::MouseButtonPressed; }
+    private:
+        MouseCode m_Button;
+    };
+
+    class MouseButtonReleasedEvent : public Event {
+    public:
+        HYPA_API MouseButtonReleasedEvent(const MouseCode button) : m_Button(button) {}
+
+        HYPA_API MouseCode GetMouseButton() const { return m_Button; }
+
+        HYPA_API EventType GetEventType() override { return EventType::MouseButtonReleased; }
+    private:
+        MouseCode m_Button;
+    };
 
 	/*
 	* RenderingAPI
 	*/
-	class RenderingAPI {
-	public:
-		HYPA_API RenderingAPI() {}
 
-		HYPA_API virtual void OnAttach() { }
-		HYPA_API virtual void OnDetach() { }
-		HYPA_API virtual void Render() { }
+    class RenderingAPI {
+    public:
+        HYPA_API RenderingAPI() {}
 
-		HYPA_API virtual const std::string& GetName() const { return name; }
+        HYPA_API virtual void OnAttach() { }
+        HYPA_API virtual void OnDetach() { }
+        HYPA_API virtual void Render() { }
 
-	private:
-		Flags flags;
-		std::string name;
-	};
+        HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
+        HYPA_API virtual void RemoveShader(std::string name) {}
+        HYPA_API virtual void ChangeShader(std::string name) {}
 
-	class RenderingAPISystem {
-	public:
-		HYPA_API RenderingAPISystem() {}
+        HYPA_API virtual const std::string& GetName() const { return name; }
 
-		HYPA_API void AddAPI(std::shared_ptr<RenderingAPI> API);
-		HYPA_API void RemoveAPIByName(const std::string& name);
+    private:
+        Flags flags;
+        std::string name;
+    };
 
-	private:
-		std::vector<std::shared_ptr<RenderingAPI>> renderingAPIS;
-	};
+    class RenderingAPISystem {
+    public:
+        HYPA_API RenderingAPISystem();
+
+        HYPA_API void AddAPI(std::shared_ptr<RenderingAPI> API);
+        HYPA_API void RemoveAPIByName(const std::string& name);
+        HYPA_API std::shared_ptr<RenderingAPI> GetCurrentRenderingAPI();
+        HYPA_API void SwitchRenderingAPI(std::string name);
+        HYPA_API std::string GetCurrentRenderingAPIName();
+
+    private:
+        std::vector<std::shared_ptr<RenderingAPI>> renderingAPIS;
+        std::string CurrentRenderingAPI;
+    };
 
 	/*
 	* Window
 	*/
 
-	class Window {
-	public:
-		HYPA_API Window(std::shared_ptr<EventSystem> EvSys);
+    class Window {
+    public:
+        HYPA_API Window(std::shared_ptr<EventSystem> EvSys);
 
-		HYPA_API GLFWwindow* GetWindow();
+        HYPA_API GLFWwindow* GetWindow();
 
-		HYPA_API void Update();
-		HYPA_API void ProcessEvents();
-		HYPA_API bool shouldClose();
-		HYPA_API std::shared_ptr<Flags> GetFlags();
+        HYPA_API void Update();
+        HYPA_API void ProcessEvents();
+        HYPA_API bool shouldClose();
+        HYPA_API std::shared_ptr<Flags> GetFlags();
 
-	private:
-		int width = 800;
-		int height = 600;
-		std::string title = "New Hypa Game";
-		int WindowX = 100;
-		int WindowY = 100;
-		GLFWwindow* window;
-		Logging log;
-		std::shared_ptr<Flags> flags = std::make_shared<Flags>();
-		std::shared_ptr<EventSystem> Events = NULL;
-	};
+    private:
+        int width = 800;
+        int height = 600;
+        std::string title = "New Hypa Game";
+        int WindowX = 100;
+        int WindowY = 100;
+        GLFWwindow* window;
+        Logging log;
+        std::shared_ptr<Flags> flags = std::make_shared<Flags>();
+        std::shared_ptr<EventSystem> Events = NULL;
+
+        std::vector<int> key_codes;
+        std::vector<int> keyRel_codes;
+        bool wasLeftMouseButtonPressed = false;
+        bool wasRightMouseButtonPressed = false;
+        double lastMouseX = 0.0;
+        double lastMouseY = 0.0;
+        double lastSMouseX = 0.0;
+        double lastSMouseY = 0.0;
+    };
 
     /*
     * Layer
@@ -644,6 +945,10 @@ namespace Hypa {
 
         HYPA_API const std::string& GetName() const override;
         HYPA_API void resize_framebuffer(bool tof);
+        HYPA_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
+        HYPA_API std::pair<VkShaderModule, VkShaderModule> GetShader(std::string name);
+        HYPA_API void RemoveShader(std::string name) override;
+        HYPA_API void ChangeShader(std::string name);
 
     private:
 
@@ -667,7 +972,7 @@ namespace Hypa {
         void createLogicalDevice();
         void createSwapChain();
         void createImageViews();
-        VkPipeline createGraphicsPipeline(const char* fname, const char* fgname, VkViewport viewport);
+        VkPipeline createGraphicsPipeline(VkViewport viewport);
         void createRenderPass();
         void createFramebuffers();
         void createCommandPool();
@@ -679,9 +984,13 @@ namespace Hypa {
 
         Flags flags;
         std::string name;
+        std::string CurrentShaderName = "Default";
         Logging log;
+        bool ShaderChanged = false;
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
+        std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
+
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
@@ -710,7 +1019,7 @@ namespace Hypa {
         const uint32_t HEIGHT = 600;
         const std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
-        };
+    };
         const std::vector<const char*> deviceExtensions = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };

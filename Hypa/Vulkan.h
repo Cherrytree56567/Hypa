@@ -61,6 +61,10 @@ namespace Hypa {
 
 		HYPA_API const std::string& GetName() const override;
         HYPA_API void resize_framebuffer(bool tof);
+        HYPA_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
+        HYPA_API std::pair<VkShaderModule, VkShaderModule> GetShader(std::string name);
+        HYPA_API void RemoveShader(std::string name) override;
+        HYPA_API void ChangeShader(std::string name) override;
 
 	private:
 
@@ -84,7 +88,7 @@ namespace Hypa {
         void createLogicalDevice();
         void createSwapChain();
         void createImageViews();
-        VkPipeline createGraphicsPipeline(const char* fname, const char* fgname, VkViewport viewport);
+        VkPipeline createGraphicsPipeline(VkViewport viewport);
         void createRenderPass();
         void createFramebuffers();
         void createCommandPool();
@@ -96,9 +100,13 @@ namespace Hypa {
 
 		Flags flags;
 		std::string name;
+        std::string CurrentShaderName = "Default";
         Logging log;
+        bool ShaderChanged = false;
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
+        std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
+
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;

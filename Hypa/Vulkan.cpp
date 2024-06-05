@@ -641,6 +641,24 @@ namespace Hypa {
         }
     }
 
+    void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
+        Shaders.insert(std::make_pair(name, Create_VulkanShader(VertShaderPath.c_str(), FragShaderPath.c_str())));
+    }
+
+    void Vulkan::RemoveShader(std::string name) {
+        auto it = Shaders.find(name);
+        if (it != Shaders.end()) {
+            Shaders.erase(it);
+        }
+        else {
+            std::cout << name << " not found in the map." << std::endl;
+        }
+    }
+
+    std::pair<VkShaderModule, VkShaderModule> Vulkan::GetShader(std::string name) {
+        return Shaders[name];
+    }
+
     std::pair<VkShaderModule, VkShaderModule> Vulkan::Create_VulkanShader(const char* fname, const char* fgname) {
 
         std::ifstream file(fname, std::ios::ate | std::ios::binary);
@@ -694,8 +712,13 @@ namespace Hypa {
         return std::make_pair(vertShader, fragShader);
     }
 
-    VkPipeline Vulkan::createGraphicsPipeline(const char* fname, const char* fgname, VkViewport viewport) {
-        std::pair<VkShaderModule, VkShaderModule> ShaderModule = Create_VulkanShader(fname, fgname);
+    void Vulkan::ChangeShader(std::string name) {
+        CurrentShaderName = name;
+        ShaderChanged = true;
+    }
+
+    VkPipeline Vulkan::createGraphicsPipeline(VkViewport viewport) {
+        std::pair<VkShaderModule, VkShaderModule> ShaderModule = GetShader(CurrentShaderName);
 
         VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -802,9 +825,6 @@ namespace Hypa {
             switchError(a);
             throw std::runtime_error("[Hypa::Core::Vulkan] Error: Failed to create graphics pipeline!");
         }
-
-        vkDestroyShaderModule(device, ShaderModule.first, nullptr);
-        vkDestroyShaderModule(device, ShaderModule.second, nullptr);
 
         return graphicsPipelinaae;
     }
@@ -1099,7 +1119,9 @@ namespace Hypa {
         createSwapChain();
         createImageViews();
         createRenderPass();
-        DefaultgraphicsPipeline = createGraphicsPipeline("vert.spv", "frag.spv", viewport);
+        CreateShader("Default", "vert.spv", "frag.spv");
+        ChangeShader("Default");
+        DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
         createFramebuffers();
         createCommandPool();
         createCommandBuffers();
@@ -1125,79 +1147,23 @@ namespace Hypa {
         glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 cameraPosition = glm::inverse(viewMatrix)[3];
 
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float)swapChainExtent.width;
+        viewport.height = (float)swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        if (ShaderChanged) {
+            DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
+            ShaderChanged = false;
+        }
+        createFramebuffers();
+        createCommandPool();
+        createCommandBuffers();
+        createSyncObjects();
+
         drawFrame();
-
-        // Pass ProjectionMatrix, ViewMatrix and CameraPosition to Vulkan Shader
-
-        // Pass Lights and Number of Lights to Vulkan Shader
-
-        // Set the uniform values for the number of lights
-
-        // Loop through each light in the array
-        /*for (size_t i = 0; i < Lights.size(); ++i) {
-            std::string lightPrefix = "lights[" + std::to_string(i) + "]";
-            // Set its values
-        }
-        for (const auto& obje : Objects) {
-            if (obje.hide) {
-                continue;
-            }
-            else {
-                // Look at Object struct in RenderingLayer.h
-                if (false) { // If Default Vulkan shader is not equal to Vulkan Shader Inside "obje"
-
-                    // Set Vulkan Shader inside of "obje" as current usable one
-
-                    // Pass ProjectionMatrix, ViewMatrix and CameraPosition to Vulkan Shader
-
-                    // Pass Lights and Number of Lights to Vulkan Shader inside of "obje"
-
-                    // Set the uniform values for the number of lights to Vulkan Shader inside of "obje"
-
-                    // Loop through each light in the array
-                    for (size_t i = 0; i < Lights.size(); ++i) {
-                        std::string lightPrefix = "lights[" + std::to_string(i) + "]";
-                        // Set its values to Vulkan Shader inside of "obje"
-                    }
-
-                    // If Skybox is True
-                    if (obje.name == "Skybox") {
-                        // Pass true to Skybox Value in Vulkan Shader inside of "obje"
-                    }
-                    else {
-                        // Pass false to Skybox Value in Vulkan Shader inside of "obje"
-                    }
-                    if (Lighting == false) {
-                        // Pass true to Skybox Value in Vulkan Shader inside of "obje"
-                    }
-                    // Convert OpenGL Texture to Vulkan Texture
-
-                    // Pass Vulkan Texture to Vulkan Shader inside of "obje"
-
-                    // Pass Vulkan Shader the ModelMatrix inside "obje"
-                }
-                else {
-                    // If Skybox is True
-                    if (obje.name == "Skybox") {
-                        // Pass true to Skybox Value in Vulkan Shader
-                    }
-                    else {
-                        // Pass false to Skybox Value in Vulkan Shader
-                    }
-                    if (Lighting == false) {
-                        // Pass true to Skybox Value in Vulkan Shader
-                    }
-                    // Convert OpenGL Texture to Vulkan Texture
-
-                    // Pass Vulkan Texture to Vulkan Shader
-
-                    // Pass Vulkan Shader the ModelMatrix
-                }
-            }
-            // Bind Vertex Array inside of "obje"
-            // Draw Vertexs
-        }
-
-        // Disable Face Culling*/
     }
 }

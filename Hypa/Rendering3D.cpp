@@ -5,12 +5,11 @@ namespace Hypa {
 
 	}
 
-	Rendering3D::Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("3DLayer"), pWindow(window), rAPISystem(rAPIsys) {
+	Rendering3D::Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("3DLayer"), pWindow(window), rAPISystem(rAPIsys), show(true) {
 
 	}
 
 	void Rendering3D::OnAttach() {
-
 	}
 
 	void Rendering3D::OnDetach() {
@@ -18,7 +17,7 @@ namespace Hypa {
 	}
 
 	void Rendering3D::Render() {
-
+		rAPISystem->GetCurrentRenderingAPI()->Render();
 	}
 
 	bool Rendering3D::IsShown() const {

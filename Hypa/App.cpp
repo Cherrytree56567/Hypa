@@ -22,6 +22,7 @@ namespace Hypa {
 		Events->AddEvent(std::make_shared<AppUpdateEvent>());
 		Events->DispatchEvent();
 		window->ProcessEvents();
+		Layerdispatch->DispatchLayerRender();
 		Events->AddEvent(std::make_shared<AppRenderEvent>());
 		return !window->shouldClose();
 	}

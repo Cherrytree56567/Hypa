@@ -1,9 +1,12 @@
 #include "RenderingAPI.h"
 
 namespace Hypa {
+    RenderingAPISystem::RenderingAPISystem() {
+        CurrentRenderingAPI = "NONE";
+    }
+
     void RenderingAPISystem::AddAPI(std::shared_ptr<RenderingAPI> API) {
         renderingAPIS.push_back(API);
-        CurrentRenderingAPI = "NONE";
     }
 
     void RenderingAPISystem::RemoveAPIByName(const std::string& name) {
