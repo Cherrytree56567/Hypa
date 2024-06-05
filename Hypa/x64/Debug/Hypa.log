@@ -1,7 +1,1 @@
-﻿  Window.cpp
-D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'Window.cpp')
-  D:\Hypa\Hypa\base.h(2,1):
-  'HYPA_EXPORTS' previously declared on the command line
-  
-  Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll
+﻿  Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll
