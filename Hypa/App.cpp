@@ -35,4 +35,8 @@ namespace Hypa {
 	std::shared_ptr<RenderingAPISystem> App::GetRenderingAPISystem() {
 		return rAPIsystem;
 	}
+
+	std::shared_ptr<LayerDispatch> App::GetLayerDispatch() {
+		return Layerdispatch;
+	}
 }

@@ -5,13 +5,14 @@
 #include <algorithm>
 #include "base.h"
 #include "Window.h"
+#include "RenderingAPI.h"
 
 namespace Hypa {
     class Layer {
     public:
         HYPA_API Layer() {}
 
-        HYPA_API Layer(std::shared_ptr<Window> window) : name("Layer"), pWindow(window) {}
+        HYPA_API Layer(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("Layer"), pWindow(window), rAPISystem(rAPIsys) {}
 
         HYPA_API virtual ~Layer() = default;
         HYPA_API virtual void OnAttach() { }
@@ -25,6 +26,7 @@ namespace Hypa {
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
+        std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
     };
 
     class LayerDispatch {
