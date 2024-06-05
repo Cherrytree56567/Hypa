@@ -8,13 +8,13 @@ namespace Hypa {
         HYPA_API Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys);
 
         HYPA_API virtual ~Rendering3D() override;
-        HYPA_API virtual void OnAttach() override { }
-        HYPA_API virtual void OnDetach() override { }
-        HYPA_API virtual void Render() override { }
+        HYPA_API virtual void OnAttach() override;
+        HYPA_API virtual void OnDetach() override;
+        HYPA_API virtual void Render() override;
 
-        HYPA_API virtual bool IsShown() const override { return show; }
-        HYPA_API virtual const std::string& GetName() const override { return name; }
-        HYPA_API virtual void SetShow(bool value) override { show = value; }
+        HYPA_API virtual bool IsShown() const override;
+        HYPA_API virtual const std::string& GetName() const override;
+        HYPA_API virtual void SetShow(bool value) override;
     private:
         bool show = false;
         std::string name;

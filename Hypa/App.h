@@ -3,6 +3,7 @@
 #include "RenderingAPI.h"
 #include "Vulkan.h"
 #include "Layer.h"
+#include "Rendering3D.h"
 
 namespace Hypa {
 	class App {
@@ -22,5 +23,6 @@ namespace Hypa {
 		std::shared_ptr<RenderingAPISystem> rAPIsystem;
 		std::shared_ptr<Vulkan> VulkanAPI;
 		std::shared_ptr<LayerDispatch> Layerdispatch;
+		std::shared_ptr<Rendering3D> Rendering3d;
 	};
 }

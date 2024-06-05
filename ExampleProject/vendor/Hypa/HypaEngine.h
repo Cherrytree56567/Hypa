@@ -572,6 +572,50 @@ namespace Hypa {
 	};
 
     /*
+    * Layer
+    */
+
+    class Layer {
+    public:
+        HYPA_API Layer() {}
+
+        HYPA_API Layer(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("Layer"), pWindow(window), rAPISystem(rAPIsys) {}
+
+        HYPA_API virtual ~Layer() = default;
+        HYPA_API virtual void OnAttach() { }
+        HYPA_API virtual void OnDetach() { }
+        HYPA_API virtual void Render() { }
+
+        HYPA_API virtual bool IsShown() const { return show; }
+        HYPA_API virtual const std::string& GetName() const { return name; }
+        HYPA_API virtual void SetShow(bool value) { show = value; }
+    private:
+        bool show = false;
+        std::string name;
+        std::shared_ptr<Window> pWindow = NULL;
+        std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+    };
+
+    class LayerDispatch {
+    public:
+        HYPA_API void AddLayer(std::shared_ptr<Layer> layer);
+        HYPA_API void RemoveLayerByName(const std::string& name);
+        HYPA_API void ShowHideLayerByName(const std::string& name, bool show);
+        HYPA_API std::shared_ptr<Layer> GetLayer(const std::string& name);
+        HYPA_API void PushFront(const std::string& name);
+        HYPA_API void PushForward(const std::string& name);
+        HYPA_API void PushBack(const std::string& name);
+        HYPA_API void PushBackward(const std::string& name);
+
+        HYPA_API void DispatchLayerRender();
+        HYPA_API void DispatchLayerDetach();
+        HYPA_API void DispatchLayerAttach();
+
+    private:
+        std::vector<std::shared_ptr<Layer>> layers;
+    };
+
+    /*
     * Vulkan
     */
 
@@ -678,23 +722,50 @@ namespace Hypa {
 #endif
     };
 
+    /*
+    * Rendering3D
+    */
+
+    class Rendering3D : public Layer {
+    public:
+        HYPA_API Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys);
+
+        HYPA_API virtual ~Rendering3D() override;
+        HYPA_API virtual void OnAttach() override;
+        HYPA_API virtual void OnDetach() override;
+        HYPA_API virtual void Render() override;
+
+        HYPA_API virtual bool IsShown() const override;
+        HYPA_API virtual const std::string& GetName() const override;
+        HYPA_API virtual void SetShow(bool value) override;
+    private:
+        bool show = false;
+        std::string name;
+        std::shared_ptr<Window> pWindow = NULL;
+        std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+    };
+
 	/*
 	* App
 	*/
 
-	class App {
-	public:
-		HYPA_API App();
+    class App {
+    public:
+        HYPA_API App();
 
-		HYPA_API bool Update();
+        HYPA_API bool Update();
 
-		HYPA_API std::shared_ptr<Window> GetWindow();
-		HYPA_API std::shared_ptr<EventSystem> GetEventSystem();
-		HYPA_API std::shared_ptr<RenderingAPISystem> GetRenderingAPISystem();
+        HYPA_API std::shared_ptr<Window> GetWindow();
+        HYPA_API std::shared_ptr<EventSystem> GetEventSystem();
+        HYPA_API std::shared_ptr<RenderingAPISystem> GetRenderingAPISystem();
+        HYPA_API std::shared_ptr<LayerDispatch> GetLayerDispatch();
 
-	private:
-		std::shared_ptr<Window> window;
-		std::shared_ptr<EventSystem> Events;
-		std::shared_ptr<RenderingAPISystem> rAPIsystem;
-	};
+    private:
+        std::shared_ptr<Window> window;
+        std::shared_ptr<EventSystem> Events;
+        std::shared_ptr<RenderingAPISystem> rAPIsystem;
+        std::shared_ptr<Vulkan> VulkanAPI;
+        std::shared_ptr<LayerDispatch> Layerdispatch;
+        std::shared_ptr<Rendering3D> Rendering3d;
+    };
 }

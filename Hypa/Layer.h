@@ -34,6 +34,7 @@ namespace Hypa {
         HYPA_API void AddLayer(std::shared_ptr<Layer> layer);
         HYPA_API void RemoveLayerByName(const std::string& name);
         HYPA_API void ShowHideLayerByName(const std::string& name, bool show);
+        HYPA_API std::shared_ptr<Layer> GetLayer(const std::string& name);
         HYPA_API void PushFront(const std::string& name);
         HYPA_API void PushForward(const std::string& name);
         HYPA_API void PushBack(const std::string& name);

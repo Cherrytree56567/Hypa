@@ -9,6 +9,8 @@ namespace Hypa {
 		rAPIsystem->AddAPI(VulkanAPI);
 		rAPIsystem->SwitchRenderingAPI("Vulkan");
 		Layerdispatch = std::make_shared<LayerDispatch>();
+		Rendering3d = std::make_shared<Rendering3D>(window, rAPIsystem);
+		Layerdispatch->AddLayer(Rendering3d);
 
 		Layerdispatch->DispatchLayerAttach();
 	}

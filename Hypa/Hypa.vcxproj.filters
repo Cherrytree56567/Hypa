@@ -46,6 +46,9 @@
     <Filter Include="Source Files\Layer">
       <UniqueIdentifier>{3ed23183-521a-45e8-be90-2e2849c1b57b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Rendering3D">
+      <UniqueIdentifier>{3a15d325-c354-4f0b-ba39-d35671b53193}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -77,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="Layer.cpp">
       <Filter>Source Files\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering3D.cpp">
+      <Filter>Source Files\Rendering3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="Layer.h">
       <Filter>Source Files\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering3D.h">
+      <Filter>Source Files\Rendering3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

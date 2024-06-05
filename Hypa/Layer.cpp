@@ -86,4 +86,12 @@ namespace Hypa {
             std::iter_swap(it, std::prev(it));
         }
     }
+
+    std::shared_ptr<Layer> LayerDispatch::GetLayer(const std::string& name) {
+        for (const auto& layer : layers) {
+            if (layer->GetName() == name) {
+                return layer;
+            }
+        }
+    }
 }
