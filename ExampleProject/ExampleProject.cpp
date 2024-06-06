@@ -10,7 +10,6 @@ int main() {
 	app.GetWindow()->GetFlags()->ChangeFlag("Height", 400);
 
 	app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->CreateShader("NewShader", "NewVert.spv", "NewFrag.spv");
-	app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->ChangeShader("Default");
 
 	while (app.Update()) {
 		if (app.GetEventSystem()->isUnhandledEvent(Hypa::EventType::WindowMoved)) { ALT = true; }
