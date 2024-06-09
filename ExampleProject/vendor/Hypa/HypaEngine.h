@@ -12,6 +12,8 @@
 #include <variant>
 #include <any>
 #include <optional>
+#include <array>
+#include <glm/glm.hpp>
 #define VK_DEFINE_HANDLE(object) typedef struct object##_T* object;
 #define VK_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef struct object##_T *object;
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSwapchainKHR)
@@ -52,18 +54,6 @@ VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkDescriptorPool)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkFramebuffer)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkCommandPool)
 
-typedef struct VkVertexInputBindingDescription {
-    uint32_t             binding;
-    uint32_t             stride;
-    VkVertexInputRate    inputRate;
-} VkVertexInputBindingDescription;
-
-typedef struct VkVertexInputAttributeDescription {
-    uint32_t    location;
-    uint32_t    binding;
-    VkFormat    format;
-    uint32_t    offset;
-} VkVertexInputAttributeDescription;
 #define VK_KHR_SWAPCHAIN_EXTENSION_NAME   "VK_KHR_swapchain"
 #define VK_NULL_HANDLE nullptr
 
@@ -448,6 +438,25 @@ typedef enum VkPresentModeKHR {
     VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR = 1000111001,
     VK_PRESENT_MODE_MAX_ENUM_KHR = 0x7FFFFFFF
 } VkPresentModeKHR;
+
+typedef enum VkVertexInputRate {
+    VK_VERTEX_INPUT_RATE_VERTEX = 0,
+    VK_VERTEX_INPUT_RATE_INSTANCE = 1,
+    VK_VERTEX_INPUT_RATE_MAX_ENUM = 0x7FFFFFFF
+} VkVertexInputRate;
+
+typedef struct VkVertexInputBindingDescription {
+    uint32_t             binding;
+    uint32_t             stride;
+    VkVertexInputRate    inputRate;
+} VkVertexInputBindingDescription;
+
+typedef struct VkVertexInputAttributeDescription {
+    uint32_t    location;
+    uint32_t    binding;
+    VkFormat    format;
+    uint32_t    offset;
+} VkVertexInputAttributeDescription;
 
 typedef struct GLFWwindow GLFWwindow;
 
