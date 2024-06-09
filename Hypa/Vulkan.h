@@ -37,7 +37,7 @@
 
 namespace Hypa {
     struct Vertex {
-        glm::vec2 pos;
+        glm::vec3 pos;
         glm::vec3 color;
 
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -110,6 +110,7 @@ namespace Hypa {
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
+        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
         void createInstance();
         void setupDebugMessenger();
@@ -127,6 +128,7 @@ namespace Hypa {
         void drawFrame();
         void cleanupSwapChain();
         void recreateSwapChain();
+        void createVertexBuffer(std::vector<Vertex> vertices);
 
 		Flags flags;
 		std::string name;
@@ -137,10 +139,18 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
+        const std::vector<Vertex> vertices = {
+            {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+        };
+
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
+        VkBuffer vertexBuffer;
+        VkDeviceMemory vertexBufferMemory;
         VkSurfaceKHR surface;
         VkQueue presentQueue;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;

@@ -63,6 +63,7 @@ typedef struct VkExtent2D {
 } VkExtent2D;
 
 typedef uint32_t VkFlags;
+typedef VkFlags VkMemoryPropertyFlags;
 typedef VkFlags VkImageUsageFlags;
 
 typedef enum VkSurfaceTransformFlagBitsKHR {
@@ -943,7 +944,7 @@ namespace Hypa {
     */
 
     struct Vertex {
-        glm::vec2 pos;
+        glm::vec3 pos;
         glm::vec3 color;
 
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -1000,7 +1001,7 @@ namespace Hypa {
         HYPA_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
         HYPA_API std::pair<VkShaderModule, VkShaderModule> GetShader(std::string name);
         HYPA_API void RemoveShader(std::string name) override;
-        HYPA_API void ChangeShader(std::string name);
+        HYPA_API void ChangeShader(std::string name) override;
 
     private:
 
@@ -1016,6 +1017,7 @@ namespace Hypa {
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
+        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
         void createInstance();
         void setupDebugMessenger();
@@ -1033,6 +1035,7 @@ namespace Hypa {
         void drawFrame();
         void cleanupSwapChain();
         void recreateSwapChain();
+        void createVertexBuffer(std::vector<Vertex> vertices);
 
         Flags flags;
         std::string name;
@@ -1043,10 +1046,18 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
+        const std::vector<Vertex> vertices = {
+            {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+        };
+
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
+        VkBuffer vertexBuffer;
+        VkDeviceMemory vertexBufferMemory;
         VkSurfaceKHR surface;
         VkQueue presentQueue;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -1071,7 +1082,7 @@ namespace Hypa {
         const uint32_t HEIGHT = 600;
         const std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
-    };
+        };
         const std::vector<const char*> deviceExtensions = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
