@@ -1,6 +1,11 @@
 #pragma once
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <chrono>
 #include "base.h"
 #include "Window.h"
 #include "RenderingAPI.h"
@@ -75,6 +80,12 @@ namespace Hypa {
         }
     };
 
+    struct UniformBufferObject {
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 proj;
+    };
+
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
@@ -111,6 +122,9 @@ namespace Hypa {
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        void updateUniformBuffer(uint32_t currentImage);
+        void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+        void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
         void createInstance();
         void setupDebugMessenger();
@@ -129,9 +143,9 @@ namespace Hypa {
         void cleanupSwapChain();
         void recreateSwapChain();
         void createVertexBuffer(std::vector<Vertex> vertices);
-        void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-        void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         void createIndexBuffer();
+        void createDescriptorSetLayout();
+        void createUniformBuffers();
 
 		Flags flags;
 		std::string name;
@@ -161,6 +175,10 @@ namespace Hypa {
         VkDeviceMemory vertexBufferMemory;
         VkBuffer indexBuffer;
         VkDeviceMemory indexBufferMemory;
+
+        std::vector<VkBuffer> uniformBuffers;
+        std::vector<VkDeviceMemory> uniformBuffersMemory;
+        std::vector<void*> uniformBuffersMapped;
         VkSurfaceKHR surface;
         VkQueue presentQueue;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -170,6 +188,7 @@ namespace Hypa {
         VkExtent2D swapChainExtent;
         std::vector<VkImageView> swapChainImageViews;
         VkRenderPass renderPass;
+        VkDescriptorSetLayout descriptorSetLayout;
         VkPipelineLayout pipelineLayout;
         VkPipeline DefaultgraphicsPipeline;
         std::vector<VkFramebuffer> swapChainFramebuffers;
