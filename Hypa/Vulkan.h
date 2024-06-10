@@ -146,6 +146,8 @@ namespace Hypa {
         void createIndexBuffer();
         void createDescriptorSetLayout();
         void createUniformBuffers();
+        void createDescriptorPool();
+        void createDescriptorSets();
 
 		Flags flags;
 		std::string name;
@@ -188,6 +190,8 @@ namespace Hypa {
         VkExtent2D swapChainExtent;
         std::vector<VkImageView> swapChainImageViews;
         VkRenderPass renderPass;
+        VkDescriptorPool descriptorPool;
+        std::vector<VkDescriptorSet> descriptorSets;
         VkDescriptorSetLayout descriptorSetLayout;
         VkPipelineLayout pipelineLayout;
         VkPipeline DefaultgraphicsPipeline;
