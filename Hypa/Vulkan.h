@@ -129,6 +129,9 @@ namespace Hypa {
         void cleanupSwapChain();
         void recreateSwapChain();
         void createVertexBuffer(std::vector<Vertex> vertices);
+        void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+        void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        void createIndexBuffer();
 
 		Flags flags;
 		std::string name;
@@ -140,9 +143,14 @@ namespace Hypa {
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
         const std::vector<Vertex> vertices = {
-            {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+        };
+
+        const std::vector<uint16_t> indices = {
+            0, 1, 2, 2, 3, 0
         };
 
         VkInstance instance;
@@ -151,6 +159,8 @@ namespace Hypa {
         VkQueue graphicsQueue;
         VkBuffer vertexBuffer;
         VkDeviceMemory vertexBufferMemory;
+        VkBuffer indexBuffer;
+        VkDeviceMemory indexBufferMemory;
         VkSurfaceKHR surface;
         VkQueue presentQueue;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
