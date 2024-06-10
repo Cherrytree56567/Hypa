@@ -65,6 +65,8 @@ typedef struct VkExtent2D {
 typedef uint32_t VkFlags;
 typedef VkFlags VkMemoryPropertyFlags;
 typedef VkFlags VkImageUsageFlags;
+typedef uint64_t VkDeviceSize;
+typedef VkFlags VkBufferUsageFlags;
 
 typedef enum VkSurfaceTransformFlagBitsKHR {
     VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR = 0x00000001,
@@ -982,6 +984,12 @@ namespace Hypa {
         }
     };
 
+    struct UniformBufferObject {
+        alignas(16) glm::mat4 model;
+        alignas(16) glm::mat4 view;
+        alignas(16) glm::mat4 proj;
+    };
+
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
@@ -1018,6 +1026,9 @@ namespace Hypa {
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        void updateUniformBuffer(uint32_t currentImage);
+        void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+        void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
         void createInstance();
         void setupDebugMessenger();
@@ -1036,6 +1047,11 @@ namespace Hypa {
         void cleanupSwapChain();
         void recreateSwapChain();
         void createVertexBuffer(std::vector<Vertex> vertices);
+        void createIndexBuffer();
+        void createDescriptorSetLayout();
+        void createUniformBuffers();
+        void createDescriptorPool();
+        void createDescriptorSets();
 
         Flags flags;
         std::string name;
@@ -1047,9 +1063,14 @@ namespace Hypa {
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
         const std::vector<Vertex> vertices = {
-            {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+        };
+
+        const std::vector<uint16_t> indices = {
+            0, 1, 2, 2, 3, 0
         };
 
         VkInstance instance;
@@ -1058,6 +1079,12 @@ namespace Hypa {
         VkQueue graphicsQueue;
         VkBuffer vertexBuffer;
         VkDeviceMemory vertexBufferMemory;
+        VkBuffer indexBuffer;
+        VkDeviceMemory indexBufferMemory;
+
+        std::vector<VkBuffer> uniformBuffers;
+        std::vector<VkDeviceMemory> uniformBuffersMemory;
+        std::vector<void*> uniformBuffersMapped;
         VkSurfaceKHR surface;
         VkQueue presentQueue;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -1067,6 +1094,9 @@ namespace Hypa {
         VkExtent2D swapChainExtent;
         std::vector<VkImageView> swapChainImageViews;
         VkRenderPass renderPass;
+        VkDescriptorPool descriptorPool;
+        std::vector<VkDescriptorSet> descriptorSets;
+        VkDescriptorSetLayout descriptorSetLayout;
         VkPipelineLayout pipelineLayout;
         VkPipeline DefaultgraphicsPipeline;
         std::vector<VkFramebuffer> swapChainFramebuffers;
