@@ -5,6 +5,27 @@
 int main() {
 	Hypa::App app;
 	bool ALT = false;
+    const std::vector<Hypa::Vertex> Squarevertices = {
+            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+    };
+
+    const std::vector<uint16_t> Squareindices = {
+        0, 1, 2, 2, 3, 0
+    };
+
+    const std::vector<Hypa::Vertex> Squareavertices = {
+        {{-0.5f, -0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+    };
+
+    const std::vector<uint16_t> Squareaindices = {
+        0, 1, 2, 2, 3, 0
+    };
 
 	app.GetWindow()->GetFlags()->ChangeFlag("Width", 800);
 	app.GetWindow()->GetFlags()->ChangeFlag("Height", 400);
@@ -18,5 +39,7 @@ int main() {
 			app.GetWindow()->GetFlags()->ChangeFlag("Height", std::get<int>(app.GetWindow()->GetFlags()->GetFlag("Height")) + 100);
 			app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->ChangeShader("NewShader");
 		}
+        app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squarevertices, Squareindices);
+        app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squareavertices, Squareaindices);
 	}
 }

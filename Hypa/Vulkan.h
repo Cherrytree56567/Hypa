@@ -41,10 +41,6 @@
     } while (0)
 
 namespace Hypa {
-    struct Vertex {
-        glm::vec3 pos;
-        glm::vec3 color;
-    };
 
     struct QueueFamilyIndices {
         std::optional<uint32_t> graphicsFamily;
@@ -82,7 +78,7 @@ namespace Hypa {
         HYPA_API void RemoveShader(std::string name) override;
         HYPA_API void ChangeShader(std::string name) override;
 
-        HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+        HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
 	private:
 
@@ -158,28 +154,6 @@ namespace Hypa {
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
-
-        const std::vector<Vertex> Squarevertices = {
-            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-        };
-
-        const std::vector<uint16_t> Squareindices = {
-            0, 1, 2, 2, 3, 0
-        };
-
-        const std::vector<Vertex> Squareavertices = {
-            {{-0.5f, -0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-        };
-
-        const std::vector<uint16_t> Squareaindices = {
-            0, 1, 2, 2, 3, 0
-        };
 
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;

@@ -1394,13 +1394,6 @@ namespace Hypa {
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
         createFramebuffers();
         createCommandPool();
-        DrawVerts(Squarevertices, Squareindices);
-        DrawVerts(Squareavertices, Squareaindices);
-        createUniformBuffers();
-        createDescriptorPool();
-        createDescriptorSets();
-        createCommandBuffers();
-        createSyncObjects();
 
         pEvents->AddEventListener(WindowResize, resizeCallback, this);
 
@@ -1434,11 +1427,39 @@ namespace Hypa {
             DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
             ShaderChanged = false;
         }
+        createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
+        createCommandBuffers();
+        createSyncObjects();
         createFramebuffers();
         createCommandPool();
         createCommandBuffers();
         createSyncObjects();
 
         drawFrame();
+
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+        }
+
+        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+
+        //vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+        for (size_t i = 0; i < indexBuffer.size(); i++) {
+            vkDestroyBuffer(device, indexBuffer[i], nullptr);
+            vkFreeMemory(device, indexBufferMemory[i], nullptr);
+
+            vkDestroyBuffer(device, vertexBuffer[i], nullptr);
+            vkFreeMemory(device, vertexBufferMemory[i], nullptr);
+        }
+
+        indexBuffer.clear();
+        indexBufferMemory.clear();
+        vertexBuffer.clear();
+        vertexBufferMemory.clear();
+        IndicesSize.clear();
     }
 }

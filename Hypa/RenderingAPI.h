@@ -1,8 +1,17 @@
 #pragma once
 #include "base.h"
 #include "Flags.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/fwd.hpp>
 
 namespace Hypa {
+
+	struct Vertex {
+		glm::vec3 pos;
+		glm::vec3 color;
+	};
+
 	class RenderingAPI {
 	public:
 		HYPA_API RenderingAPI() {}
@@ -14,6 +23,8 @@ namespace Hypa {
 		HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
 		HYPA_API virtual void RemoveShader(std::string name) {}
 		HYPA_API virtual void ChangeShader(std::string name) {}
+
+		HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
 
 		HYPA_API virtual const std::string& GetName() const { return name; }
 
