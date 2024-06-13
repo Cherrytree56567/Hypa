@@ -44,31 +44,6 @@ namespace Hypa {
     struct Vertex {
         glm::vec3 pos;
         glm::vec3 color;
-
-        static VkVertexInputBindingDescription getBindingDescription() {
-            VkVertexInputBindingDescription bindingDescription{};
-            bindingDescription.binding = 0;
-            bindingDescription.stride = sizeof(Vertex);
-            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-            return bindingDescription;
-        }
-
-        static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
-            std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
-
-            attributeDescriptions[0].binding = 0;
-            attributeDescriptions[0].location = 0;
-            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-            attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-            attributeDescriptions[1].binding = 0;
-            attributeDescriptions[1].location = 1;
-            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-            attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-            return attributeDescriptions;
-        }
     };
 
     struct QueueFamilyIndices {
@@ -107,6 +82,8 @@ namespace Hypa {
         HYPA_API void RemoveShader(std::string name) override;
         HYPA_API void ChangeShader(std::string name) override;
 
+        HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+
 	private:
 
         bool checkValidationLayerSupport();
@@ -125,6 +102,30 @@ namespace Hypa {
         void updateUniformBuffer(uint32_t currentImage);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        static VkVertexInputBindingDescription getBindingDescription() {
+            VkVertexInputBindingDescription bindingDescription{};
+            bindingDescription.binding = 0;
+            bindingDescription.stride = sizeof(Vertex);
+            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            return bindingDescription;
+        }
+
+        static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+            std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+            return attributeDescriptions;
+        }
 
         void createInstance();
         void setupDebugMessenger();
@@ -143,7 +144,7 @@ namespace Hypa {
         void cleanupSwapChain();
         void recreateSwapChain();
         void createVertexBuffer(std::vector<Vertex> vertices);
-        void createIndexBuffer();
+        void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
         void createUniformBuffers();
         void createDescriptorPool();
@@ -158,14 +159,25 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
-        const std::vector<Vertex> vertices = {
+        const std::vector<Vertex> Squarevertices = {
             {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
             {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
             {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
         };
 
-        const std::vector<uint16_t> indices = {
+        const std::vector<uint16_t> Squareindices = {
+            0, 1, 2, 2, 3, 0
+        };
+
+        const std::vector<Vertex> Squareavertices = {
+            {{-0.5f, -0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+        };
+
+        const std::vector<uint16_t> Squareaindices = {
             0, 1, 2, 2, 3, 0
         };
 
@@ -173,10 +185,11 @@ namespace Hypa {
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        std::vector<VkBuffer> vertexBuffer;
+        std::vector<VkDeviceMemory> vertexBufferMemory;
+        std::vector<VkBuffer> indexBuffer;
+        std::vector<VkDeviceMemory> indexBufferMemory;
+        std::vector<int> IndicesSize;
 
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;

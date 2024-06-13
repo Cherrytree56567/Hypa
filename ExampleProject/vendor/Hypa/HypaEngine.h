@@ -827,6 +827,11 @@ namespace Hypa {
 	* RenderingAPI
 	*/
 
+    struct Vertex {
+        glm::vec3 pos;
+        glm::vec3 color;
+    };
+
     class RenderingAPI {
     public:
         HYPA_API RenderingAPI() {}
@@ -838,6 +843,8 @@ namespace Hypa {
         HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
         HYPA_API virtual void RemoveShader(std::string name) {}
         HYPA_API virtual void ChangeShader(std::string name) {}
+
+        HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
 
         HYPA_API virtual const std::string& GetName() const { return name; }
 
@@ -1047,7 +1054,7 @@ namespace Hypa {
         void cleanupSwapChain();
         void recreateSwapChain();
         void createVertexBuffer(std::vector<Vertex> vertices);
-        void createIndexBuffer();
+        void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
         void createUniformBuffers();
         void createDescriptorPool();
@@ -1062,14 +1069,14 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
-        const std::vector<Vertex> vertices = {
+        const std::vector<Vertex> Squarevertices = {
             {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
             {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
             {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
         };
 
-        const std::vector<uint16_t> indices = {
+        const std::vector<uint16_t> Squareindices = {
             0, 1, 2, 2, 3, 0
         };
 
@@ -1077,10 +1084,11 @@ namespace Hypa {
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        std::vector<VkBuffer> vertexBuffer;
+        std::vector<VkDeviceMemory> vertexBufferMemory;
+        std::vector<VkBuffer> indexBuffer;
+        std::vector<VkDeviceMemory> indexBufferMemory;
+        std::vector<int> IndicesSize;
 
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;

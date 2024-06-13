@@ -100,11 +100,13 @@ namespace Hypa {
 
         vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-        vkDestroyBuffer(device, indexBuffer, nullptr);
-        vkFreeMemory(device, indexBufferMemory, nullptr);
+        for (size_t i = 0; i < indexBuffer.size(); i++) {
+            vkDestroyBuffer(device, indexBuffer[i], nullptr);
+            vkFreeMemory(device, indexBufferMemory[i], nullptr);
 
-        vkDestroyBuffer(device, vertexBuffer, nullptr);
-        vkFreeMemory(device, vertexBufferMemory, nullptr);
+            vkDestroyBuffer(device, vertexBuffer[i], nullptr);
+            vkFreeMemory(device, vertexBufferMemory[i], nullptr);
+        }
 
         vkDestroyPipeline(device, DefaultgraphicsPipeline, nullptr);
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -751,8 +753,8 @@ namespace Hypa {
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-        auto bindingDescription = Vertex::getBindingDescription();
-        auto attributeDescriptions = Vertex::getAttributeDescriptions();
+        auto bindingDescription = getBindingDescription();
+        auto attributeDescriptions = getAttributeDescriptions();
 
         vertexInputInfo.vertexBindingDescriptionCount = 1;
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -979,14 +981,16 @@ namespace Hypa {
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-        VkBuffer vertexBuffers[] = { vertexBuffer };
-        VkDeviceSize offsets[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+        for (size_t i = 0; i < vertexBuffer.size(); i++) {
+            VkBuffer vertexBuffers[] = { vertexBuffer[i]};
+            VkDeviceSize offsets[] = { 0 };
+            vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-        vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+            vkCmdBindIndexBuffer(commandBuffer, indexBuffer[i], 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-        vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
+            vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(IndicesSize[i]), 1, 0, 0, 0);
+        }
 
         vkCmdEndRenderPass(commandBuffer);
 
@@ -1155,12 +1159,18 @@ namespace Hypa {
         memcpy(data, vertices.data(), (size_t)bufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
 
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+        VkBuffer vertexBuffera;
+        VkDeviceMemory vertexBufferMemorya;
 
-        copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffera, vertexBufferMemorya);
+
+        copyBuffer(stagingBuffer, vertexBuffera, bufferSize);
 
         vkDestroyBuffer(device, stagingBuffer, nullptr);
         vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+        vertexBuffer.push_back(vertexBuffera);
+        vertexBufferMemory.push_back(vertexBufferMemorya);
     }
 
     void Vulkan::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
@@ -1233,7 +1243,7 @@ namespace Hypa {
         vkBindBufferMemory(device, buffer, bufferMemory, 0);
     }
 
-    void Vulkan::createIndexBuffer() {
+    void Vulkan::createIndexBuffer(std::vector<uint16_t> indices) {
         VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
         VkBuffer stagingBuffer;
@@ -1245,12 +1255,19 @@ namespace Hypa {
         memcpy(data, indices.data(), (size_t)bufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
 
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+        VkBuffer indexBuffera;
+        VkDeviceMemory indexBufferMemorya;
 
-        copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffera, indexBufferMemorya);
+
+        copyBuffer(stagingBuffer, indexBuffera, bufferSize);
 
         vkDestroyBuffer(device, stagingBuffer, nullptr);
         vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+        indexBuffer.push_back(indexBuffera);
+        indexBufferMemory.push_back(indexBufferMemorya);
+        IndicesSize.push_back(indices.size());
     }
 
     void Vulkan::createDescriptorSetLayout() {
@@ -1338,6 +1355,11 @@ namespace Hypa {
         }
     }
 
+    void Vulkan::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
+        createVertexBuffer(vertices);
+        createIndexBuffer(indices);
+    }
+
     void Vulkan::OnAttach() {
 
         log.Warning("Vulkan Initialization Not Implemented.");
@@ -1372,8 +1394,8 @@ namespace Hypa {
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
         createFramebuffers();
         createCommandPool();
-        createVertexBuffer(vertices);
-        createIndexBuffer();
+        DrawVerts(Squarevertices, Squareindices);
+        DrawVerts(Squareavertices, Squareaindices);
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
