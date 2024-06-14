@@ -1288,8 +1288,9 @@ namespace Hypa {
         }
     }
 
+    template<typename UBO>
     void Vulkan::createUniformBuffers() {
-        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+        VkDeviceSize bufferSize = sizeof(UBO);
 
         uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
         uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1394,6 +1395,9 @@ namespace Hypa {
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
         createFramebuffers();
         createCommandPool();
+        createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
 
         pEvents->AddEventListener(WindowResize, resizeCallback, this);
 
@@ -1427,10 +1431,6 @@ namespace Hypa {
             DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
             ShaderChanged = false;
         }
-        createUniformBuffers();
-        createDescriptorPool();
-        createDescriptorSets();
-        createCommandBuffers();
         createSyncObjects();
         createFramebuffers();
         createCommandPool();
@@ -1439,23 +1439,18 @@ namespace Hypa {
 
         drawFrame();
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+        for (size_t i = 0; i < OLDindexBuffer.size(); i++) {
+            vkDestroyBuffer(device, OLDindexBuffer[i], nullptr);
+            vkFreeMemory(device, OLDindexBufferMemory[i], nullptr);
+
+            vkDestroyBuffer(device, OLDvertexBuffer[i], nullptr);
+            vkFreeMemory(device, OLDvertexBufferMemory[i], nullptr);
         }
 
-        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
-        //vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-
-        for (size_t i = 0; i < indexBuffer.size(); i++) {
-            vkDestroyBuffer(device, indexBuffer[i], nullptr);
-            vkFreeMemory(device, indexBufferMemory[i], nullptr);
-
-            vkDestroyBuffer(device, vertexBuffer[i], nullptr);
-            vkFreeMemory(device, vertexBufferMemory[i], nullptr);
-        }
-
+        OLDindexBuffer = indexBuffer;
+        OLDindexBufferMemory = indexBufferMemory;
+        OLDvertexBuffer = vertexBuffer;
+        OLDvertexBufferMemory = vertexBufferMemory;
         indexBuffer.clear();
         indexBufferMemory.clear();
         vertexBuffer.clear();

@@ -51,10 +51,12 @@ namespace Hypa {
         }
     };
 
+    template<typename... Args>
     struct UniformBufferObject {
         alignas(16) glm::mat4 model;
         alignas(16) glm::mat4 view;
         alignas(16) glm::mat4 proj;
+        std::tuple<Args...> customArgs;
     };
 
     struct SwapChainSupportDetails {
@@ -142,6 +144,7 @@ namespace Hypa {
         void createVertexBuffer(std::vector<Vertex> vertices);
         void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
+        template<typename UBO>
         void createUniformBuffers();
         void createDescriptorPool();
         void createDescriptorSets();
@@ -159,6 +162,10 @@ namespace Hypa {
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
+        std::vector<VkBuffer> OLDvertexBuffer;
+        std::vector<VkDeviceMemory> OLDvertexBufferMemory;
+        std::vector<VkBuffer> OLDindexBuffer;
+        std::vector<VkDeviceMemory> OLDindexBufferMemory;
         std::vector<VkBuffer> vertexBuffer;
         std::vector<VkDeviceMemory> vertexBufferMemory;
         std::vector<VkBuffer> indexBuffer;
