@@ -51,14 +51,6 @@ namespace Hypa {
         }
     };
 
-    template<typename... Args>
-    struct UniformBufferObject {
-        alignas(16) glm::mat4 model;
-        alignas(16) glm::mat4 view;
-        alignas(16) glm::mat4 proj;
-        std::tuple<Args...> customArgs;
-    };
-
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
@@ -82,8 +74,10 @@ namespace Hypa {
 
         HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
-	private:
+        HYPA_API void updateUniform(const IUniformBufferObject& ubo) override;
 
+	private:
+        
         bool checkValidationLayerSupport();
         std::vector<const char*> getRequiredExtensions();
         int rateDeviceSuitability(VkPhysicalDevice device);
@@ -97,7 +91,8 @@ namespace Hypa {
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        void updateUniformBuffer(uint32_t currentImage);
+        template<typename UBO>
+        void updateUniformBuffer(uint32_t currentImage, const UBO& ubo);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -145,7 +140,7 @@ namespace Hypa {
         void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
         template<typename UBO>
-        void createUniformBuffers();
+        void createUniformBuffers(const UBO& ubo);
         void createDescriptorPool();
         void createDescriptorSets();
 

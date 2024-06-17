@@ -1021,22 +1021,15 @@ namespace Hypa {
         }
     }
 
-    void Vulkan::updateUniformBuffer(uint32_t currentImage) {
-        static auto startTime = std::chrono::high_resolution_clock::now();
+    template<typename UBO>
+    void Vulkan::updateUniformBuffer(uint32_t currentImage, const UBO& ubo) {
 
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+        memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(UBO));
+    }
 
-        UniformBufferObject ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-
-        ubo.proj[1][1] *= -1;
-
-        memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+    void Vulkan::updateUniform(const IUniformBufferObject& ubo) {
+        updateUniformBuffer(currentFrame, ubo);
+        createUniformBuffers(ubo);
     }
 
     void Vulkan::drawFrame() {
@@ -1052,8 +1045,6 @@ namespace Hypa {
         else if (result != VK_SUCCESS) {
             throw std::runtime_error("[Hypa::Core::Vulkan] Error: Failed to acquire swap chain image!");
         }
-
-        updateUniformBuffer(currentFrame);
 
         // Only reset the fence if we are submitting work
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
@@ -1289,7 +1280,7 @@ namespace Hypa {
     }
 
     template<typename UBO>
-    void Vulkan::createUniformBuffers() {
+    void Vulkan::createUniformBuffers(const UBO& ubo) {
         VkDeviceSize bufferSize = sizeof(UBO);
 
         uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1337,7 +1328,7 @@ namespace Hypa {
             VkDescriptorBufferInfo bufferInfo{};
             bufferInfo.buffer = uniformBuffers[i];
             bufferInfo.offset = 0;
-            bufferInfo.range = sizeof(UniformBufferObject);
+            bufferInfo.range = sizeof(UniformBufferObject<>);
 
             VkWriteDescriptorSet descriptorWrite{};
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1395,9 +1386,6 @@ namespace Hypa {
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
         createFramebuffers();
         createCommandPool();
-        createUniformBuffers();
-        createDescriptorPool();
-        createDescriptorSets();
 
         pEvents->AddEventListener(WindowResize, resizeCallback, this);
 
@@ -1431,11 +1419,12 @@ namespace Hypa {
             DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
             ShaderChanged = false;
         }
+        createDescriptorPool();
+        createDescriptorSets();
+        createCommandBuffers();
         createSyncObjects();
         createFramebuffers();
         createCommandPool();
-        createCommandBuffers();
-        createSyncObjects();
 
         drawFrame();
 

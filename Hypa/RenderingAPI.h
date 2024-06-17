@@ -12,6 +12,50 @@ namespace Hypa {
 		glm::vec3 color;
 	};
 
+	class IUniformBufferObject {
+	public:
+		virtual ~IUniformBufferObject() = default;
+		virtual const glm::mat4& getModel() const = 0;
+		virtual const glm::mat4& getView() const = 0;
+		virtual const glm::mat4& getProj() const = 0;
+		virtual void setModel(const glm::mat4& model) = 0;
+		virtual void setView(const glm::mat4& view) = 0;
+		virtual void setProj(const glm::mat4& proj) = 0;
+	};
+
+	template<typename... Args>
+	struct UniformBufferObject : public IUniformBufferObject {
+		alignas(16) glm::mat4 model;
+		alignas(16) glm::mat4 view;
+		alignas(16) glm::mat4 proj;
+		std::tuple<Args...> customArgs;
+
+		const glm::mat4& getModel() const override {
+			return model;
+		}
+
+		const glm::mat4& getView() const override {
+			return view;
+		}
+
+		const glm::mat4& getProj() const override {
+			return proj;
+		}
+
+		void setModel(const glm::mat4& newModel) override {
+			model = newModel;
+		}
+
+		void setView(const glm::mat4& newView) override {
+			view = newView;
+		}
+
+		void setProj(const glm::mat4& newProj) override {
+			proj = newProj;
+		}
+	};
+
+
 	class RenderingAPI {
 	public:
 		HYPA_API RenderingAPI() {}
@@ -27,6 +71,8 @@ namespace Hypa {
 		HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
 
 		HYPA_API virtual const std::string& GetName() const { return name; }
+
+		HYPA_API virtual void updateUniform(const IUniformBufferObject& ubo) = 0;
 
 	private:
 		Flags flags;

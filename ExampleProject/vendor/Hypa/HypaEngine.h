@@ -13,7 +13,11 @@
 #include <any>
 #include <optional>
 #include <array>
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <chrono>
 #define VK_DEFINE_HANDLE(object) typedef struct object##_T* object;
 #define VK_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef struct object##_T *object;
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSwapchainKHR)
@@ -832,6 +836,20 @@ namespace Hypa {
         glm::vec3 color;
     };
 
+    class IUniformBufferObject {
+    public:
+        virtual ~IUniformBufferObject() = default;
+    };
+
+    template<typename... Args>
+    struct UniformBufferObject : public IUniformBufferObject {
+        alignas(16) glm::mat4 model;
+        alignas(16) glm::mat4 view;
+        alignas(16) glm::mat4 proj;
+        std::tuple<Args...> customArgs;
+    };
+
+
     class RenderingAPI {
     public:
         HYPA_API RenderingAPI() {}
@@ -847,6 +865,8 @@ namespace Hypa {
         HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
 
         HYPA_API virtual const std::string& GetName() const { return name; }
+
+        HYPA_API virtual void updateUniform(const IUniformBufferObject& ubo) = 0;
 
     private:
         Flags flags;
@@ -961,12 +981,6 @@ namespace Hypa {
         }
     };
 
-    struct UniformBufferObject {
-        alignas(16) glm::mat4 model;
-        alignas(16) glm::mat4 view;
-        alignas(16) glm::mat4 proj;
-    };
-
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
@@ -990,6 +1004,8 @@ namespace Hypa {
 
         HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
+        HYPA_API void updateUniform(const IUniformBufferObject& ubo) override;
+
     private:
 
         bool checkValidationLayerSupport();
@@ -1005,7 +1021,8 @@ namespace Hypa {
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        void updateUniformBuffer(uint32_t currentImage);
+        template<typename UBO>
+        void updateUniformBuffer(uint32_t currentImage, const UBO& ubo);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -1052,7 +1069,8 @@ namespace Hypa {
         void createVertexBuffer(std::vector<Vertex> vertices);
         void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
-        void createUniformBuffers();
+        template<typename UBO>
+        void createUniformBuffers(const UBO& ubo);
         void createDescriptorPool();
         void createDescriptorSets();
 
@@ -1065,32 +1083,14 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
 
-        const std::vector<Vertex> Squarevertices = {
-            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-        };
-
-        const std::vector<uint16_t> Squareindices = {
-            0, 1, 2, 2, 3, 0
-        };
-
-        const std::vector<Vertex> Squareavertices = {
-            {{-0.5f, -0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-        };
-
-        const std::vector<uint16_t> Squareaindices = {
-            0, 1, 2, 2, 3, 0
-        };
-
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
+        std::vector<VkBuffer> OLDvertexBuffer;
+        std::vector<VkDeviceMemory> OLDvertexBufferMemory;
+        std::vector<VkBuffer> OLDindexBuffer;
+        std::vector<VkDeviceMemory> OLDindexBufferMemory;
         std::vector<VkBuffer> vertexBuffer;
         std::vector<VkDeviceMemory> vertexBufferMemory;
         std::vector<VkBuffer> indexBuffer;
@@ -1127,7 +1127,7 @@ namespace Hypa {
         const uint32_t HEIGHT = 600;
         const std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
-    };
+        };
         const std::vector<const char*> deviceExtensions = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
