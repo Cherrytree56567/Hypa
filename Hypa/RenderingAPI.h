@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/fwd.hpp>
+#include <string>
 
 namespace Hypa {
 
@@ -12,14 +13,12 @@ namespace Hypa {
 		glm::vec3 color;
 	};
 
-	template<typename... Args>
 	struct UniformBufferObject {
 		alignas(16) glm::mat4 model;
 		alignas(16) glm::mat4 view;
 		alignas(16) glm::mat4 proj;
-		std::tuple<Args...> customArgs;
+		std::vector<std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>> CustomArgs;
 	};
-
 
 	class RenderingAPI {
 	public:
@@ -32,12 +31,13 @@ namespace Hypa {
 		HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
 		HYPA_API virtual void RemoveShader(std::string name) {}
 		HYPA_API virtual void ChangeShader(std::string name) {}
+		HYPA_API virtual std::string GetCurrentShaderName() { return ""; }
 
 		HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
 
 		HYPA_API virtual const std::string& GetName() const { return name; }
 
-		HYPA_API virtual void updateUniform(UniformBufferObject ubo) = 0;
+		HYPA_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) = 0;
 
 	private:
 		Flags flags;

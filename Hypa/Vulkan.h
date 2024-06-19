@@ -68,13 +68,14 @@ namespace Hypa {
 		HYPA_API const std::string& GetName() const override;
         HYPA_API void resize_framebuffer(bool tof);
         HYPA_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
-        HYPA_API std::pair<VkShaderModule, VkShaderModule> GetShader(std::string name);
+        HYPA_API std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> GetShader(std::string name);
         HYPA_API void RemoveShader(std::string name) override;
         HYPA_API void ChangeShader(std::string name) override;
+        HYPA_API std::string GetCurrentShaderName() override;
 
         HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
-        HYPA_API void updateUniform(const IUniformBufferObject& ubo) override;
+        HYPA_API void AddUniform(std::string name, UniformBufferObject& ubo) override;
 
 	private:
         
@@ -91,8 +92,7 @@ namespace Hypa {
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        template<typename UBO>
-        void updateUniformBuffer(uint32_t currentImage, const UBO& ubo);
+        void updateUniformBuffer(uint32_t currentImage);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -139,8 +139,7 @@ namespace Hypa {
         void createVertexBuffer(std::vector<Vertex> vertices);
         void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
-        template<typename UBO>
-        void createUniformBuffers(const UBO& ubo);
+        void createUniformBuffers();
         void createDescriptorPool();
         void createDescriptorSets();
 
@@ -151,7 +150,7 @@ namespace Hypa {
         bool ShaderChanged = false;
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
-        std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
+        std::map<std::string, std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject>> Shaders;
 
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;

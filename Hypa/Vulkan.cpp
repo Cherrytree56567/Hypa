@@ -659,7 +659,8 @@ namespace Hypa {
     }
 
     void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
-        Shaders.insert(std::make_pair(name, Create_VulkanShader(VertShaderPath.c_str(), FragShaderPath.c_str())));
+        std::pair<VkShaderModule, VkShaderModule> a = Create_VulkanShader(VertShaderPath.c_str(), FragShaderPath.c_str());
+        Shaders.insert(std::make_pair(name, std::make_tuple(a.first, a.second, UniformBufferObject())));
     }
 
     void Vulkan::RemoveShader(std::string name) {
@@ -672,7 +673,7 @@ namespace Hypa {
         }
     }
 
-    std::pair<VkShaderModule, VkShaderModule> Vulkan::GetShader(std::string name) {
+    std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> Vulkan::GetShader(std::string name) {
         return Shaders[name];
     }
 
@@ -735,17 +736,17 @@ namespace Hypa {
     }
 
     VkPipeline Vulkan::createGraphicsPipeline(VkViewport viewport) {
-        std::pair<VkShaderModule, VkShaderModule> ShaderModule = GetShader(CurrentShaderName);
+        std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> ShaderModule = GetShader(CurrentShaderName);
 
         VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertShaderStageInfo.module = ShaderModule.first;
+        vertShaderStageInfo.module = std::get<0>(ShaderModule);
         vertShaderStageInfo.pName = "main";
         VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
         fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragShaderStageInfo.module = ShaderModule.second;
+        fragShaderStageInfo.module = std::get<1>(ShaderModule);
         fragShaderStageInfo.pName = "main";
 
         VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
@@ -1021,15 +1022,127 @@ namespace Hypa {
         }
     }
 
-    template<typename UBO>
-    void Vulkan::updateUniformBuffer(uint32_t currentImage, const UBO& ubo) {
-
-        memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(UBO));
+    std::string Vulkan::GetCurrentShaderName() {
+        return CurrentShaderName;
     }
 
-    void Vulkan::updateUniform(const IUniformBufferObject& ubo) {
-        updateUniformBuffer(currentFrame, ubo);
-        createUniformBuffers(ubo);
+    void Vulkan::updateUniformBuffer(uint32_t currentImage) {
+        std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> tup = GetShader(CurrentShaderName);
+
+        UniformBufferObject ubo = std::get<2>(tup);
+
+        static auto startTime = std::chrono::high_resolution_clock::now();
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+
+        ubo.proj[1][1] *= -1;
+
+        memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(UniformBufferObject));
+
+        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+        vkMapMemory(device, uniformBuffersMemory[currentImage], 0, bufferSize, 0, &uniformBuffersMapped[currentImage]);
+        std::memcpy(uniformBuffersMapped[currentImage], &ubo.model, sizeof(ubo.model));
+        std::memcpy(static_cast<char*>(uniformBuffersMapped[currentImage]) + sizeof(ubo.model), &ubo.view, sizeof(ubo.view));
+        std::memcpy(static_cast<char*>(uniformBuffersMapped[currentImage]) + sizeof(ubo.model) + sizeof(ubo.view), &ubo.proj, sizeof(ubo.proj));
+        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
+
+        // Pass custom arguments to the shader
+        size_t offset = sizeof(ubo.model) + sizeof(ubo.view) + sizeof(ubo.proj);
+        for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
+            std::visit([&](auto&& value) {
+                using T = std::decay_t<decltype(value)>;
+                if constexpr (std::is_same_v<T, int>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
+                    offset += sizeof(int);
+                }
+                else if constexpr (std::is_same_v<T, float>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
+                    offset += sizeof(float);
+                }
+                else if constexpr (std::is_same_v<T, double>) {
+                    float temp = static_cast<float>(value);
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
+                    offset += sizeof(float);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
+                    offset += sizeof(glm::mat2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x2>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
+                    offset += sizeof(glm::mat2x2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x3>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x3), &value);
+                    offset += sizeof(glm::mat2x3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x4>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x4), &value);
+                    offset += sizeof(glm::mat2x4);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3), &value);
+                    offset += sizeof(glm::mat3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x2>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x2), &value);
+                    offset += sizeof(glm::mat3x2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x3>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x3), &value);
+                    offset += sizeof(glm::mat3x3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x4>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x4), &value);
+                    offset += sizeof(glm::mat3x4);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4), &value);
+                    offset += sizeof(glm::mat4);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x2>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x2), &value);
+                    offset += sizeof(glm::mat4x2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x3>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x3), &value);
+                    offset += sizeof(glm::mat4x3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x4>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x4), &value);
+                    offset += sizeof(glm::mat4x4);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec1>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec1), &value);
+                    offset += sizeof(glm::vec1);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec2>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec2), &value);
+                    offset += sizeof(glm::vec2);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec3>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec3), &value);
+                    offset += sizeof(glm::vec3);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec4>) {
+                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec4), &value);
+                    offset += sizeof(glm::vec4);
+                }
+                // Add more type handlers as needed
+                }, ubo.CustomArgs[i]);
+        }
+    }
+
+    void Vulkan::AddUniform(std::string name, UniformBufferObject& ubo) {
+        Shaders[name] = std::make_tuple(std::get<0>(Shaders[name]), std::get<1>(Shaders[name]), ubo);
     }
 
     void Vulkan::drawFrame() {
@@ -1045,6 +1158,8 @@ namespace Hypa {
         else if (result != VK_SUCCESS) {
             throw std::runtime_error("[Hypa::Core::Vulkan] Error: Failed to acquire swap chain image!");
         }
+
+        updateUniformBuffer(currentFrame);
 
         // Only reset the fence if we are submitting work
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
@@ -1279,9 +1394,8 @@ namespace Hypa {
         }
     }
 
-    template<typename UBO>
-    void Vulkan::createUniformBuffers(const UBO& ubo) {
-        VkDeviceSize bufferSize = sizeof(UBO);
+    void Vulkan::createUniformBuffers() {
+        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
         uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
         uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1289,8 +1403,6 @@ namespace Hypa {
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-
-            vkMapMemory(device, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
         }
     }
 
@@ -1328,7 +1440,7 @@ namespace Hypa {
             VkDescriptorBufferInfo bufferInfo{};
             bufferInfo.buffer = uniformBuffers[i];
             bufferInfo.offset = 0;
-            bufferInfo.range = sizeof(UniformBufferObject<>);
+            bufferInfo.range = sizeof(UniformBufferObject);
 
             VkWriteDescriptorSet descriptorWrite{};
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1419,6 +1531,7 @@ namespace Hypa {
             DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
             ShaderChanged = false;
         }
+        createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
         createCommandBuffers();

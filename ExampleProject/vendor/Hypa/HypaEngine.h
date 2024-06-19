@@ -836,19 +836,12 @@ namespace Hypa {
         glm::vec3 color;
     };
 
-    class IUniformBufferObject {
-    public:
-        virtual ~IUniformBufferObject() = default;
-    };
-
-    template<typename... Args>
-    struct UniformBufferObject : public IUniformBufferObject {
+    struct UniformBufferObject {
         alignas(16) glm::mat4 model;
         alignas(16) glm::mat4 view;
         alignas(16) glm::mat4 proj;
-        std::tuple<Args...> customArgs;
+        std::vector<std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>> CustomArgs;
     };
-
 
     class RenderingAPI {
     public:
@@ -861,12 +854,13 @@ namespace Hypa {
         HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
         HYPA_API virtual void RemoveShader(std::string name) {}
         HYPA_API virtual void ChangeShader(std::string name) {}
+        HYPA_API virtual std::string GetCurrentShaderName() { return ""; }
 
         HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
 
         HYPA_API virtual const std::string& GetName() const { return name; }
 
-        HYPA_API virtual void updateUniform(const IUniformBufferObject& ubo) = 0;
+        HYPA_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) = 0;
 
     private:
         Flags flags;
@@ -998,13 +992,14 @@ namespace Hypa {
         HYPA_API const std::string& GetName() const override;
         HYPA_API void resize_framebuffer(bool tof);
         HYPA_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
-        HYPA_API std::pair<VkShaderModule, VkShaderModule> GetShader(std::string name);
+        HYPA_API std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> GetShader(std::string name);
         HYPA_API void RemoveShader(std::string name) override;
         HYPA_API void ChangeShader(std::string name) override;
+        HYPA_API std::string GetCurrentShaderName() override;
 
         HYPA_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
-        HYPA_API void updateUniform(const IUniformBufferObject& ubo) override;
+        HYPA_API void AddUniform(std::string name, UniformBufferObject& ubo) override;
 
     private:
 
@@ -1021,8 +1016,7 @@ namespace Hypa {
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         std::pair<VkShaderModule, VkShaderModule> Create_VulkanShader(const char* vertexShaderSource, const char* fragmentShaderSource);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        template<typename UBO>
-        void updateUniformBuffer(uint32_t currentImage, const UBO& ubo);
+        void updateUniformBuffer(uint32_t currentImage);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         static VkVertexInputBindingDescription getBindingDescription() {
@@ -1069,8 +1063,7 @@ namespace Hypa {
         void createVertexBuffer(std::vector<Vertex> vertices);
         void createIndexBuffer(std::vector<uint16_t> indices);
         void createDescriptorSetLayout();
-        template<typename UBO>
-        void createUniformBuffers(const UBO& ubo);
+        void createUniformBuffers();
         void createDescriptorPool();
         void createDescriptorSets();
 
@@ -1081,7 +1074,7 @@ namespace Hypa {
         bool ShaderChanged = false;
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
-        std::map<std::string, std::pair<VkShaderModule, VkShaderModule>> Shaders;
+        std::map<std::string, std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject>> Shaders;
 
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
