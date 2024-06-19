@@ -1,4 +1,17 @@
-﻿  shaders\shader.vert:17: error: 'location' : overlapping use of location 0
+﻿  shaders\shader.vert:20: error: 'ubo' : undeclared identifier
+  shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'proj' : vector swizzle selection out of range
+  shaders\shader.vert:20: error: 'view' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'view' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'view' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'view' : vector swizzle selection out of range
+  shaders\shader.vert:20: error: 'model' : vector swizzle too long
+  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
+  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
+  13 errors generated.
   shaders\shader.vert:20: error: 'ubo' : undeclared identifier
   shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
   shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
@@ -12,8 +25,7 @@
   shaders\shader.vert:20: error: 'model' : unknown swizzle selection
   shaders\shader.vert:20: error: 'model' : unknown swizzle selection
   shaders\shader.vert:20: error: 'model' : unknown swizzle selection
-  14 errors generated.
-  shaders\shader.vert:17: error: 'location' : overlapping use of location 0
+  13 errors generated.
   shaders\shader.vert:20: error: 'ubo' : undeclared identifier
   shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
   shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
@@ -27,22 +39,55 @@
   shaders\shader.vert:20: error: 'model' : unknown swizzle selection
   shaders\shader.vert:20: error: 'model' : unknown swizzle selection
   shaders\shader.vert:20: error: 'model' : unknown swizzle selection
-  14 errors generated.
-  shaders\shader.vert:17: error: 'location' : overlapping use of location 0
-  shaders\shader.vert:20: error: 'ubo' : undeclared identifier
-  shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'proj' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'proj' : vector swizzle selection out of range
-  shaders\shader.vert:20: error: 'view' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'view' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'view' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'view' : vector swizzle selection out of range
-  shaders\shader.vert:20: error: 'model' : vector swizzle too long
-  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
-  shaders\shader.vert:20: error: 'model' : unknown swizzle selection
-  14 errors generated.
+  13 errors generated.
+  App.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'App.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  EventSystem.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'EventSystem.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Flags.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Flags.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Hypa.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Hypa.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Layer.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Layer.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Logging.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Logging.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Rendering3D.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Rendering3D.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  RenderingAPI.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'RenderingAPI.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
   Vulkan.cpp
 D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
   (compiling source file 'Vulkan.cpp')
@@ -260,6 +305,15 @@ D:\Hypa\Hypa\Vulkan.cpp(1136,103): warning C4267: 'argument': conversion from 's
               _T1=glm::vec4 &
           ]
   
+  Window.cpp
+D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  (compiling source file 'Window.cpp')
+  D:\Hypa\Hypa\base.h(2,1):
+  'HYPA_EXPORTS' previously declared on the command line
+  
+  Generating Code...
+D:\Hypa\Hypa\Layer.cpp(96,1): warning C4715: 'Hypa::LayerDispatch::GetLayer': not all control paths return a value
+D:\Hypa\Hypa\Flags.cpp(53,1): warning C4715: 'Hypa::Flags::GetFlag': not all control paths return a value
      Creating library D:\Hypa\x64\Debug\Hypa.lib and object D:\Hypa\x64\Debug\Hypa.exp
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll
