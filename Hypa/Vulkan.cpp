@@ -815,8 +815,8 @@ namespace Hypa {
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 1;
         pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-        pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-        pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+        pipelineLayoutInfo.pushConstantRangeCount = pushConstantRanges.size();
+        pipelineLayoutInfo.pPushConstantRanges = pushConstantRanges.data();
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("[Hypa::Core::Vulkan] Error: Failed to create pipeline layout!");
@@ -1044,8 +1044,6 @@ namespace Hypa {
 
         ubo.proj[1][1] *= -1;
 
-        memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(UniformBufferObject));
-
         VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, bufferSize, 0, &uniformBuffersMapped[currentImage]);
@@ -1060,23 +1058,60 @@ namespace Hypa {
             std::visit([&](auto&& value) {
                 using T = std::decay_t<decltype(value)>;
                 if constexpr (std::is_same_v<T, int>) {
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.size = sizeof(int);
+                    pushConstantRanges.push_back(pushConstantRange);
+                    pushConstantRangesOffset += sizeof(int);
+
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
                     offset += sizeof(int);
                 }
                 else if constexpr (std::is_same_v<T, float>) {
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.size = sizeof(float);
+                    pushConstantRanges.push_back(pushConstantRange);
+                    pushConstantRangesOffset += sizeof(float);
+
+                    DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
+
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
                     offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.size = sizeof(float);
+                    pushConstantRanges.push_back(pushConstantRange);
+                    pushConstantRangesOffset += sizeof(float);
+
                     float temp = static_cast<float>(value);
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
                     offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.size = sizeof(glm::mat2);
+                    pushConstantRanges.push_back(pushConstantRange);
+                    pushConstantRangesOffset += sizeof(glm::mat2);
+
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
                     offset += sizeof(glm::mat2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.size = sizeof(glm::mat2x2);
+                    pushConstantRanges.push_back(pushConstantRange);
+                    pushConstantRangesOffset += sizeof(glm::mat2x2);
+
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
                     offset += sizeof(glm::mat2x2);
                 }
@@ -1139,6 +1174,8 @@ namespace Hypa {
                 // Add more type handlers as needed
                 }, ubo.CustomArgs[i]);
         }
+
+        pushConstantRangesOffset = 0;
     }
 
     void Vulkan::AddUniform(std::string name, UniformBufferObject& ubo) {
@@ -1519,7 +1556,6 @@ namespace Hypa {
         glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 cameraPosition = glm::inverse(viewMatrix)[3];
 
-        VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
         viewport.width = (float)swapChainExtent.width;

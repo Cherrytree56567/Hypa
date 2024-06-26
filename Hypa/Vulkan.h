@@ -156,6 +156,8 @@ namespace Hypa {
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
+        std::vector<VkPushConstantRange> pushConstantRanges;
+        int pushConstantRangesOffset = 0;
         std::vector<VkBuffer> OLDvertexBuffer;
         std::vector<VkDeviceMemory> OLDvertexBufferMemory;
         std::vector<VkBuffer> OLDindexBuffer;
@@ -165,6 +167,8 @@ namespace Hypa {
         std::vector<VkBuffer> indexBuffer;
         std::vector<VkDeviceMemory> indexBufferMemory;
         std::vector<int> IndicesSize;
+
+        VkViewport viewport{};
 
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
