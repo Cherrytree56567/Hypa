@@ -815,7 +815,7 @@ namespace Hypa {
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 1;
         pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-        std::cout << "\n" << currentFrame << "\n";
+        std::cout << "\n" << pushConstantRanges[currentFrame].size() << "\n";
         if (pushConstantRanges[currentFrame].size() == 0) {
             pipelineLayoutInfo.pushConstantRangeCount = 0;
             pipelineLayoutInfo.pPushConstantRanges = nullptr;
@@ -1089,10 +1089,6 @@ namespace Hypa {
                     pushConstantRange.size = sizeof(float);
                     pushConstantRanges[currentFrame].push_back(pushConstantRange);
                     pushConstantRangesOffset[currentFrame] += sizeof(float);
-
-                    float temp = static_cast<float>(value);
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
-                    offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
                     VkPushConstantRange pushConstantRange{};
@@ -1101,9 +1097,6 @@ namespace Hypa {
                     pushConstantRange.size = sizeof(glm::mat2);
                     pushConstantRanges[currentFrame].push_back(pushConstantRange);
                     pushConstantRangesOffset[currentFrame] += sizeof(glm::mat2);
-
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
-                    offset += sizeof(glm::mat2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
                     VkPushConstantRange pushConstantRange{};
@@ -1235,80 +1228,80 @@ namespace Hypa {
             std::visit([&](auto&& value) {
                 using T = std::decay_t<decltype(value)>;
                 if constexpr (std::is_same_v<T, int>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
                     offset += sizeof(int);
                 }
                 else if constexpr (std::is_same_v<T, float>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
                     offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
                     float temp = static_cast<float>(value);
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
                     offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
                     offset += sizeof(glm::mat2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
                     offset += sizeof(glm::mat2x2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x3>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x3), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x3), &value);
                     offset += sizeof(glm::mat2x3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x4>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x4), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x4), &value);
                     offset += sizeof(glm::mat2x4);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3), &value);
                     offset += sizeof(glm::mat3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x2>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x2), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x2), &value);
                     offset += sizeof(glm::mat3x2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x3>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x3), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x3), &value);
                     offset += sizeof(glm::mat3x3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x4>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x4), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x4), &value);
                     offset += sizeof(glm::mat3x4);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4), &value);
                     offset += sizeof(glm::mat4);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x2>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x2), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x2), &value);
                     offset += sizeof(glm::mat4x2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x3>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x3), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x3), &value);
                     offset += sizeof(glm::mat4x3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x4>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x4), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x4), &value);
                     offset += sizeof(glm::mat4x4);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec1>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec1), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec1), &value);
                     offset += sizeof(glm::vec1);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec2>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec2), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec2), &value);
                     offset += sizeof(glm::vec2);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec3>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec3), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec3), &value);
                     offset += sizeof(glm::vec3);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec4>) {
-                    vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec4), &value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec4), &value);
                     offset += sizeof(glm::vec4);
                 }
                 // Add more type handlers as needed
