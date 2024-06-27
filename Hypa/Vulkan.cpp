@@ -815,8 +815,15 @@ namespace Hypa {
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 1;
         pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-        pipelineLayoutInfo.pushConstantRangeCount = pushConstantRanges.size();
-        pipelineLayoutInfo.pPushConstantRanges = pushConstantRanges.data();
+        std::cout << "\n" << currentFrame << "\n";
+        if (pushConstantRanges[currentFrame].size() == 0) {
+            pipelineLayoutInfo.pushConstantRangeCount = 0;
+            pipelineLayoutInfo.pPushConstantRanges = nullptr;
+        }
+        else {
+            pipelineLayoutInfo.pushConstantRangeCount = pushConstantRanges[currentFrame].size();
+            pipelineLayoutInfo.pPushConstantRanges = pushConstantRanges[currentFrame].data();
+        }
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("[Hypa::Core::Vulkan] Error: Failed to create pipeline layout!");
@@ -1027,6 +1034,7 @@ namespace Hypa {
     }
 
     void Vulkan::updateUniformBuffer(uint32_t currentImage) {
+
         std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> tup = GetShader(CurrentShaderName);
 
         UniformBufferObject ubo = std::get<2>(tup);
@@ -1061,26 +1069,26 @@ namespace Hypa {
                 if constexpr (std::is_same_v<T, int>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(int);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(int);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(int);
                 }
                 else if constexpr (std::is_same_v<T, float>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(float);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(float);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(float);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(float);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(float);
 
                     float temp = static_cast<float>(value);
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
@@ -1089,10 +1097,10 @@ namespace Hypa {
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat2);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat2);
 
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
                     offset += sizeof(glm::mat2);
@@ -1100,122 +1108,122 @@ namespace Hypa {
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat2x2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat2x2);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat2x2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x3>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat2x3);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat2x3);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat2x3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x4>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat2x4);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat2x4);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat2x4);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat3);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat3);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x2>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat3x2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat3x2);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat3x2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x3>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat3x3);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat3x3);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat3x3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x4>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat3x4);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat3x4);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat3x4);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat4);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat4);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat4);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x2>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat4x2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat4x2);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat4x2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x3>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat4x3);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat4x3);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat4x3);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x4>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::mat4x4);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat4x4);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat4x4);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec1>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::vec1);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::vec1);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::vec1);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec2>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::vec2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::vec2);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::vec2);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec3>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::vec3);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::vec3);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::vec3);
                 }
                 else if constexpr (std::is_same_v<T, glm::vec4>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
                     pushConstantRange.size = sizeof(glm::vec4);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::vec4);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::vec4);
                 }
                 // Add more type handlers as needed
                 }, ubo.CustomArgs[i]);
@@ -1227,60 +1235,23 @@ namespace Hypa {
             std::visit([&](auto&& value) {
                 using T = std::decay_t<decltype(value)>;
                 if constexpr (std::is_same_v<T, int>) {
-                    VkPushConstantRange pushConstantRange{};
-                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
-                    pushConstantRange.size = sizeof(int);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(int);
-
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
                     offset += sizeof(int);
                 }
                 else if constexpr (std::is_same_v<T, float>) {
-                    VkPushConstantRange pushConstantRange{};
-                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
-                    pushConstantRange.size = sizeof(float);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(float);
-
-                    DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
-
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
                     offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
-                    VkPushConstantRange pushConstantRange{};
-                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
-                    pushConstantRange.size = sizeof(float);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(float);
-
                     float temp = static_cast<float>(value);
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
                     offset += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
-                    VkPushConstantRange pushConstantRange{};
-                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
-                    pushConstantRange.size = sizeof(glm::mat2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat2);
-
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
                     offset += sizeof(glm::mat2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
-                    VkPushConstantRange pushConstantRange{};
-                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset;
-                    pushConstantRange.size = sizeof(glm::mat2x2);
-                    pushConstantRanges.push_back(pushConstantRange);
-                    pushConstantRangesOffset += sizeof(glm::mat2x2);
-
                     vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
                     offset += sizeof(glm::mat2x2);
                 }
@@ -1344,7 +1315,8 @@ namespace Hypa {
                 }, ubo.CustomArgs[i]);
         }
 
-        pushConstantRangesOffset = 0;
+        pushConstantRangesOffset[currentFrame] = 0;
+        pushConstantRanges[currentFrame] = { };
     }
 
     void Vulkan::AddUniform(std::string name, UniformBufferObject& ubo) {
@@ -1689,6 +1661,11 @@ namespace Hypa {
         viewport.height = (float)swapChainExtent.height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
+
+        for (int i = 0; i < 2; i++) {
+            pushConstantRangesOffset.push_back(0);
+            pushConstantRanges.push_back({ });
+        }
 
         createInstance();
         setupDebugMessenger();

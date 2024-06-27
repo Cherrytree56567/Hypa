@@ -5,6 +5,7 @@
 int main() {
 	Hypa::App app;
 	bool ALT = false;
+    bool LLL = false;
     float i = 0;
 
     const std::vector<Hypa::Vertex> Squarevertices = {
@@ -40,16 +41,19 @@ int main() {
 			app.GetWindow()->GetFlags()->ChangeFlag("Width", std::get<int>(app.GetWindow()->GetFlags()->GetFlag("Width")) + 100);
 			app.GetWindow()->GetFlags()->ChangeFlag("Height", std::get<int>(app.GetWindow()->GetFlags()->GetFlag("Height")) + 100);
 			app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->ChangeShader("NewShader");
+            LLL = true;
 		}
         app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squarevertices, Squareindices);
         app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squareavertices, Squareaindices);
 
-        Hypa::UniformBufferObject uni;
+        if (LLL) {
+            Hypa::UniformBufferObject uni;
 
-        uni.CustomArgs.push_back(i);
+            uni.CustomArgs.push_back(i);
 
-        app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->AddUniform("Default", uni);
+            app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->AddUniform("NewShader", uni);
 
-        i += 0.01;
+            i += 0.01;
+        }
 	}
 }
