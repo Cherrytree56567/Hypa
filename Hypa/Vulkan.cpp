@@ -975,6 +975,8 @@ namespace Hypa {
 
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DefaultgraphicsPipeline);
 
+        OtherHalfUpdateUniform();
+
         VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
@@ -1061,7 +1063,9 @@ namespace Hypa {
         vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
 
         // Pass custom arguments to the shader
-        size_t offset = sizeof(ubo.model) + sizeof(ubo.view) + sizeof(ubo.proj);
+        Uniformoffset = sizeof(ubo.model) + sizeof(ubo.view) + sizeof(ubo.proj);
+
+        size_t offset = Uniformoffset;
 
         for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
             std::visit([&](auto&& value) {
@@ -1078,9 +1082,9 @@ namespace Hypa {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
                     pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
-                    pushConstantRange.size = sizeof(float);
+                    pushConstantRange.size = 8;
                     pushConstantRanges[currentFrame].push_back(pushConstantRange);
-                    pushConstantRangesOffset[currentFrame] += sizeof(float);
+                    pushConstantRangesOffset[currentFrame] += 8; //sizeof(float)
                 }
                 else if constexpr (std::is_same_v<T, double>) {
                     VkPushConstantRange pushConstantRange{};
@@ -1223,6 +1227,16 @@ namespace Hypa {
         }
 
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
+
+        
+    }
+
+    void Vulkan::OtherHalfUpdateUniform() {
+        std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> tup = GetShader(CurrentShaderName);
+
+        UniformBufferObject ubo = std::get<2>(tup);
+
+        size_t offset = Uniformoffset;
 
         for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
             std::visit([&](auto&& value) {

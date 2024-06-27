@@ -1,6 +1,6 @@
 #version 450
 
-layout(push_constant) uniform CustomArgs {
+layout(push_constant) uniform PushConstants {
     float customFloat;
     int customInt;
 };

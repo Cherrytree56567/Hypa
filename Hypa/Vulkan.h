@@ -95,6 +95,7 @@ namespace Hypa {
         void updateUniformBuffer(uint32_t currentImage);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        void OtherHalfUpdateUniform();
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;
@@ -152,6 +153,7 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject>> Shaders;
 
+        size_t Uniformoffset = 0;
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
