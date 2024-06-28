@@ -2,7 +2,6 @@
 
 layout(push_constant) uniform PushConstants {
     float customFloat;
-    int customInt;
 };
 
 layout(set = 0, binding = 0) uniform UniformBufferObject {

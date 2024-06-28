@@ -1081,10 +1081,10 @@ namespace Hypa {
                 else if constexpr (std::is_same_v<T, float>) {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
-                    pushConstantRange.size = 8;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame]; // 192
+                    pushConstantRange.size = sizeof(float); // 4
                     pushConstantRanges[currentFrame].push_back(pushConstantRange);
-                    pushConstantRangesOffset[currentFrame] += 8; //sizeof(float)
+                    pushConstantRangesOffset[currentFrame] += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
                     VkPushConstantRange pushConstantRange{};
