@@ -1067,6 +1067,11 @@ namespace Hypa {
 
         size_t offset = Uniformoffset;
 
+        pushConstantRangesOffset[currentFrame] += offset;
+
+        std::cout << "\nPUSHCONST = " << pushConstantRangesOffset[currentFrame] << "\n";
+        std::cout << "\nFLOATSIZE = " << sizeof(float) << "\n";
+
         for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
             std::visit([&](auto&& value) {
                 using T = std::decay_t<decltype(value)>;

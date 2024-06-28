@@ -5,8 +5,13 @@ D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
   'HYPA_EXPORTS' previously declared on the command line
   
 D:\Hypa\Hypa\Vulkan.cpp(824,94): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
-D:\Hypa\Hypa\Vulkan.cpp(1245,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1245,114):
+D:\Hypa\Hypa\Vulkan.cpp(1070,51): warning C4267: '+=': conversion from 'size_t' to '_Ty', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1070,51): warning C4267:         with
+D:\Hypa\Hypa\Vulkan.cpp(1070,51): warning C4267:         [
+D:\Hypa\Hypa\Vulkan.cpp(1070,51): warning C4267:             _Ty=int
+D:\Hypa\Hypa\Vulkan.cpp(1070,51): warning C4267:         ]
+D:\Hypa\Hypa\Vulkan.cpp(1250,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1250,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1595,11):
   	see reference to alias template instantiation 'std::_Variant_visit_result_t<_Callable,std::variant<int,float,double,std::string,char,char *,glm::mat2,glm::mat2x2,glm::mat2x3,glm::mat2x4,glm::mat3,glm::mat3x2,glm::mat3x3,glm::mat3x4,glm::mat4,glm::mat4x2,glm::mat4x3,glm::mat4x4,glm::vec3,glm::vec1,glm::vec2,glm::vec4>&>' being compiled
@@ -22,15 +27,15 @@ D:\Hypa\Hypa\Vulkan.cpp(1245,114): warning C4267: 'argument': conversion from 's
               _T1=int &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1561,43): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
-D:\Hypa\Hypa\Vulkan.cpp(1561,43): warning C4267:         with
-D:\Hypa\Hypa\Vulkan.cpp(1561,43): warning C4267:         [
-D:\Hypa\Hypa\Vulkan.cpp(1561,43): warning C4267:             _Ty=int
-D:\Hypa\Hypa\Vulkan.cpp(1561,43): warning C4267:         ]
-D:\Hypa\Hypa\Vulkan.cpp(1249,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1249,114):
+D:\Hypa\Hypa\Vulkan.cpp(1566,43): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1566,43): warning C4267:         with
+D:\Hypa\Hypa\Vulkan.cpp(1566,43): warning C4267:         [
+D:\Hypa\Hypa\Vulkan.cpp(1566,43): warning C4267:             _Ty=int
+D:\Hypa\Hypa\Vulkan.cpp(1566,43): warning C4267:         ]
+D:\Hypa\Hypa\Vulkan.cpp(1254,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1254,114):
   the template instantiation context (the oldest one first) is
-  	D:\Hypa\Hypa\Vulkan.cpp(1242,18):
+  	D:\Hypa\Hypa\Vulkan.cpp(1247,18):
   	see reference to function template instantiation 'void std::visit<Hypa::Vulkan::OtherHalfUpdateUniform::<lambda_1>,_Ty&,void>(_Callable &&,_Ty &)' being compiled
           with
           [
@@ -48,8 +53,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1249,114): warning C4267: 'argument': conversion from 's
               _T1=float &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1254,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1254,114):
+D:\Hypa\Hypa\Vulkan.cpp(1259,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1259,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<double &> >' being compiled
@@ -60,8 +65,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1254,114): warning C4267: 'argument': conversion from 's
               _T1=double &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1258,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1258,114):
+D:\Hypa\Hypa\Vulkan.cpp(1263,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1263,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<2,2,float,0> &> >' being compiled
@@ -72,8 +77,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1258,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat2 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1266,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1266,114):
+D:\Hypa\Hypa\Vulkan.cpp(1271,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1271,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<2,3,float,0> &> >' being compiled
@@ -84,8 +89,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1266,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat2x3 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1270,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1270,114):
+D:\Hypa\Hypa\Vulkan.cpp(1275,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1275,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<2,4,float,0> &> >' being compiled
@@ -96,8 +101,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1270,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat2x4 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1274,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1274,114):
+D:\Hypa\Hypa\Vulkan.cpp(1279,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1279,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<3,3,float,0> &> >' being compiled
@@ -108,8 +113,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1274,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat3 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1278,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1278,114):
+D:\Hypa\Hypa\Vulkan.cpp(1283,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1283,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<3,2,float,0> &> >' being compiled
@@ -120,8 +125,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1278,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat3x2 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1286,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1286,114):
+D:\Hypa\Hypa\Vulkan.cpp(1291,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1291,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<3,4,float,0> &> >' being compiled
@@ -132,8 +137,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1286,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat3x4 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1290,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1290,114):
+D:\Hypa\Hypa\Vulkan.cpp(1295,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1295,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<4,4,float,0> &> >' being compiled
@@ -144,8 +149,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1290,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat4 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1294,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1294,114):
+D:\Hypa\Hypa\Vulkan.cpp(1299,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1299,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<4,2,float,0> &> >' being compiled
@@ -156,8 +161,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1294,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat4x2 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1298,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1298,114):
+D:\Hypa\Hypa\Vulkan.cpp(1303,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1303,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::mat<4,3,float,0> &> >' being compiled
@@ -168,8 +173,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1298,114): warning C4267: 'argument': conversion from 's
               _T1=glm::mat4x3 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1314,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1314,114):
+D:\Hypa\Hypa\Vulkan.cpp(1319,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1319,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::vec<3,float,0> &> >' being compiled
@@ -180,8 +185,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1314,114): warning C4267: 'argument': conversion from 's
               _T1=glm::vec3 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1306,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1306,114):
+D:\Hypa\Hypa\Vulkan.cpp(1311,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1311,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::vec<1,float,0> &> >' being compiled
@@ -192,8 +197,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1306,114): warning C4267: 'argument': conversion from 's
               _T1=glm::vec1 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1310,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1310,114):
+D:\Hypa\Hypa\Vulkan.cpp(1315,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1315,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::vec<2,float,0> &> >' being compiled
@@ -204,8 +209,8 @@ D:\Hypa\Hypa\Vulkan.cpp(1310,114): warning C4267: 'argument': conversion from 's
               _T1=glm::vec2 &
           ]
   
-D:\Hypa\Hypa\Vulkan.cpp(1318,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  D:\Hypa\Hypa\Vulkan.cpp(1318,114):
+D:\Hypa\Hypa\Vulkan.cpp(1323,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  D:\Hypa\Hypa\Vulkan.cpp(1323,114):
   the template instantiation context (the oldest one first) is
   	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\variant(1577,10):
   	see reference to variable template 'const bool _Variant_all_visit_results_same<void,`Hypa::Vulkan::OtherHalfUpdateUniform'::`4'::<lambda_1>,std::_Meta_list<glm::vec<4,float,0> &> >' being compiled
