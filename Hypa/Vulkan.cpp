@@ -1507,9 +1507,7 @@ namespace Hypa {
         uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            uniformBuffers[i].resize(ubo.CustomArgs.size() + 1);
-            uniformBuffersMemory[i].resize(ubo.CustomArgs.size() + 1);
-            for (size_t x = 1; x < (ubo.CustomArgs.size() + 1); x++) {
+            for (size_t x = 1; x < ubo.CustomArgs.size(); x++) {
                 std::visit([&](auto&& value) {
                     using T = std::decay_t<decltype(value)>;
                     if constexpr (std::is_same_v<T, int>) {
