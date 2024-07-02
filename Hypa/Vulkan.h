@@ -172,9 +172,9 @@ namespace Hypa {
 
         VkViewport viewport{};
 
-        std::vector<std::vector<VkBuffer>> uniformBuffers;
-        std::vector<std::vector<VkDeviceMemory>> uniformBuffersMemory;
-        std::vector<std::vector<void*>> uniformBuffersMapped;
+        std::vector<VkBuffer> uniformBuffers;
+        std::vector<VkDeviceMemory> uniformBuffersMemory;
+        std::vector<void*> uniformBuffersMapped;
         VkSurfaceKHR surface;
         VkQueue presentQueue;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
