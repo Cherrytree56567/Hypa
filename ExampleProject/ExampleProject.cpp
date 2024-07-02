@@ -54,6 +54,7 @@ int main() {
             app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->AddUniform("NewShader", uni);
 
             i += 0.01;
+            std::cout << app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName();
         }
 	}
 }

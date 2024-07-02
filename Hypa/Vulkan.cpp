@@ -1054,6 +1054,10 @@ namespace Hypa {
 
         ubo.proj[1][1] *= -1;
 
+        if (ubo.CustomArgs.size() != 0) {
+            std::cout << "";
+        }
+
         VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, bufferSize, 0, &uniformBuffersMapped[currentImage]);
@@ -1067,7 +1071,7 @@ namespace Hypa {
 
         size_t offset = Uniformoffset;
 
-        pushConstantRangesOffset[currentFrame] += offset;
+        pushConstantRangesOffset[currentFrame] = 0;
 
         std::cout << "\nPUSHCONST = " << pushConstantRangesOffset[currentFrame] << "\n";
         std::cout << "\nFLOATSIZE = " << sizeof(float) << "\n";
@@ -1087,7 +1091,7 @@ namespace Hypa {
                     VkPushConstantRange pushConstantRange{};
                     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
                     pushConstantRange.offset = pushConstantRangesOffset[currentFrame]; // 192
-                    pushConstantRange.size = sizeof(float); // 4
+                    pushConstantRange.size = sizeof(float) * 4; // 4
                     pushConstantRanges[currentFrame].push_back(pushConstantRange);
                     pushConstantRangesOffset[currentFrame] += sizeof(float);
                 }
@@ -1244,6 +1248,7 @@ namespace Hypa {
         size_t offset = Uniformoffset;
 
         for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
+            offset = pushConstantRanges[currentFrame][i].offset;
             std::visit([&](auto&& value) {
                 using T = std::decay_t<decltype(value)>;
                 if constexpr (std::is_same_v<T, int>) {
@@ -1350,6 +1355,11 @@ namespace Hypa {
         }
 
         updateUniformBuffer(currentFrame);
+
+        if (ShaderChanged) {
+            DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
+            ShaderChanged = false;
+        }
 
         // Only reset the fence if we are submitting work
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
@@ -1721,10 +1731,13 @@ namespace Hypa {
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
-        if (ShaderChanged) {
-            DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
-            ShaderChanged = false;
+        std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> tup = GetShader(CurrentShaderName);
+
+        UniformBufferObject ubo = std::get<2>(tup);
+        if (ubo.CustomArgs.size() != 0) {
+            std::cout << "";
         }
+
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
