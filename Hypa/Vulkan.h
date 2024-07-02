@@ -95,6 +95,7 @@ namespace Hypa {
         void updateUniformBuffer(uint32_t currentImage);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        void OtherHalfUpdateUniform();
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;

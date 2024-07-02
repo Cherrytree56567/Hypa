@@ -92,10 +92,8 @@ namespace Hypa {
         cleanupSwapChain();
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            for (size_t x = 0; x < uniformBuffers[i].size(); x++){
-                vkDestroyBuffer(device, uniformBuffers[i][x], nullptr);
-                vkFreeMemory(device, uniformBuffersMemory[i][x], nullptr);
-            }
+            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
         }
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -977,6 +975,8 @@ namespace Hypa {
 
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DefaultgraphicsPipeline);
 
+        OtherHalfUpdateUniform();
+
         VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
@@ -1056,11 +1056,11 @@ namespace Hypa {
 
         VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-        vkMapMemory(device, uniformBuffersMemory[currentImage][0], 0, bufferSize, 0, &uniformBuffersMapped[currentImage][0]);
-        std::memcpy(uniformBuffersMapped[currentImage][0], &ubo.model, sizeof(ubo.model));
-        std::memcpy(static_cast<char*>(uniformBuffersMapped[currentImage][0]) + sizeof(ubo.model), &ubo.view, sizeof(ubo.view));
-        std::memcpy(static_cast<char*>(uniformBuffersMapped[currentImage][0]) + sizeof(ubo.model) + sizeof(ubo.view), &ubo.proj, sizeof(ubo.proj));
-        vkUnmapMemory(device, uniformBuffersMemory[currentImage][0]);
+        vkMapMemory(device, uniformBuffersMemory[currentImage], 0, bufferSize, 0, &uniformBuffersMapped[currentImage]);
+        std::memcpy(uniformBuffersMapped[currentImage], &ubo.model, sizeof(ubo.model));
+        std::memcpy(static_cast<char*>(uniformBuffersMapped[currentImage]) + sizeof(ubo.model), &ubo.view, sizeof(ubo.view));
+        std::memcpy(static_cast<char*>(uniformBuffersMapped[currentImage]) + sizeof(ubo.model) + sizeof(ubo.view), &ubo.proj, sizeof(ubo.proj));
+        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
 
         // Pass custom arguments to the shader
         Uniformoffset = sizeof(ubo.model) + sizeof(ubo.view) + sizeof(ubo.proj);
@@ -1076,32 +1076,36 @@ namespace Hypa {
             std::visit([&](auto&& value) {
                 using T = std::decay_t<decltype(value)>;
                 if constexpr (std::is_same_v<T, int>) {
-                    VkDeviceSize buffeSize = sizeof(int);
-
-                    vkMapMemory(device, uniformBuffersMemory[currentImage][i + 1], 0, buffeSize, 0, &uniformBuffersMapped[currentImage][i + 1]);
-                    std::memcpy(uniformBuffersMapped[currentImage][i + 1], &value, sizeof(int));
-                    vkUnmapMemory(device, uniformBuffersMemory[currentImage][i + 1]);
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
+                    pushConstantRange.size = sizeof(int);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(int);
                 }
                 else if constexpr (std::is_same_v<T, float>) {
-                    VkDeviceSize buffeSize = sizeof(float);
-
-                    vkMapMemory(device, uniformBuffersMemory[currentImage][i + 1], 0, buffeSize, 0, &uniformBuffersMapped[currentImage][i + 1]);
-                    std::memcpy(uniformBuffersMapped[currentImage][i + 1], &value, sizeof(float));
-                    vkUnmapMemory(device, uniformBuffersMemory[currentImage][i + 1]);
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame]; // 192
+                    pushConstantRange.size = sizeof(float); // 4
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
-                    VkDeviceSize buffeSize = sizeof(float);
-
-                    vkMapMemory(device, uniformBuffersMemory[currentImage][i + 1], 0, buffeSize, 0, &uniformBuffersMapped[currentImage][i + 1]);
-                    std::memcpy(uniformBuffersMapped[currentImage][i + 1], &value, sizeof(float));
-                    vkUnmapMemory(device, uniformBuffersMemory[currentImage][i + 1]);
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
+                    pushConstantRange.size = sizeof(float);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(float);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
-                    VkDeviceSize buffeSize = sizeof(glm::mat2);
-
-                    vkMapMemory(device, uniformBuffersMemory[currentImage][i + 1], 0, buffeSize, 0, &uniformBuffersMapped[currentImage][i + 1]);
-                    std::memcpy(uniformBuffersMapped[currentImage][i + 1], &value, sizeof(glm::mat2));
-                    vkUnmapMemory(device, uniformBuffersMemory[currentImage][i + 1]);
+                    VkPushConstantRange pushConstantRange{};
+                    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+                    pushConstantRange.offset = pushConstantRangesOffset[currentFrame];
+                    pushConstantRange.size = sizeof(glm::mat2);
+                    pushConstantRanges[currentFrame].push_back(pushConstantRange);
+                    pushConstantRangesOffset[currentFrame] += sizeof(glm::mat2);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
                     VkPushConstantRange pushConstantRange{};
@@ -1230,6 +1234,101 @@ namespace Hypa {
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
 
         
+    }
+
+    void Vulkan::OtherHalfUpdateUniform() {
+        std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> tup = GetShader(CurrentShaderName);
+
+        UniformBufferObject ubo = std::get<2>(tup);
+
+        size_t offset = Uniformoffset;
+
+        for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
+            std::visit([&](auto&& value) {
+                using T = std::decay_t<decltype(value)>;
+                if constexpr (std::is_same_v<T, int>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
+                    offset += sizeof(int);
+                }
+                else if constexpr (std::is_same_v<T, float>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
+                    offset += sizeof(float);
+                }
+                else if constexpr (std::is_same_v<T, double>) {
+                    float temp = static_cast<float>(value);
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
+                    offset += sizeof(float);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
+                    offset += sizeof(glm::mat2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x2>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
+                    offset += sizeof(glm::mat2x2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x3>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x3), &value);
+                    offset += sizeof(glm::mat2x3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x4>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x4), &value);
+                    offset += sizeof(glm::mat2x4);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3), &value);
+                    offset += sizeof(glm::mat3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x2>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x2), &value);
+                    offset += sizeof(glm::mat3x2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x3>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x3), &value);
+                    offset += sizeof(glm::mat3x3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x4>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x4), &value);
+                    offset += sizeof(glm::mat3x4);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4), &value);
+                    offset += sizeof(glm::mat4);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x2>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x2), &value);
+                    offset += sizeof(glm::mat4x2);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x3>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x3), &value);
+                    offset += sizeof(glm::mat4x3);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x4>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x4), &value);
+                    offset += sizeof(glm::mat4x4);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec1>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec1), &value);
+                    offset += sizeof(glm::vec1);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec2>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec2), &value);
+                    offset += sizeof(glm::vec2);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec3>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec3), &value);
+                    offset += sizeof(glm::vec3);
+                }
+                else if constexpr (std::is_same_v<T, glm::vec4>) {
+                    vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec4), &value);
+                    offset += sizeof(glm::vec4);
+                }
+                // Add more type handlers as needed
+                }, ubo.CustomArgs[i]);
+        }
+
+        pushConstantRangesOffset[currentFrame] = 0;
+        pushConstantRanges[currentFrame] = { };
     }
 
     void Vulkan::AddUniform(std::string name, UniformBufferObject& ubo) {
@@ -1468,28 +1567,17 @@ namespace Hypa {
     }
 
     void Vulkan::createDescriptorSetLayout() {
-        std::vector<VkDescriptorSetLayoutBinding> uboLayoutBinding;
-        VkDescriptorSetLayoutBinding uboLayout{};
-        uboLayout.binding = 0;
-        uboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayout.descriptorCount = 1;
-        uboLayout.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        uboLayout.pImmutableSamplers = nullptr;
-        uboLayoutBinding.push_back(uboLayout);
-        for (int i = 1; i < std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); i++) {
-            VkDescriptorSetLayoutBinding uboLayout{};
-            uboLayout.binding = i;
-            uboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            uboLayout.descriptorCount = 1;
-            uboLayout.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-            uboLayout.pImmutableSamplers = nullptr;
-            uboLayoutBinding.push_back(uboLayout);
-        }
+        VkDescriptorSetLayoutBinding uboLayoutBinding{};
+        uboLayoutBinding.binding = 0;
+        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        uboLayoutBinding.descriptorCount = 1;
+        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
 
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size() + 1;
-        layoutInfo.pBindings = uboLayoutBinding.data();
+        layoutInfo.bindingCount = 1;
+        layoutInfo.pBindings = &uboLayoutBinding;
 
         if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
             throw std::runtime_error("[Hypa::Core::Vulkan] Error: Failed to create descriptor set layout!");
@@ -1499,99 +1587,109 @@ namespace Hypa {
     void Vulkan::createUniformBuffers() {
         VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-        std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject> tup = GetShader(CurrentShaderName);
-        UniformBufferObject ubo = std::get<2>(tup);
-
         uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
         uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
         uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            for (size_t x = 1; x < ubo.CustomArgs.size(); x++) {
-                std::visit([&](auto&& value) {
-                    using T = std::decay_t<decltype(value)>;
-                    if constexpr (std::is_same_v<T, int>) {
-                        createBuffer(sizeof(int), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, float>) {
-                        createBuffer(sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, double>) {
-                        float temp = static_cast<float>(value);
-                        createBuffer(sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2>) {
-                        createBuffer(sizeof(glm::mat2), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2x2>) {
-                        createBuffer(sizeof(glm::mat2x2), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2x3>) {
-                        createBuffer(sizeof(glm::mat2x3), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2x4>) {
-                        createBuffer(sizeof(glm::mat2x4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3>) {
-                        createBuffer(sizeof(glm::mat3), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3x2>) {
-                        createBuffer(sizeof(glm::mat3x2), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3x3>) {
-                        createBuffer(sizeof(glm::mat3x3), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3x4>) {
-                        createBuffer(sizeof(glm::mat3x4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4>) {
-                        createBuffer(sizeof(glm::mat4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4x2>) {
-                        createBuffer(sizeof(glm::mat4x2), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4x3>) {
-                        createBuffer(sizeof(glm::mat4x3), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4x4>) {
-                        createBuffer(sizeof(glm::mat4x4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec1>) {
-                        createBuffer(sizeof(glm::vec1), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec2>) {
-                        createBuffer(sizeof(glm::vec2), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec3>) {
-                        createBuffer(sizeof(glm::vec3), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec4>) {
-                        createBuffer(sizeof(glm::vec4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
-                    }
-                    // Add more type handlers as needed
-                    }, ubo.CustomArgs[i]);
+            for (size_t x = 0; x < std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); x++) {
+                for (size_t i = 0; i < ubo.CustomArgs.size(); ++i) {
+                    std::visit([&](auto&& value) {
+                        using T = std::decay_t<decltype(value)>;
+                        if constexpr (std::is_same_v<T, int>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(int), &value);
+                            offset += sizeof(int);
+                        }
+                        else if constexpr (std::is_same_v<T, float>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &value);
+                            offset += sizeof(float);
+                        }
+                        else if constexpr (std::is_same_v<T, double>) {
+                            float temp = static_cast<float>(value);
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(float), &temp);
+                            offset += sizeof(float);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat2>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2), &value);
+                            offset += sizeof(glm::mat2);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat2x2>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x2), &value);
+                            offset += sizeof(glm::mat2x2);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat2x3>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x3), &value);
+                            offset += sizeof(glm::mat2x3);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat2x4>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat2x4), &value);
+                            offset += sizeof(glm::mat2x4);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat3>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3), &value);
+                            offset += sizeof(glm::mat3);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat3x2>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x2), &value);
+                            offset += sizeof(glm::mat3x2);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat3x3>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x3), &value);
+                            offset += sizeof(glm::mat3x3);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat3x4>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat3x4), &value);
+                            offset += sizeof(glm::mat3x4);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat4>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4), &value);
+                            offset += sizeof(glm::mat4);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat4x2>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x2), &value);
+                            offset += sizeof(glm::mat4x2);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat4x3>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x3), &value);
+                            offset += sizeof(glm::mat4x3);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::mat4x4>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::mat4x4), &value);
+                            offset += sizeof(glm::mat4x4);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::vec1>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec1), &value);
+                            offset += sizeof(glm::vec1);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::vec2>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec2), &value);
+                            offset += sizeof(glm::vec2);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::vec3>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec3), &value);
+                            offset += sizeof(glm::vec3);
+                        }
+                        else if constexpr (std::is_same_v<T, glm::vec4>) {
+                            vkCmdPushConstants(commandBuffers[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(glm::vec4), &value);
+                            offset += sizeof(glm::vec4);
+                        }
+                        // Add more type handlers as needed
+                        }, ubo.CustomArgs[i]);
                 }
-            createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][0], uniformBuffersMemory[i][0]);
+                createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i][x], uniformBuffersMemory[i][x]);
+            }
         }
     }
 
     void Vulkan::createDescriptorPool() {
-        std::vector<VkDescriptorPoolSize> poolSize;
-        VkDescriptorPoolSize pols{};
-        pols.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        pols.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-        poolSize.push_back(pols);
-        for (int i = 1; i < std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); i++) {
-            VkDescriptorPoolSize pols{};
-            pols.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            pols.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-            poolSize.push_back(pols);
-        }
+        VkDescriptorPoolSize poolSize{};
+        poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.poolSizeCount = std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size() + 1;
-        poolInfo.pPoolSizes = poolSize.data();
+        poolInfo.poolSizeCount = 1;
+        poolInfo.pPoolSizes = &poolSize;
 
         poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
@@ -1614,104 +1712,12 @@ namespace Hypa {
         }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            std::vector<VkDescriptorBufferInfo> bufferInfo;
-            int offset = 0;
-            VkDescriptorBufferInfo bufin;
-            bufin.buffer = uniformBuffers[i][0];
-            bufin.offset = 0;
-            bufin.range = sizeof(UniformBufferObject);
-            bufferInfo.push_back(bufin);
-            for (int x = 0; x < std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); x++) {
-                VkDescriptorBufferInfo bufin;
-                bufin.buffer = uniformBuffers[i][x + 1];
-                bufin.offset = 0;
-                std::visit([&](auto&& value) {
-                    using T = std::decay_t<decltype(value)>;
-                    if constexpr (std::is_same_v<T, int>) {
-                        bufin.range = sizeof(int);
-                        offset += sizeof(int);
-                    }
-                    else if constexpr (std::is_same_v<T, float>) {
-                        bufin.range = sizeof(float);
-                        offset += sizeof(float);
-                    }
-                    else if constexpr (std::is_same_v<T, double>) {
-                        bufin.range = sizeof(float);
-                        offset += sizeof(float);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2>) {
-                        bufin.range = sizeof(glm::mat2);
-                        offset += sizeof(glm::mat2);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2x2>) {
-                        bufin.range = sizeof(glm::mat2x2);
-                        offset += sizeof(glm::mat2x2);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2x3>) {
-                        bufin.range = sizeof(glm::mat2x3);
-                        offset += sizeof(glm::mat2x3);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat2x4>) {
-                        bufin.range = sizeof(glm::mat2x4);
-                        offset += sizeof(glm::mat2x4);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3>) {
-                        bufin.range = sizeof(glm::mat3);
-                        offset += sizeof(glm::mat3);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3x2>) {
-                        bufin.range = sizeof(glm::mat3x2);
-                        offset += sizeof(glm::mat3x2);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3x3>) {
-                        bufin.range = sizeof(glm::mat3x3);
-                        offset += sizeof(glm::mat3x3);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat3x4>) {
-                        bufin.range = sizeof(glm::mat3x4);
-                        offset += sizeof(glm::mat3x4);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4>) {
-                        bufin.range = sizeof(glm::mat4);
-                        offset += sizeof(glm::mat4);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4x2>) {
-                        bufin.range = sizeof(glm::mat4x2);
-                        offset += sizeof(glm::mat4x2);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4x3>) {
-                        bufin.range = sizeof(glm::mat4x3);
-                        offset += sizeof(glm::mat4x3);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::mat4x4>) {
-                        bufin.range = sizeof(glm::mat4x4);
-                        offset += sizeof(glm::mat4x4);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec1>) {
-                        bufin.range = sizeof(glm::vec1);
-                        offset += sizeof(glm::vec1);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec2>) {
-                        bufin.range = sizeof(glm::vec2);
-                        offset += sizeof(glm::vec2);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec3>) {
-                        bufin.range = sizeof(glm::vec3);
-                        offset += sizeof(glm::vec3);
-                    }
-                    else if constexpr (std::is_same_v<T, glm::vec4>) {
-                        bufin.range = sizeof(glm::vec4);
-                        offset += sizeof(glm::vec4);
-                    }
-                    // Add more type handlers as needed
-                }, std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs[x]);
-                bufferInfo.push_back(bufin);
-            }
-            
-            const int aaaa = std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size() + 1;
+            VkDescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = uniformBuffers[i];
+            bufferInfo.offset = 0;
+            bufferInfo.range = sizeof(UniformBufferObject);
 
-            std::vector<VkWriteDescriptorSet> descriptorWrites;
-            VkWriteDescriptorSet descriptorWrite;
+            VkWriteDescriptorSet descriptorWrite{};
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrite.dstSet = descriptorSets[i];
             descriptorWrite.dstBinding = 0;
@@ -1720,27 +1726,11 @@ namespace Hypa {
             descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrite.descriptorCount = 1;
 
-            descriptorWrite.pBufferInfo = &bufferInfo.data()[0];
+            descriptorWrite.pBufferInfo = &bufferInfo;
             descriptorWrite.pImageInfo = nullptr; // Optional
             descriptorWrite.pTexelBufferView = nullptr; // Optional
-            descriptorWrites.push_back(descriptorWrite);
-            for (int x = 1; x < std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); x++) {
-                VkWriteDescriptorSet descriptorWrite;
-                descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                descriptorWrite.dstSet = descriptorSets[i];
-                descriptorWrite.dstBinding = x;
-                descriptorWrite.dstArrayElement = 0;
 
-                descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-                descriptorWrite.descriptorCount = 1;
-
-                descriptorWrite.pBufferInfo = &bufferInfo.data()[x];
-                descriptorWrite.pImageInfo = nullptr; // Optional
-                descriptorWrite.pTexelBufferView = nullptr; // Optional
-                descriptorWrites.push_back(descriptorWrite);
-            }
-
-            vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data()  , 0, nullptr);
+            vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
         }
     }
 
