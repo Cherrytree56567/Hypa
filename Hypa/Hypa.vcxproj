@@ -185,6 +185,7 @@
     <ClInclude Include="AppEvent.h" />
     <ClInclude Include="base.h" />
     <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="Exec.h" />
     <ClInclude Include="Flags.h" />
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="KeyCodes.h" />
@@ -200,6 +201,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="EventSystem.cpp" />
+    <ClCompile Include="Exec.cpp" />
     <ClCompile Include="Flags.cpp" />
     <ClCompile Include="Hypa.cpp" />
     <ClCompile Include="Layer.cpp" />

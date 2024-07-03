@@ -49,6 +49,9 @@
     <Filter Include="Source Files\Rendering3D">
       <UniqueIdentifier>{3a15d325-c354-4f0b-ba39-d35671b53193}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Exec">
+      <UniqueIdentifier>{489a93fe-c40c-4908-82c1-9682a2b72463}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -83,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="Rendering3D.cpp">
       <Filter>Source Files\Rendering3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Exec.cpp">
+      <Filter>Source Files\Exec</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="Rendering3D.h">
       <Filter>Source Files\Rendering3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Exec.h">
+      <Filter>Source Files\Exec</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

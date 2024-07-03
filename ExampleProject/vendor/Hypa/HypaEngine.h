@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 #include <string>
 #include <variant>
 #include <any>
@@ -827,6 +828,21 @@ namespace Hypa {
         MouseCode m_Button;
     };
 
+    /*
+    * Exec
+    */
+
+    class Exec {
+    public:
+        HYPA_API Exec() {}
+
+        HYPA_API void AddFunction(std::string name, std::function<std::any(std::vector<std::any>)> func);
+        HYPA_API std::any Execute(std::string name, std::vector<std::any> args);
+
+    private:
+        std::unordered_map<std::string, std::function<std::any(std::vector<std::any>)>> Functions;
+    };
+
 	/*
 	* RenderingAPI
 	*/
@@ -936,11 +952,13 @@ namespace Hypa {
         HYPA_API virtual bool IsShown() const { return show; }
         HYPA_API virtual const std::string& GetName() const { return name; }
         HYPA_API virtual void SetShow(bool value) { show = value; }
+        HYPA_API virtual std::shared_ptr<Exec> GetExec() { return pExec; }
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+        std::shared_ptr<Exec> pExec = std::make_shared<Exec>();
     };
 
     class LayerDispatch {
@@ -1148,9 +1166,11 @@ namespace Hypa {
         HYPA_API virtual bool IsShown() const override;
         HYPA_API virtual const std::string& GetName() const override;
         HYPA_API virtual void SetShow(bool value) override;
+        HYPA_API virtual std::shared_ptr<Exec> GetExec() override;
     private:
         bool show = false;
         std::string name;
+        std::shared_ptr<Exec> pExec = std::make_shared<Exec>();
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
     };
