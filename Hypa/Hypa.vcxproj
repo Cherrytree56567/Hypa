@@ -140,14 +140,14 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>vendor/GLFW/include;vendor;vendor/vulkan/vulkan;vendor/glm;vendor/vulkan</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>vendor\Glad\include;vendor\Assimp\include;vendor/GLFW/include;vendor;vendor/vulkan/vulkan;vendor/glm;vendor/vulkan</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>vendor\vulkan\lib;vendor\GLFW\lib-vc2022;vendor\vulkan\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>vendor\vulkan\lib;vendor\GLFW\lib-vc2022;vendor\Assimp\lib;vendor\vulkan\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;vendor\Assimp\lib\x64\assimp-vc143-mt.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(SolutionDir)Hypa\compile.bat</Command>
@@ -185,7 +185,6 @@
     <ClInclude Include="AppEvent.h" />
     <ClInclude Include="base.h" />
     <ClInclude Include="EventSystem.h" />
-    <ClInclude Include="Exec.h" />
     <ClInclude Include="Flags.h" />
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="KeyCodes.h" />
@@ -193,6 +192,7 @@
     <ClInclude Include="Logging.h" />
     <ClInclude Include="MouseEvents.h" />
     <ClInclude Include="MouseCodes.h" />
+    <ClInclude Include="OpenGL.h" />
     <ClInclude Include="Rendering3D.h" />
     <ClInclude Include="RenderingAPI.h" />
     <ClInclude Include="Vulkan.h" />
@@ -201,13 +201,15 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="EventSystem.cpp" />
-    <ClCompile Include="Exec.cpp" />
     <ClCompile Include="Flags.cpp" />
     <ClCompile Include="Hypa.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="Rendering3D.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
+    <ClCompile Include="vendor\Glad\src\glad.c" />
+    <ClCompile Include="vendor\Glad\src\glad_wgl.c" />
     <ClCompile Include="Vulkan.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>

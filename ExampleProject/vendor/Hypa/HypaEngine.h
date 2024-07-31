@@ -828,21 +828,6 @@ namespace Hypa {
         MouseCode m_Button;
     };
 
-    /*
-    * Exec
-    */
-
-    class Exec {
-    public:
-        HYPA_API Exec() {}
-
-        HYPA_API void AddFunction(std::string name, std::function<std::any(std::vector<std::any>)> func);
-        HYPA_API std::any Execute(std::string name, std::vector<std::any> args);
-
-    private:
-        std::unordered_map<std::string, std::function<std::any(std::vector<std::any>)>> Functions;
-    };
-
 	/*
 	* RenderingAPI
 	*/
@@ -949,16 +934,16 @@ namespace Hypa {
         HYPA_API virtual void OnDetach() { }
         HYPA_API virtual void Render() { }
 
+        HYPA_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
+
         HYPA_API virtual bool IsShown() const { return show; }
         HYPA_API virtual const std::string& GetName() const { return name; }
         HYPA_API virtual void SetShow(bool value) { show = value; }
-        HYPA_API virtual std::shared_ptr<Exec> GetExec() { return pExec; }
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
-        std::shared_ptr<Exec> pExec = std::make_shared<Exec>();
     };
 
     class LayerDispatch {
@@ -1154,6 +1139,8 @@ namespace Hypa {
     * Rendering3D
     */
 
+    HYPA_API std::pair<std::vector<float>, std::vector<unsigned int>> LoadObjFile(const std::string& filePath);
+
     class Rendering3D : public Layer {
     public:
         HYPA_API Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys);
@@ -1166,11 +1153,11 @@ namespace Hypa {
         HYPA_API virtual bool IsShown() const override;
         HYPA_API virtual const std::string& GetName() const override;
         HYPA_API virtual void SetShow(bool value) override;
-        HYPA_API virtual std::shared_ptr<Exec> GetExec() override;
+
+        HYPA_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
     private:
         bool show = false;
         std::string name;
-        std::shared_ptr<Exec> pExec = std::make_shared<Exec>();
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
     };

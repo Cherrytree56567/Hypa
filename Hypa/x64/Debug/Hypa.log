@@ -1,19 +1,7 @@
-﻿  Rendering3D.cpp
+﻿  OpenGL.cpp
 D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'Rendering3D.cpp')
+  (compiling source file 'OpenGL.cpp')
   D:\Hypa\Hypa\base.h(2,1):
   'HYPA_EXPORTS' previously declared on the command line
   
-D:\Hypa\Hypa\Rendering3D.cpp(9,47): error C2276: '&': illegal operation on bound member function expression
-D:\Hypa\Hypa\Rendering3D.cpp(9,42): error C2672: 'std::bind': no matching overloaded function found
-  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\functional(2224,55):
-  could be 'std::_Binder<_Ret,_Fx,_Types...> std::bind(_Fx &&,_Types &&...)'
-  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\functional(2219,60):
-  or       'std::_Binder<std::_Unforced,_Fx,_Types...> std::bind(_Fx &&,_Types &&...)'
-  
-D:\Hypa\Hypa\Rendering3D.cpp(9,8): error C2660: 'Hypa::Exec::AddFunction': function does not take 1 arguments
-  D:\Hypa\Hypa\Exec.h(13,17):
-  see declaration of 'Hypa::Exec::AddFunction'
-  D:\Hypa\Hypa\Rendering3D.cpp(9,8):
-  while trying to match the argument list '(const char [12])'
-  
+  Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll

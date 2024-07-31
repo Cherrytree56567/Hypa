@@ -26,12 +26,15 @@ namespace Hypa {
 
     void RenderingAPISystem::SwitchRenderingAPI(std::string name) {
         for (const auto& api : renderingAPIS) {
-            if (api->GetName() == name) {
+            if (api->GetName() != name) {
                 if (CurrentRenderingAPI != "NONE") {
                     GetCurrentRenderingAPI()->OnDetach();
                 }
                 CurrentRenderingAPI = name;
                 GetCurrentRenderingAPI()->OnAttach();
+            }
+            else {
+
             }
         }
     }

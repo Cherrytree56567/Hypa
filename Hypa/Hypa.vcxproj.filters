@@ -49,8 +49,14 @@
     <Filter Include="Source Files\Rendering3D">
       <UniqueIdentifier>{3a15d325-c354-4f0b-ba39-d35671b53193}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Exec">
-      <UniqueIdentifier>{489a93fe-c40c-4908-82c1-9682a2b72463}</UniqueIdentifier>
+    <Filter Include="Source Files\OpenGL">
+      <UniqueIdentifier>{1b4e6f58-5840-40c0-bed4-b71bc914416b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vendor">
+      <UniqueIdentifier>{5cb04107-7e5c-40bb-b14a-2da7e3077026}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vendor\Glad">
+      <UniqueIdentifier>{ade6ec51-47e0-4e8d-a000-eca65e3cb950}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,8 +93,14 @@
     <ClCompile Include="Rendering3D.cpp">
       <Filter>Source Files\Rendering3D</Filter>
     </ClCompile>
-    <ClCompile Include="Exec.cpp">
-      <Filter>Source Files\Exec</Filter>
+    <ClCompile Include="OpenGL.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\Glad\src\glad.c">
+      <Filter>Header Files\vendor\Glad</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\Glad\src\glad_wgl.c">
+      <Filter>Header Files\vendor\Glad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,8 +149,8 @@
     <ClInclude Include="Rendering3D.h">
       <Filter>Source Files\Rendering3D</Filter>
     </ClInclude>
-    <ClInclude Include="Exec.h">
-      <Filter>Source Files\Exec</Filter>
+    <ClInclude Include="OpenGL.h">
+      <Filter>Source Files\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

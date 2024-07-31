@@ -5,7 +5,6 @@
 #include <algorithm>
 #include "base.h"
 #include "Window.h"
-#include "Exec.h"
 #include "RenderingAPI.h"
 
 namespace Hypa {
@@ -20,17 +19,16 @@ namespace Hypa {
         HYPA_API virtual void OnDetach() { }
         HYPA_API virtual void Render() { }
 
+        HYPA_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
+
         HYPA_API virtual bool IsShown() const { return show; }
         HYPA_API virtual const std::string& GetName() const { return name; }
         HYPA_API virtual void SetShow(bool value) { show = value; }
-        HYPA_API virtual std::shared_ptr<Exec> GetExec() { return pExec; }
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
-        std::shared_ptr<Exec> pExec = std::make_shared<Exec>();
-
     };
 
     class LayerDispatch {
