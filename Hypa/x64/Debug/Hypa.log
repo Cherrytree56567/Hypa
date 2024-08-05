@@ -1,4 +1,9 @@
 ﻿  OpenGL.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'OpenGL.cpp')
+  D:\Hypa\Hypa\vendor\Glad1\include\glad\glad.h(897,1):
+  see previous definition of 'APIENTRY'
+  
 D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
   (compiling source file 'OpenGL.cpp')
   D:\Hypa\Hypa\base.h(2,1):

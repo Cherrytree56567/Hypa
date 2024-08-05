@@ -7,6 +7,7 @@ D:\Hypa\Hypa\Logging.cpp;D:\Hypa\Hypa\x64\Debug\Logging.obj
 D:\Hypa\Hypa\OpenGL.cpp;D:\Hypa\Hypa\x64\Debug\OpenGL.obj
 D:\Hypa\Hypa\Rendering3D.cpp;D:\Hypa\Hypa\x64\Debug\Rendering3D.obj
 D:\Hypa\Hypa\RenderingAPI.cpp;D:\Hypa\Hypa\x64\Debug\RenderingAPI.obj
-D:\Hypa\Hypa\vendor\Glad\src\glad.c;D:\Hypa\Hypa\x64\Debug\glad.obj
+D:\Hypa\Hypa\vendor\Glad1\src\glad.c;D:\Hypa\Hypa\x64\Debug\glad.obj
+D:\Hypa\Hypa\vendor\Glad1\src\glad_wgl.c;D:\Hypa\Hypa\x64\Debug\glad_wgl.obj
 D:\Hypa\Hypa\Vulkan.cpp;D:\Hypa\Hypa\x64\Debug\Vulkan.obj
 D:\Hypa\Hypa\Window.cpp;D:\Hypa\Hypa\x64\Debug\Window.obj

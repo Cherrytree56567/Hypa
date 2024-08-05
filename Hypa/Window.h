@@ -21,6 +21,9 @@ namespace Hypa {
 		HYPA_API bool shouldClose();
 		HYPA_API std::shared_ptr<Flags> GetFlags();
 
+		HYPA_API void UseGLFW();
+		HYPA_API void UseNoClientApi();
+
 	private:
 		int width = 800;
 		int height = 600;

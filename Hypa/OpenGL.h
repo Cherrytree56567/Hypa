@@ -1,10 +1,15 @@
 #pragma once
 #include <glad/glad.h>
-#include <glad/glad_wgl.h>
 #include <windows.h>
 #include "RenderingAPI.h"
 #include "Window.h"
 #include "EventSystem.h"
+#define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WGL
+#include <GLFW/glfw3native.h>
+#include <GLFW/glfw3.h>
+
+#pragma comment (lib, "opengl32.lib")
 
 namespace Hypa {
 	class OpenGL : public RenderingAPI {
@@ -31,5 +36,7 @@ namespace Hypa {
 		std::string name;
 		std::shared_ptr<Window> pWindow;
 		std::shared_ptr<EventSystem> pEvents;
+		unsigned int shaderProgram;
+		unsigned int VBO, VAO;
 	};
 }

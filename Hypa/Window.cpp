@@ -10,6 +10,41 @@ namespace Hypa {
 		yffset = yoffset;
 	}
 
+	void Window::UseGLFW() {
+		glfwDestroyWindow(window);
+		glfwDefaultWindowHints();
+		window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+		if (!window) {
+			glfwTerminate();
+			log.Error("Failed to create GLFW window");
+		}
+
+		glfwMakeContextCurrent(window);
+		glfwSetWindowUserPointer(window, this);
+		glfwGetWindowPos(window, &WindowX, &WindowY);
+		glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	}
+
+	void Window::UseNoClientApi() {
+		glfwDestroyWindow(window);
+		glfwDefaultWindowHints();
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+		if (!window) {
+			glfwTerminate();
+			log.Error("Failed to create GLFW window");
+		}
+
+		glfwMakeContextCurrent(window);
+		glfwSetWindowUserPointer(window, this);
+		glfwGetWindowPos(window, &WindowX, &WindowY);
+		glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	}
+
 	Window::Window(std::shared_ptr<EventSystem> EvSys) : Events(EvSys) {
 		flags->AddFlag("Width", &width);
 		flags->AddFlag("Height", &height);

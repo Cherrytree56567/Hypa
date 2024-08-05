@@ -140,7 +140,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>vendor\Glad\include;vendor\Assimp\include;vendor/GLFW/include;vendor;vendor/vulkan/vulkan;vendor/glm;vendor/vulkan</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>vendor\Glad1\include;vendor\Glad\include;vendor\Assimp\include;vendor/GLFW/include;vendor;vendor/vulkan/vulkan;vendor/glm;vendor/vulkan</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -208,8 +208,8 @@
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="Rendering3D.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
-    <ClCompile Include="vendor\Glad\src\glad.c" />
-    <ClCompile Include="vendor\Glad\src\glad_wgl.c" />
+    <ClCompile Include="vendor\Glad1\src\glad.c" />
+    <ClCompile Include="vendor\Glad1\src\glad_wgl.c" />
     <ClCompile Include="Vulkan.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
