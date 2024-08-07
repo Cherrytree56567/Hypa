@@ -8,6 +8,7 @@
 #define GLFW_EXPOSE_NATIVE_WGL
 #include <GLFW/glfw3native.h>
 #include <GLFW/glfw3.h>
+#include <fstream>
 
 #pragma comment (lib, "opengl32.lib")
 
@@ -32,11 +33,19 @@ namespace Hypa {
 		HYPA_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) override;
 
 	private:
+		std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
+
 		Flags flags;
 		std::string name;
 		std::shared_ptr<Window> pWindow;
 		std::shared_ptr<EventSystem> pEvents;
-		unsigned int shaderProgram;
-		unsigned int VBO, VAO;
+		Logging log;
+		std::vector<GLuint> VertexArray;
+		std::vector<GLuint> VertexBuffer;
+		std::vector<GLuint> IndexBuffer;
+		std::vector<std::vector<uint16_t>> Indices;
+		std::string CurrentShaderName = "Default";
+		bool ShaderChanged = false;
+		std::map<std::string, std::tuple<unsigned int, unsigned int, UniformBufferObject>> Shaders;
 	};
 }
