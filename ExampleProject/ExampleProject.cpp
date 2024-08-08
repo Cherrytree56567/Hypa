@@ -43,10 +43,10 @@ int main() {
 			//app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->ChangeShader("NewShader");
             LLL = true;
 		}
-        /*app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squarevertices, Squareindices);
+        app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squarevertices, Squareindices);
         app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squareavertices, Squareaindices);
 
-        if (LLL) {
+        /*if (LLL) {
             Hypa::UniformBufferObject uni;
 
             uni.CustomArgs.push_back(i);

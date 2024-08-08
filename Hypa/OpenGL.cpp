@@ -39,6 +39,15 @@ namespace Hypa {
         }
 
         CreateShader("Default", "vertex.glsl", "fragment.glsl");
+	}
+
+	void OpenGL::OnDetach() {
+		pWindow->UseNoClientApi();
+	}
+
+    void OpenGL::Render() {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         std::vector<Vertex> vertices = {
             {{-0.5f, -0.5f, 0.0f}, {0.0, 0.0, 0.0}}, // left
@@ -51,22 +60,17 @@ namespace Hypa {
         };
 
         DrawVerts(vertices, indices);
-	}
-
-	void OpenGL::OnDetach() {
-		pWindow->UseNoClientApi();
-	}
-
-	void OpenGL::Render() {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(std::get<0>(GetShader(GetCurrentShaderName())));
         for (int i = 0; i < VertexArray.size(); i++) {
             glBindVertexArray(VertexArray[i]);
-            glDrawElements(GL_TRIANGLES, Indices[i].size(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, Indices[i].size(), GL_UNSIGNED_SHORT, 0);
         }
-	}
+
+        VertexArray.clear();
+        VertexBuffer.clear();
+        IndexBuffer.clear();
+    }
 
 	void OpenGL::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
         const char* vertexShaderSource = readFile(VertShaderPath.c_str());
@@ -129,31 +133,33 @@ namespace Hypa {
 		return CurrentShaderName;
 	}
 
-	void OpenGL::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
+    void OpenGL::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
         GLuint CurrentVertexArray, CurrentVertexBuffer, CurrentIndexBuffer;
         glGenVertexArrays(1, &CurrentVertexArray);
         glGenBuffers(1, &CurrentVertexBuffer);
         glGenBuffers(1, &CurrentIndexBuffer);
-
+        //
         glBindVertexArray(CurrentVertexArray);
 
         glBindBuffer(GL_ARRAY_BUFFER, CurrentVertexBuffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)offsetof(Vertex, pos));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
         glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CurrentIndexBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices.data(), GL_STATIC_DRAW);
-        
-        glBindVertexArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+        glEnableVertexAttribArray(1);
 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CurrentIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), indices.data(), GL_STATIC_DRAW);
+
+        glBindVertexArray(0);
 
         VertexArray.push_back(CurrentVertexArray);
         VertexBuffer.push_back(CurrentVertexBuffer);
         IndexBuffer.push_back(CurrentIndexBuffer);
         Indices.push_back(indices);
-	}
+    }
 
 	void OpenGL::AddUniform(std::string name, UniformBufferObject& ubo) {
         Shaders[name] = std::make_tuple(std::get<0>(Shaders[name]), std::get<1>(Shaders[name]), ubo);
