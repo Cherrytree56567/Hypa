@@ -7,6 +7,11 @@
 
 namespace Hypa {
 
+    struct Object {
+        std::vector<Vertex> vertices;
+        std::vector<uint16_t> indices;
+    };
+
     HYPA_API std::pair<std::vector<float>, std::vector<unsigned int>> LoadObjFile(const std::string& filePath);
 
 	class Rendering3D : public Layer {

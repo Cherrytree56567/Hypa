@@ -1232,7 +1232,7 @@ namespace Hypa {
                     pushConstantRangesOffset[currentFrame] += sizeof(glm::vec4);
                 }
                 // Add more type handlers as needed
-                }, ubo.CustomArgs[i]);
+                }, ubo.CustomArgs[i].first);
         }
 
         DefaultgraphicsPipeline = createGraphicsPipeline(viewport);
@@ -1329,7 +1329,7 @@ namespace Hypa {
                     offset += sizeof(glm::vec4);
                 }
                 // Add more type handlers as needed
-                }, ubo.CustomArgs[i]);
+                }, ubo.CustomArgs[i].first);
         }
 
         pushConstantRangesOffset[currentFrame] = 0;

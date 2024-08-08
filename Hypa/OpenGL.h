@@ -9,6 +9,8 @@
 #include <GLFW/glfw3native.h>
 #include <GLFW/glfw3.h>
 #include <fstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #pragma comment (lib, "opengl32.lib")
 
@@ -31,6 +33,7 @@ namespace Hypa {
 		HYPA_API virtual const std::string& GetName() const override { return name; }
 
 		HYPA_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) override;
+		HYPA_API virtual UniformBufferObject& GetUniform(std::string name) override;
 
 	private:
 		std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
@@ -45,7 +48,7 @@ namespace Hypa {
 		std::vector<GLuint> IndexBuffer;
 		std::vector<std::vector<uint16_t>> Indices;
 		std::string CurrentShaderName = "Default";
-		bool ShaderChanged = false;
+		bool ShaderChanged = true;
 		std::map<std::string, std::tuple<unsigned int, unsigned int, UniformBufferObject>> Shaders;
 	};
 }

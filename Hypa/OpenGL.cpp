@@ -39,6 +39,8 @@ namespace Hypa {
         }
 
         CreateShader("Default", "vertex.glsl", "fragment.glsl");
+
+        ShaderChanged = true;
 	}
 
 	void OpenGL::OnDetach() {
@@ -46,20 +48,85 @@ namespace Hypa {
 	}
 
     void OpenGL::Render() {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        std::vector<Vertex> vertices = {
-            {{-0.5f, -0.5f, 0.0f}, {0.0, 0.0, 0.0}}, // left
-            {{0.5f, -0.5f, 0.0f}, {0.0, 0.0, 0.0}}, // right
-            {{ 0.0f, 0.5f, 0.0f}, {0.0, 0.0, 0.0}}  // top
-        };
+        GLuint viewMatrixLoc = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), "viewMatrix");
+        GLuint projectionMatrixLoc = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), "projectionMatrix");
+        GLuint modelMatrixLoc = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), "modelMatrix");
 
-        std::vector<uint16_t> indices = {
-            0, 1, 2
-        };
+        for (int i = 0; i > std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); i++) {
+            std::visit([&](auto&& value) {
+                using T = std::decay_t<decltype(value)>;
+                GLuint uniformLocation = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs[i].second.c_str());
 
-        DrawVerts(vertices, indices);
+                if constexpr (std::is_same_v<T, int>) {
+                    glUniform1i(uniformLocation, value);
+                }
+                else if constexpr (std::is_same_v<T, float>) {
+                    glUniform1f(uniformLocation, value);
+                }
+                else if constexpr (std::is_same_v<T, double>) {
+                    glUniform1d(uniformLocation, value);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2>) {
+                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x2>) {
+                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x3>) {
+                    glUniformMatrix2x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x4>) {
+                    glUniformMatrix2x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3>) {
+                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x2>) {
+                    glUniformMatrix3x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x3>) {
+                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x4>) {
+                    glUniformMatrix3x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4>) {
+                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x2>) {
+                    glUniformMatrix4x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x3>) {
+                    glUniformMatrix4x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x4>) {
+                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec1>) {
+                    glUniform1fv(uniformLocation, 1, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec2>) {
+                    glUniform2fv(uniformLocation, 1, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec3>) {
+                    glUniform3fv(uniformLocation, 1, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec4>) {
+                    glUniform4fv(uniformLocation, 1, glm::value_ptr(value));
+                }
+                else if constexpr (std::is_same_v<T, unsigned int>) {
+                    glUniform1ui(uniformLocation, value);
+                }
+                // Add more type handlers as needed
+                }, std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs[i].first);
+        }
+
+        glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(std::get<2>(GetShader(GetCurrentShaderName())).view));
+        glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, glm::value_ptr(std::get<2>(GetShader(GetCurrentShaderName())).proj));
+        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(std::get<2>(GetShader(GetCurrentShaderName())).model));
 
         glUseProgram(std::get<0>(GetShader(GetCurrentShaderName())));
         for (int i = 0; i < VertexArray.size(); i++) {
@@ -112,7 +179,13 @@ namespace Hypa {
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        Shaders.insert(std::make_pair(name, std::make_tuple(shaderProgram, shaderProgram, UniformBufferObject())));
+        UniformBufferObject uni;
+
+        uni.proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 150.0f);
+        uni.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        uni.model = glm::mat4(1.0f);
+
+        Shaders.insert(std::make_pair(name, std::make_tuple(shaderProgram, shaderProgram, uni)));
 	}
 
 	void OpenGL::RemoveShader(std::string name) {
@@ -164,6 +237,10 @@ namespace Hypa {
 	void OpenGL::AddUniform(std::string name, UniformBufferObject& ubo) {
         Shaders[name] = std::make_tuple(std::get<0>(Shaders[name]), std::get<1>(Shaders[name]), ubo);
 	}
+
+    UniformBufferObject& OpenGL::GetUniform(std::string name) {
+        return std::get<2>(Shaders[name]);
+    }
 
     std::tuple<unsigned int, unsigned int, UniformBufferObject> OpenGL::GetShader(std::string name) {
         return Shaders[name];

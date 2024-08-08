@@ -28,6 +28,7 @@ VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSurfaceKHR)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkBuffer)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkImage)
 VK_DEFINE_HANDLE(VkInstance)
+#define UBOVariant std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>
 typedef struct VkViewport {
     float    x;
     float    y;
@@ -841,7 +842,7 @@ namespace Hypa {
         alignas(16) glm::mat4 model;
         alignas(16) glm::mat4 view;
         alignas(16) glm::mat4 proj;
-        std::vector<std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>> CustomArgs;
+        std::vector<std::pair<std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>, std::string>> CustomArgs;
     };
 
     class RenderingAPI {
@@ -862,6 +863,7 @@ namespace Hypa {
         HYPA_API virtual const std::string& GetName() const { return name; }
 
         HYPA_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) = 0;
+        HYPA_API virtual UniformBufferObject& GetUniform(std::string name) { UniformBufferObject ub; return ub; }
 
     private:
         Flags flags;
