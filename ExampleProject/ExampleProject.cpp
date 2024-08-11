@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono> <cmath>
 #include <memory>
 #include <HypaEngine.h>
 
@@ -47,15 +48,21 @@ int main() {
         app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squareavertices, Squareaindices);
 
         if (LLL) {
-            Hypa::UniformBufferObject uni = app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetUniform(app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName());
+            auto now = std::chrono::high_resolution_clock::now();
+            auto duration = now.time_since_epoch();
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+            float timeValue = static_cast<float>(milliseconds) / 1000.0f; // Convert milliseconds to seconds
+
+            // Compute the color value based on the current time
+            float colorValue = (std::sin(timeValue) + 1.0f) / 2.0f;   // Normalize to [0, 1] range
+
+            // Update the uniform buffer object
+            Hypa::UniformBufferObject& uni = app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetUniform(app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName());
 
             uni.CustomArgs.clear();
-            uni.CustomArgs.push_back({ i, "color"});
+            uni.CustomArgs.push_back({ colorValue, "color" });
 
-            app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->AddUniform("NewShader", uni);
-
-            i += 0.01;
-            std::cout << app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName();
+            app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->AddUniform(app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName(), uni);
         }
 	}
 }

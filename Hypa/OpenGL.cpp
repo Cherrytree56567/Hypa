@@ -41,6 +41,8 @@ namespace Hypa {
         CreateShader("Default", "vertex.glsl", "fragment.glsl");
 
         ShaderChanged = true;
+
+        //CreateUniformBuffer("Default");
 	}
 
 	void OpenGL::OnDetach() {
@@ -51,84 +53,94 @@ namespace Hypa {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        GLuint viewMatrixLoc = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), "viewMatrix");
-        GLuint projectionMatrixLoc = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), "projectionMatrix");
-        GLuint modelMatrixLoc = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), "modelMatrix");
+        GLuint shaderProgram = std::get<0>(GetShader(GetCurrentShaderName()));
+        glUseProgram(shaderProgram);
 
-        for (int i = 0; i > std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs.size(); i++) {
-            std::visit([&](auto&& value) {
-                using T = std::decay_t<decltype(value)>;
-                GLuint uniformLocation = glGetUniformLocation(std::get<0>(GetShader(GetCurrentShaderName())), std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs[i].second.c_str());
+        GLuint viewMatrixLoc = glGetUniformLocation(shaderProgram, "viewMatrix");
+        GLuint projectionMatrixLoc = glGetUniformLocation(shaderProgram, "projectionMatrix");
+        GLuint modelMatrixLoc = glGetUniformLocation(shaderProgram, "modelMatrix");
 
+        UniformBufferObject ubo = std::get<2>(GetShader(GetCurrentShaderName()));
+
+        glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.view));
+        glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.proj));
+        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.model));
+
+        for (const auto& [value, uniformName] : ubo.CustomArgs) {
+            GLuint uniformLocation = glGetUniformLocation(shaderProgram, uniformName.c_str());
+
+            std::visit([&](auto&& val) {
+                using T = std::decay_t<decltype(val)>;
                 if constexpr (std::is_same_v<T, int>) {
-                    glUniform1i(uniformLocation, value);
+                    glUniform1i(uniformLocation, val);
                 }
                 else if constexpr (std::is_same_v<T, float>) {
-                    glUniform1f(uniformLocation, value);
+                    glUniform1f(uniformLocation, val);
                 }
                 else if constexpr (std::is_same_v<T, double>) {
-                    glUniform1d(uniformLocation, value);
+                    glUniform1d(uniformLocation, val);
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2>) {
-                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x2>) {
-                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x3>) {
-                    glUniformMatrix2x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix2x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat2x4>) {
-                    glUniformMatrix2x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix2x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3>) {
-                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x2>) {
-                    glUniformMatrix3x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix3x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x3>) {
-                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat3x4>) {
-                    glUniformMatrix3x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix3x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4>) {
-                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x2>) {
-                    glUniformMatrix4x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix4x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x3>) {
-                    glUniformMatrix4x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix4x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::mat4x4>) {
-                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value));
+                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::vec1>) {
-                    glUniform1fv(uniformLocation, 1, glm::value_ptr(value));
+                    glUniform1fv(uniformLocation, 1, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::vec2>) {
-                    glUniform2fv(uniformLocation, 1, glm::value_ptr(value));
+                    glUniform2fv(uniformLocation, 1, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::vec3>) {
-                    glUniform3fv(uniformLocation, 1, glm::value_ptr(value));
+                    glUniform3fv(uniformLocation, 1, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, glm::vec4>) {
-                    glUniform4fv(uniformLocation, 1, glm::value_ptr(value));
+                    glUniform4fv(uniformLocation, 1, glm::value_ptr(val));
                 }
                 else if constexpr (std::is_same_v<T, unsigned int>) {
-                    glUniform1ui(uniformLocation, value);
+                    glUniform1ui(uniformLocation, val);
                 }
-                // Add more type handlers as needed
-                }, std::get<2>(GetShader(GetCurrentShaderName())).CustomArgs[i].first);
+                else if constexpr (std::is_same_v<T, char*>) {
+                    glUniform1i(uniformLocation, *reinterpret_cast<int*>(val));
+                }
+                else if constexpr (std::is_same_v<T, std::string>) {
+                    glUniform1i(uniformLocation, std::stoi(val));
+                }
+                }, value);
         }
 
-        glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(std::get<2>(GetShader(GetCurrentShaderName())).view));
-        glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, glm::value_ptr(std::get<2>(GetShader(GetCurrentShaderName())).proj));
-        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(std::get<2>(GetShader(GetCurrentShaderName())).model));
-
-        glUseProgram(std::get<0>(GetShader(GetCurrentShaderName())));
+        // Render the objects
         for (int i = 0; i < VertexArray.size(); i++) {
             glBindVertexArray(VertexArray[i]);
             glDrawElements(GL_TRIANGLES, Indices[i].size(), GL_UNSIGNED_SHORT, 0);

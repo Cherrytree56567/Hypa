@@ -1,3 +1,3 @@
 ﻿  ExampleProject.cpp
-D:\Hypa\ExampleProject\ExampleProject.cpp(57,22): warning C4305: '+=': truncation from 'double' to 'float'
+D:\Hypa\ExampleProject\ExampleProject.cpp(2,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   ExampleProject.vcxproj -> D:\Hypa\x64\Debug\ExampleProject.exe

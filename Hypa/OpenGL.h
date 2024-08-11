@@ -37,6 +37,8 @@ namespace Hypa {
 
 	private:
 		std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
+		//void CreateUniformBuffer(std::string shaderName);
+		//void UpdateUniformBuffer(std::string shaderName);
 
 		Flags flags;
 		std::string name;
