@@ -28,6 +28,11 @@ namespace Hypa {
 		HYPA_API virtual void ChangeShader(std::string name) override;
 		HYPA_API virtual std::string GetCurrentShaderName() override;
 
+		HYPA_API virtual void CreateTexture(std::string name, std::string TexturePath) override;
+		HYPA_API virtual void RemoveTexture(std::string name) override;
+		HYPA_API virtual void ChangeTexture(std::string name) override;
+		HYPA_API virtual std::string GetCurrentTextureName() override;
+
 		HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
 		HYPA_API virtual const std::string& GetName() const override { return name; }
@@ -37,8 +42,6 @@ namespace Hypa {
 
 	private:
 		std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
-		//void CreateUniformBuffer(std::string shaderName);
-		//void UpdateUniformBuffer(std::string shaderName);
 
 		Flags flags;
 		std::string name;
@@ -50,7 +53,9 @@ namespace Hypa {
 		std::vector<GLuint> IndexBuffer;
 		std::vector<std::vector<uint16_t>> Indices;
 		std::string CurrentShaderName = "Default";
+		std::string CurrentTextureName = "";
 		bool ShaderChanged = true;
 		std::map<std::string, std::tuple<unsigned int, unsigned int, UniformBufferObject>> Shaders;
+		std::map<std::string, unsigned int> Textures;
 	};
 }

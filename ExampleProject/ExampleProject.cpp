@@ -8,33 +8,14 @@ int main() {
 	bool ALT = false;
     bool LLL = false;
     float i = 0;
-
-    const std::vector<Hypa::Vertex> Squarevertices = {
-            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-    };
-
-    const std::vector<uint16_t> Squareindices = {
-        0, 1, 2, 2, 3, 0
-    };
-
-    const std::vector<Hypa::Vertex> Squareavertices = {
-        {{-0.5f, -0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-    };
-
-    const std::vector<uint16_t> Squareaindices = {
-        0, 1, 2, 2, 3, 0
-    };
+    auto cube = Hypa::LoadObjFile("cube.obj");
 
 	app.GetWindow()->GetFlags()->ChangeFlag("Width", 800);
-	app.GetWindow()->GetFlags()->ChangeFlag("Height", 400);
+	app.GetWindow()->GetFlags()->ChangeFlag("Height", 800);
 
 	app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->CreateShader("NewShader", "NewVertex.glsl", "NewFragment.glsl");
+
+    app.GetRendering3D()->CreateObject("Cube", cube.first, cube.second);
 
 	while (app.Update()) {
 		if (app.GetEventSystem()->isUnhandledEvent(Hypa::EventType::WindowMoved)) { ALT = true; }
@@ -44,8 +25,6 @@ int main() {
 			app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->ChangeShader("NewShader");
             LLL = true;
 		}
-        app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squarevertices, Squareindices);
-        app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->DrawVerts(Squareavertices, Squareaindices);
 
         if (LLL) {
             auto now = std::chrono::high_resolution_clock::now();
@@ -57,7 +36,7 @@ int main() {
             float colorValue = (std::sin(timeValue) + 1.0f) / 2.0f;   // Normalize to [0, 1] range
 
             // Update the uniform buffer object
-            Hypa::UniformBufferObject& uni = app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetUniform(app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName());
+            Hypa::UniformBufferObject uni = app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetUniform(app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->GetCurrentShaderName());
 
             uni.CustomArgs.clear();
             uni.CustomArgs.push_back({ colorValue, "color" });

@@ -1,5 +1,8 @@
 #version 330 core
 
+in vec3 TexCoords;
+in vec3 Normals;
+
 out vec4 FragColor;
 
 in float AAColor;

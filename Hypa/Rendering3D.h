@@ -12,7 +12,7 @@ namespace Hypa {
         std::vector<uint16_t> indices;
     };
 
-    HYPA_API std::pair<std::vector<float>, std::vector<unsigned int>> LoadObjFile(const std::string& filePath);
+    HYPA_API std::pair<std::vector<Vertex>, std::vector<uint16_t>> LoadObjFile(const std::string& filePath);
 
 	class Rendering3D : public Layer {
     public:
@@ -27,11 +27,12 @@ namespace Hypa {
         HYPA_API virtual const std::string& GetName() const override;
         HYPA_API virtual void SetShow(bool value) override;
 
-        HYPA_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
+        HYPA_API void CreateObject(std::string name, std::vector<Vertex> vertices, std::vector<uint16_t> indices);
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+        std::vector<std::pair<std::string, Object>> Objects;
 	};
 }

@@ -39,6 +39,7 @@ namespace Hypa {
         }
 
         CreateShader("Default", "vertex.glsl", "fragment.glsl");
+        ChangeShader("Default");
 
         ShaderChanged = true;
 
@@ -52,15 +53,117 @@ namespace Hypa {
     void OpenGL::Render() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+    }
 
+	void OpenGL::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
+        const char* vertexShaderSource = readFile(VertShaderPath.c_str());
+        unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+        glCompileShader(vertexShader);
+
+        int success;
+        char infoLog[512];
+        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+            std::cout << "[Hypa::Core] Error: Vertex Shader Compilation Failed:\n" << infoLog << std::endl;
+        }
+
+        const char* fragmentShaderSource = readFile(FragShaderPath.c_str());
+        unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+        glCompileShader(fragmentShader);
+
+        int successa;
+        char infoLoga[512];
+        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &successa);
+        if (!successa) {
+            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLoga);
+            std::cout << "[Hypa::Core] Error: Fragment Shader Compilation Failed:\n" << infoLoga << std::endl;
+        }
+
+        unsigned int shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &successa);
+        if (!successa) {
+            glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+            std::cout << "[Hypa::Core] Error: Failed to link shaders: \n" << infoLog << std::endl;
+        }
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+
+        UniformBufferObject uni;
+
+        Shaders.insert(std::make_pair(name, std::make_tuple(shaderProgram, shaderProgram, uni)));
+        AddUniform(name, uni);
+	}
+
+	void OpenGL::RemoveShader(std::string name) {
+        auto it = Shaders.find(name);
+        if (it != Shaders.end()) {
+            Shaders.erase(it);
+        } else {
+            std::cout << name << " not found in the map." << std::endl;
+        }
+	}
+
+	void OpenGL::ChangeShader(std::string name) {
+        CurrentShaderName = name;
+        ShaderChanged = true;
+	}
+
+	std::string OpenGL::GetCurrentShaderName() {
+		return CurrentShaderName;
+	}
+
+    void OpenGL::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
+        GLuint CurrentVertexArray, CurrentVertexBuffer, CurrentIndexBuffer;
+        glGenVertexArrays(1, &CurrentVertexArray);
+        glGenBuffers(1, &CurrentVertexBuffer);
+        glGenBuffers(1, &CurrentIndexBuffer);
+        //
+        glBindVertexArray(CurrentVertexArray);
+
+        glBindBuffer(GL_ARRAY_BUFFER, CurrentVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+        // Vertex Positions
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+        glEnableVertexAttribArray(0);
+
+        // Texture Coordinates
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+        glEnableVertexAttribArray(1);
+
+        // Normals
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normals));
+        glEnableVertexAttribArray(2);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CurrentIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), indices.data(), GL_STATIC_DRAW);
+
+        glBindVertexArray(0);
+
+        glBindVertexArray(CurrentVertexArray);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
+
+        VertexArray.push_back(CurrentVertexArray);
+        VertexBuffer.push_back(CurrentVertexBuffer);
+        IndexBuffer.push_back(CurrentIndexBuffer);
+        Indices.push_back(indices);
+    }
+
+	void OpenGL::AddUniform(std::string name, UniformBufferObject& ubo) {
         GLuint shaderProgram = std::get<0>(GetShader(GetCurrentShaderName()));
         glUseProgram(shaderProgram);
+        Shaders[name] = std::make_tuple(std::get<0>(Shaders[name]), std::get<1>(Shaders[name]), ubo);
 
         GLuint viewMatrixLoc = glGetUniformLocation(shaderProgram, "viewMatrix");
         GLuint projectionMatrixLoc = glGetUniformLocation(shaderProgram, "projectionMatrix");
         GLuint modelMatrixLoc = glGetUniformLocation(shaderProgram, "modelMatrix");
-
-        UniformBufferObject ubo = std::get<2>(GetShader(GetCurrentShaderName()));
 
         glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.view));
         glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.proj));
@@ -139,115 +242,6 @@ namespace Hypa {
                 }
                 }, value);
         }
-
-        // Render the objects
-        for (int i = 0; i < VertexArray.size(); i++) {
-            glBindVertexArray(VertexArray[i]);
-            glDrawElements(GL_TRIANGLES, Indices[i].size(), GL_UNSIGNED_SHORT, 0);
-        }
-
-        VertexArray.clear();
-        VertexBuffer.clear();
-        IndexBuffer.clear();
-    }
-
-	void OpenGL::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
-        const char* vertexShaderSource = readFile(VertShaderPath.c_str());
-        unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        glCompileShader(vertexShader);
-
-        int success;
-        char infoLog[512];
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            std::cout << "[Hypa::Core] Error: Vertex Shader Compilation Failed:\n" << infoLog << std::endl;
-        }
-
-        const char* fragmentShaderSource = readFile(FragShaderPath.c_str());
-        unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        glCompileShader(fragmentShader);
-
-        int successa;
-        char infoLoga[512];
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &successa);
-        if (!successa) {
-            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLoga);
-            std::cout << "[Hypa::Core] Error: Fragment Shader Compilation Failed:\n" << infoLoga << std::endl;
-        }
-
-        unsigned int shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-
-        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &successa);
-        if (!successa) {
-            glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-            std::cout << "[Hypa::Core] Error: Failed to link shaders: \n" << infoLog << std::endl;
-        }
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        UniformBufferObject uni;
-
-        uni.proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 150.0f);
-        uni.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        uni.model = glm::mat4(1.0f);
-
-        Shaders.insert(std::make_pair(name, std::make_tuple(shaderProgram, shaderProgram, uni)));
-	}
-
-	void OpenGL::RemoveShader(std::string name) {
-        auto it = Shaders.find(name);
-        if (it != Shaders.end()) {
-            Shaders.erase(it);
-        } else {
-            std::cout << name << " not found in the map." << std::endl;
-        }
-	}
-
-	void OpenGL::ChangeShader(std::string name) {
-        CurrentShaderName = name;
-        ShaderChanged = true;
-	}
-
-	std::string OpenGL::GetCurrentShaderName() {
-		return CurrentShaderName;
-	}
-
-    void OpenGL::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-        GLuint CurrentVertexArray, CurrentVertexBuffer, CurrentIndexBuffer;
-        glGenVertexArrays(1, &CurrentVertexArray);
-        glGenBuffers(1, &CurrentVertexBuffer);
-        glGenBuffers(1, &CurrentIndexBuffer);
-        //
-        glBindVertexArray(CurrentVertexArray);
-
-        glBindBuffer(GL_ARRAY_BUFFER, CurrentVertexBuffer);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-        glEnableVertexAttribArray(1);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CurrentIndexBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), indices.data(), GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
-
-        VertexArray.push_back(CurrentVertexArray);
-        VertexBuffer.push_back(CurrentVertexBuffer);
-        IndexBuffer.push_back(CurrentIndexBuffer);
-        Indices.push_back(indices);
-    }
-
-	void OpenGL::AddUniform(std::string name, UniformBufferObject& ubo) {
-        Shaders[name] = std::make_tuple(std::get<0>(Shaders[name]), std::get<1>(Shaders[name]), ubo);
 	}
 
     UniformBufferObject& OpenGL::GetUniform(std::string name) {
@@ -256,5 +250,27 @@ namespace Hypa {
 
     std::tuple<unsigned int, unsigned int, UniformBufferObject> OpenGL::GetShader(std::string name) {
         return Shaders[name];
+    }
+
+    void OpenGL::CreateTexture(std::string name, std::string TexturePath) {
+
+    }
+
+    void OpenGL::RemoveTexture(std::string name) {
+        auto it = Textures.find(name);
+        if (it != Textures.end()) {
+            Textures.erase(it);
+        }
+        else {
+            std::cout << name << " not found in the map." << std::endl;
+        }
+    }
+
+    void OpenGL::ChangeTexture(std::string name) {
+
+    }
+
+    std::string OpenGL::GetCurrentTextureName() {
+        return CurrentTextureName;
     }
 }

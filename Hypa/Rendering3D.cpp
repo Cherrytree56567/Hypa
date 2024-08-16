@@ -15,8 +15,11 @@ namespace Hypa {
 
 	}
 
-	void Rendering3D::Render() {
-		rAPISystem->GetCurrentRenderingAPI()->Render();
+    void Rendering3D::Render() {
+        rAPISystem->GetCurrentRenderingAPI()->Render();
+        for (auto obj : Objects) {
+            rAPISystem->GetCurrentRenderingAPI()->DrawVerts(obj.second.vertices, obj.second.indices);
+        }
 	}
 
 	bool Rendering3D::IsShown() const {
@@ -31,13 +34,13 @@ namespace Hypa {
 		show = value;
 	}
 
-	void Rendering3D::DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-		rAPISystem->GetCurrentRenderingAPI()->DrawVerts(vertices, indices);
+	void Rendering3D::CreateObject(std::string name, std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
+        Objects.push_back({ name, { vertices, indices } });
 	}
 
-    std::pair<std::vector<float>, std::vector<unsigned int>> LoadObjFile(const std::string& filePath) {
-        std::vector<float> vertices;
-        std::vector<unsigned int> indices;
+    std::pair<std::vector<Vertex>, std::vector<uint16_t>> LoadObjFile(const std::string& filePath) {
+        std::vector<Vertex> vertices;
+        std::vector<uint16_t> indices;
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -47,28 +50,23 @@ namespace Hypa {
             return std::make_pair(vertices, indices);
         }
 
-        const aiMesh* mesh = scene->mMeshes[0]; // Assuming there is only one mesh in the scene
+        const aiMesh* mesh = scene->mMeshes[0];
 
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-            // Vertex position (x, y, z)
-            vertices.push_back(mesh->mVertices[i].x);
-            vertices.push_back(mesh->mVertices[i].y);
-            vertices.push_back(mesh->mVertices[i].z);
+            Vertex vertex;
 
-            // Texture coordinates (u, v)
+            vertex.pos = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+
             if (mesh->mTextureCoords[0]) {
-                vertices.push_back(mesh->mTextureCoords[0][i].x);
-                vertices.push_back(mesh->mTextureCoords[0][i].y);
+                vertex.TexCoords = glm::vec3(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y, 0.0f);
             }
             else {
-                // If the model doesn't have texture coordinates, use default values
-                vertices.push_back(0.0f);
-                vertices.push_back(0.0f);
+                vertex.TexCoords = glm::vec3(0.0f, 0.0f, 0.0f);
             }
 
-            vertices.push_back(mesh->mNormals[i].x);
-            vertices.push_back(mesh->mNormals[i].y);
-            vertices.push_back(mesh->mNormals[i].z);
+            vertex.Normals = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+
+            vertices.push_back(vertex);
         }
 
         for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {

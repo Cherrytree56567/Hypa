@@ -17,6 +17,9 @@ namespace Hypa {
 		HYPA_API std::shared_ptr<EventSystem> GetEventSystem();
 		HYPA_API std::shared_ptr<RenderingAPISystem> GetRenderingAPISystem();
 		HYPA_API std::shared_ptr<LayerDispatch> GetLayerDispatch();
+		HYPA_API std::shared_ptr<Vulkan> GetVulkan();
+		HYPA_API std::shared_ptr<OpenGL> GetOpenGL();
+		HYPA_API std::shared_ptr<Rendering3D> GetRendering3D();
 
 	private:
 		std::shared_ptr<Window> window;

@@ -73,6 +73,7 @@ typedef VkFlags VkMemoryPropertyFlags;
 typedef VkFlags VkImageUsageFlags;
 typedef uint64_t VkDeviceSize;
 typedef VkFlags VkBufferUsageFlags;
+typedef VkFlags VkShaderStageFlags;
 
 typedef enum VkSurfaceTransformFlagBitsKHR {
     VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR = 0x00000001,
@@ -467,7 +468,14 @@ typedef struct VkVertexInputAttributeDescription {
     uint32_t    offset;
 } VkVertexInputAttributeDescription;
 
+typedef struct VkPushConstantRange {
+    VkShaderStageFlags    stageFlags;
+    uint32_t              offset;
+    uint32_t              size;
+} VkPushConstantRange;
+
 typedef struct GLFWwindow GLFWwindow;
+typedef unsigned int GLuint;
 
 namespace Hypa {
 
@@ -835,7 +843,8 @@ namespace Hypa {
 
     struct Vertex {
         glm::vec3 pos;
-        glm::vec3 color;
+        glm::vec3 TexCoords;
+        glm::vec3 Normals;
     };
 
     struct UniformBufferObject {
@@ -857,6 +866,11 @@ namespace Hypa {
         HYPA_API virtual void RemoveShader(std::string name) {}
         HYPA_API virtual void ChangeShader(std::string name) {}
         HYPA_API virtual std::string GetCurrentShaderName() { return ""; }
+
+        HYPA_API virtual void CreateTexture(std::string name, std::string TexturePath) {}
+        HYPA_API virtual void RemoveTexture(std::string name) {}
+        HYPA_API virtual void ChangeTexture(std::string name) {}
+        HYPA_API virtual std::string GetCurrentTextureName() { return ""; }
 
         HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
 
@@ -1024,6 +1038,7 @@ namespace Hypa {
         void updateUniformBuffer(uint32_t currentImage);
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        void OtherHalfUpdateUniform();
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;
@@ -1044,7 +1059,7 @@ namespace Hypa {
             attributeDescriptions[1].binding = 0;
             attributeDescriptions[1].location = 1;
             attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-            attributeDescriptions[1].offset = offsetof(Vertex, color);
+            attributeDescriptions[1].offset = offsetof(Vertex, TexCoords);
 
             return attributeDescriptions;
         }
@@ -1081,10 +1096,13 @@ namespace Hypa {
         std::shared_ptr<EventSystem> pEvents;
         std::map<std::string, std::tuple<VkShaderModule, VkShaderModule, UniformBufferObject>> Shaders;
 
+        size_t Uniformoffset = 0;
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkDevice device;
         VkQueue graphicsQueue;
+        std::vector<std::vector<VkPushConstantRange>> pushConstantRanges;
+        std::vector<int> pushConstantRangesOffset;
         std::vector<VkBuffer> OLDvertexBuffer;
         std::vector<VkDeviceMemory> OLDvertexBufferMemory;
         std::vector<VkBuffer> OLDindexBuffer;
@@ -1094,6 +1112,8 @@ namespace Hypa {
         std::vector<VkBuffer> indexBuffer;
         std::vector<VkDeviceMemory> indexBufferMemory;
         std::vector<int> IndicesSize;
+
+        VkViewport viewport{};
 
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
@@ -1138,10 +1158,56 @@ namespace Hypa {
     };
 
     /*
+    * OpenGL
+    */
+
+    class OpenGL : public RenderingAPI {
+    public:
+        HYPA_API OpenGL(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events);
+
+        HYPA_API virtual void OnAttach() override;
+        HYPA_API virtual void OnDetach() override;
+        HYPA_API virtual void Render() override;
+
+        HYPA_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
+        HYPA_API virtual void RemoveShader(std::string name) override;
+        HYPA_API virtual void ChangeShader(std::string name) override;
+        HYPA_API virtual std::string GetCurrentShaderName() override;
+
+        HYPA_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
+
+        HYPA_API virtual const std::string& GetName() const override { return name; }
+
+        HYPA_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) override;
+        HYPA_API virtual UniformBufferObject& GetUniform(std::string name) override;
+
+    private:
+        std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
+
+        Flags flags;
+        std::string name;
+        std::shared_ptr<Window> pWindow;
+        std::shared_ptr<EventSystem> pEvents;
+        Logging log;
+        std::vector<GLuint> VertexArray;
+        std::vector<GLuint> VertexBuffer;
+        std::vector<GLuint> IndexBuffer;
+        std::vector<std::vector<uint16_t>> Indices;
+        std::string CurrentShaderName = "Default";
+        bool ShaderChanged = true;
+        std::map<std::string, std::tuple<unsigned int, unsigned int, UniformBufferObject>> Shaders;
+    };
+
+    /*
     * Rendering3D
     */
 
-    HYPA_API std::pair<std::vector<float>, std::vector<unsigned int>> LoadObjFile(const std::string& filePath);
+    struct Object {
+        std::vector<Vertex> vertices;
+        std::vector<uint16_t> indices;
+    };
+
+    HYPA_API std::pair<std::vector<Vertex>, std::vector<uint16_t>> LoadObjFile(const std::string& filePath);
 
     class Rendering3D : public Layer {
     public:
@@ -1156,12 +1222,13 @@ namespace Hypa {
         HYPA_API virtual const std::string& GetName() const override;
         HYPA_API virtual void SetShow(bool value) override;
 
-        HYPA_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
+        HYPA_API void CreateObject(std::string name, std::vector<Vertex> vertices, std::vector<uint16_t> indices);
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+        std::vector<std::pair<std::string, Object>> Objects;
     };
 
 	/*
@@ -1178,12 +1245,16 @@ namespace Hypa {
         HYPA_API std::shared_ptr<EventSystem> GetEventSystem();
         HYPA_API std::shared_ptr<RenderingAPISystem> GetRenderingAPISystem();
         HYPA_API std::shared_ptr<LayerDispatch> GetLayerDispatch();
+        HYPA_API std::shared_ptr<Vulkan> GetVulkan();
+        HYPA_API std::shared_ptr<OpenGL> GetOpenGL();
+        HYPA_API std::shared_ptr<Rendering3D> GetRendering3D();
 
     private:
         std::shared_ptr<Window> window;
         std::shared_ptr<EventSystem> Events;
         std::shared_ptr<RenderingAPISystem> rAPIsystem;
         std::shared_ptr<Vulkan> VulkanAPI;
+        std::shared_ptr<OpenGL> OpenGLAPI;
         std::shared_ptr<LayerDispatch> Layerdispatch;
         std::shared_ptr<Rendering3D> Rendering3d;
     };

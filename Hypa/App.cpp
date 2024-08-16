@@ -44,4 +44,16 @@ namespace Hypa {
 	std::shared_ptr<LayerDispatch> App::GetLayerDispatch() {
 		return Layerdispatch;
 	}
+
+	std::shared_ptr<OpenGL> App::GetOpenGL() {
+		return OpenGLAPI;
+	}
+
+	std::shared_ptr<Vulkan> App::GetVulkan() {
+		return VulkanAPI;
+	}
+
+	std::shared_ptr<Rendering3D> App::GetRendering3D() {
+		return Rendering3d;
+	}
 }

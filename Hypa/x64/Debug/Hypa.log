@@ -1,14 +1,52 @@
-﻿  OpenGL.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-  (compiling source file 'OpenGL.cpp')
-  D:\Hypa\Hypa\vendor\Glad1\include\glad\glad.h(897,1):
-  see previous definition of 'APIENTRY'
-  
-D:\Hypa\Hypa\base.h(2,1): warning C4005: 'HYPA_EXPORTS': macro redefinition
-  (compiling source file 'OpenGL.cpp')
-  D:\Hypa\Hypa\base.h(2,1):
-  'HYPA_EXPORTS' previously declared on the command line
-  
-D:\Hypa\Hypa\OpenGL.cpp(146,57): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-D:\Hypa\Hypa\RenderingAPI.h(41,1): warning C4172: returning address of local variable or temporary: ub
+﻿  App.cpp
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  Hypa.cpp
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  Layer.cpp
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  OpenGL.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+D:\Hypa\Hypa\OpenGL.cpp(151,50): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  Rendering3D.cpp
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  RenderingAPI.cpp
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+  Vulkan.cpp
+D:\Hypa\Hypa\base.h(2,9): warning C4005: 'HYPA_EXPORTS': macro redefinition
+D:\Hypa\Hypa\Vulkan.cpp(824,94): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1255,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1576,43): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1576,43): warning C4267:         with
+D:\Hypa\Hypa\Vulkan.cpp(1576,43): warning C4267:         [
+D:\Hypa\Hypa\Vulkan.cpp(1576,43): warning C4267:             _Ty=int
+D:\Hypa\Hypa\Vulkan.cpp(1576,43): warning C4267:         ]
+D:\Hypa\Hypa\Vulkan.cpp(1259,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1264,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1268,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1276,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1280,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1284,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1288,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1296,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1300,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1304,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1308,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1324,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1316,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1320,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Hypa\Hypa\Vulkan.cpp(1328,114): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  Generating Code...
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+D:\Hypa\Hypa\Layer.cpp(96,1): warning C4715: 'Hypa::LayerDispatch::GetLayer': not all control paths return a value
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+D:\Hypa\Hypa\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary: ub
+     Creating library D:\Hypa\x64\Debug\Hypa.lib and object D:\Hypa\x64\Debug\Hypa.exp
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Hypa.vcxproj -> D:\Hypa\x64\Debug\Hypa.dll

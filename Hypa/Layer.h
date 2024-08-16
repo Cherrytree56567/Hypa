@@ -19,8 +19,6 @@ namespace Hypa {
         HYPA_API virtual void OnDetach() { }
         HYPA_API virtual void Render() { }
 
-        HYPA_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
-
         HYPA_API virtual bool IsShown() const { return show; }
         HYPA_API virtual const std::string& GetName() const { return name; }
         HYPA_API virtual void SetShow(bool value) { show = value; }
