@@ -12,11 +12,20 @@ namespace Drizzle {
 	}
 
 	void Vulkan::OnAttach() {
-
+		init_vulkan();
+		init_swapchain();
+		init_commands();
+		init_sync_structures();
 	}
 
 	void Vulkan::OnDetach() {
+		vkDestroyInstance(_instance, nullptr);
 
+		destroy_swapchain();
+
+		vkDestroyDevice(_device, nullptr);
+		vkDestroySurfaceKHR(_instance, _surface, nullptr);
+		vkb::destroy_debug_utils_messenger(_instance, _debug_messenger);
 	}
 
 	void Vulkan::Render() {

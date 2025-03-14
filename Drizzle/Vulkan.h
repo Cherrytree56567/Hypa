@@ -20,6 +20,7 @@
 #include <functional>
 #include <deque>
 #include <set>
+#include <variant>
 
 #include <vulkan/vulkan.h>
 #include <vulkan/vk_enum_string_helper.h>
@@ -41,8 +42,6 @@
     } while (0)
 
 namespace Drizzle {
-
-
 	class Vulkan : public RenderingAPI {
 	public:
 		Drizzle_API Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events);
@@ -67,6 +66,8 @@ namespace Drizzle {
         void init_swapchain();
         void init_commands();
         void init_sync_structures();
+        void create_swapchain(uint32_t width, uint32_t height);
+        void destroy_swapchain();
 
 		Flags flags;
 		std::string name;
@@ -81,5 +82,17 @@ namespace Drizzle {
         VkPhysicalDevice _chosenGPU;
         VkDevice _device;
         VkSurfaceKHR _surface;
+        VkSwapchainKHR _swapchain;
+        VkFormat _swapchainImageFormat;
+
+        std::vector<VkImage> _swapchainImages;
+        std::vector<VkImageView> _swapchainImageViews;
+        VkExtent2D _swapchainExtent;    
+
+#ifdef NDEBUG
+        const bool bUseValidationLayers = false;
+#else
+        const bool bUseValidationLayers = true;
+#endif
 	};
 }

@@ -200,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="engine.cpp" />
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="Flags.cpp" />
     <ClCompile Include="Drizzle.cpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="Rendering3D.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
+    <ClCompile Include="swapchain.cpp" />
     <ClCompile Include="vendor\Glad1\src\glad.c" />
     <ClCompile Include="vendor\Glad1\src\glad_wgl.c" />
     <ClCompile Include="Vulkan.cpp" />
