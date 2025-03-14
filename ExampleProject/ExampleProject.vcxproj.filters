@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vendor\Hypa\HypaEngine.h">
+    <ClInclude Include="vendor\Drizzle\DrizzleEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

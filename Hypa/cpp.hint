@@ -1,2 +1,0 @@
-#define HYPA_API __declspec(dllexport)
-#define HYPA_API __declspec(dllimport)
