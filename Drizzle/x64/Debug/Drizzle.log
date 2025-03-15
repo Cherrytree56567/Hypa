@@ -1,35 +1,5 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Hypa.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  engine.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'engine.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
-D:\Drizzle\Drizzle\engine.cpp(72,20): error C2065: '_windowExtent': undeclared identifier
-D:\Drizzle\Drizzle\engine.cpp(72,41): error C2065: '_windowExtent': undeclared identifier
-D:\Drizzle\Drizzle\engine.cpp(72,3): error C2660: 'Drizzle::Vulkan::create_swapchain': function does not take 1 arguments
-      D:\Drizzle\Drizzle\Vulkan.h(69,14):
-      see declaration of 'Drizzle::Vulkan::create_swapchain'
-      D:\Drizzle\Drizzle\engine.cpp(72,3):
-      while trying to match the argument list '()'
-  
-  Drizzle.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'Drizzle.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
-  (compiling source file 'Drizzle.cpp')
-      D:\Drizzle\Drizzle\vendor\GLFW\include\GLFW\glfw3.h(123,11):
-      see previous definition of 'APIENTRY'
-  
-  Vulkan.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'Vulkan.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
-  Generating Code...
-D:\Drizzle\Drizzle\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary : ub
-D:\Drizzle\Drizzle\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary : ub
+  VkBootstrap.cpp
+     Creating library D:\Drizzle\x64\Debug\Drizzle.lib and object D:\Drizzle\x64\Debug\Drizzle.exp
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

@@ -55,6 +55,9 @@
     <Filter Include="Header Files\Glad">
       <UniqueIdentifier>{e1cc26ea-3156-42bb-8718-857d99eb628b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\VkBootstrap">
+      <UniqueIdentifier>{226585ec-5077-4ea9-9130-0d0fb879a3a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -104,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="swapchain.cpp">
       <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\vulkan\VkBootstrap\VkBootstrap.cpp">
+      <Filter>Header Files\VkBootstrap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

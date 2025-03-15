@@ -212,6 +212,7 @@
     <ClCompile Include="swapchain.cpp" />
     <ClCompile Include="vendor\Glad1\src\glad.c" />
     <ClCompile Include="vendor\Glad1\src\glad_wgl.c" />
+    <ClCompile Include="vendor\vulkan\VkBootstrap\VkBootstrap.cpp" />
     <ClCompile Include="Vulkan.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
