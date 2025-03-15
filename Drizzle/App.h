@@ -10,6 +10,7 @@ namespace Drizzle {
 	class App {
 	public:
 		Drizzle_API App();
+		Drizzle_API ~App();
 
 		Drizzle_API bool Update();
 

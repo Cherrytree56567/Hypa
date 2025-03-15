@@ -36,12 +36,19 @@
     do {                                                                \
         VkResult err = x;                                               \
         if (err) {                                                      \
-             fmt::print("Detected Vulkan error: {}", string_VkResult(err)); \
+            std::cout << "Detected Vulkan error: " << string_VkResult(err); \
             abort();                                                    \
         }                                                               \
     } while (0)
 
 namespace Drizzle {
+    struct FrameData {
+        VkSemaphore _swapchainSemaphore, _renderSemaphore;
+        VkFence _renderFence;
+        VkCommandPool _commandPool;
+        VkCommandBuffer _mainCommandBuffer;
+    };
+
 	class Vulkan : public RenderingAPI {
 	public:
 		Drizzle_API Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events);
@@ -69,6 +76,19 @@ namespace Drizzle {
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
 
+        FrameData& get_current_frame();
+        VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags);
+        VkCommandBufferAllocateInfo command_buffer_allocate_info(VkCommandPool pool, uint32_t count);
+        VkFenceCreateInfo fence_create_info(VkFenceCreateFlags flags);
+        VkSemaphoreCreateInfo semaphore_create_info(VkSemaphoreCreateFlags flags);
+        VkCommandBufferBeginInfo command_buffer_begin_info(VkCommandBufferUsageFlags flags);
+        VkSemaphoreSubmitInfo semaphore_submit_info(VkPipelineStageFlags2 stageMask, VkSemaphore semaphore);
+        VkCommandBufferSubmitInfo command_buffer_submit_info(VkCommandBuffer cmd);
+        VkSubmitInfo2 submit_info(VkCommandBufferSubmitInfo* cmd, VkSemaphoreSubmitInfo* signalSemaphoreInfo, VkSemaphoreSubmitInfo* waitSemaphoreInfo);
+
+        void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
+        VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
+
 		Flags flags;
 		std::string name;
         std::string CurrentShaderName = "Default";
@@ -84,10 +104,15 @@ namespace Drizzle {
         VkSurfaceKHR _surface;
         VkSwapchainKHR _swapchain;
         VkFormat _swapchainImageFormat;
+        VkQueue _graphicsQueue;
 
         std::vector<VkImage> _swapchainImages;
         std::vector<VkImageView> _swapchainImageViews;
-        VkExtent2D _swapchainExtent;    
+        VkExtent2D _swapchainExtent;
+        static const unsigned int FRAME_OVERLAP = 2;
+        FrameData _frames[FRAME_OVERLAP];
+        int _frameNumber{ 0 };
+        uint32_t _graphicsQueueFamily;
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;

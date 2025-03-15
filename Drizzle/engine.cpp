@@ -66,6 +66,12 @@ namespace Drizzle {
 		*/
 		_device = vkbDevice.device;
 		_chosenGPU = physicalDevice.physical_device;
+
+		/*
+		* Use vkbootstrap to get a Graphics Queue
+		*/
+		_graphicsQueue = vkbDevice.get_queue(vkb::QueueType::graphics).value();
+		_graphicsQueueFamily = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
 	}
 
 	void Vulkan::init_swapchain() {
@@ -73,10 +79,40 @@ namespace Drizzle {
 	}
 
 	void Vulkan::init_commands() {
+		/*
+		* Create a command pool for commands submitted to the graphics queue.
+		* We also want the pool to allow for resetting of individual command buffers
+		*/
+		VkCommandPoolCreateInfo commandPoolInfo = command_pool_create_info(_graphicsQueueFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
+		for (int i = 0; i < FRAME_OVERLAP; i++) {
+
+			VK_CHECK(vkCreateCommandPool(_device, &commandPoolInfo, nullptr, &_frames[i]._commandPool));
+
+			/*
+			* Allocate the default command buffer that we will use for rendering
+			*/
+			VkCommandBufferAllocateInfo cmdAllocInfo = command_buffer_allocate_info(_frames[i]._commandPool, 1);
+
+			VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_frames[i]._mainCommandBuffer));
+		}
 	}
 
 	void Vulkan::init_sync_structures() {
+		/*
+		* Create syncronization structures
+		* - 1 fence to control when the gpu has finished rendering the frame
+		* - 2 semaphores to syncronize rendering with swapchain
+		* We want the fence to start signalled so we can wait on it on the first frame
+		*/
+		VkFenceCreateInfo fenceCreateInfo = fence_create_info(VK_FENCE_CREATE_SIGNALED_BIT);
+		VkSemaphoreCreateInfo semaphoreCreateInfo = semaphore_create_info(0);
 
+		for (int i = 0; i < FRAME_OVERLAP; i++) {
+			VK_CHECK(vkCreateFence(_device, &fenceCreateInfo, nullptr, &_frames[i]._renderFence));
+
+			VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_frames[i]._swapchainSemaphore));
+			VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_frames[i]._renderSemaphore));
+		}
 	}
 }

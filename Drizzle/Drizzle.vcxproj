@@ -204,6 +204,7 @@
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="Flags.cpp" />
     <ClCompile Include="Drizzle.cpp" />
+    <ClCompile Include="helper.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="OpenGL.cpp" />
