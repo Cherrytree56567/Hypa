@@ -10,12 +10,6 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(1
       D:\Drizzle\Drizzle\vendor\GLFW\include\GLFW\glfw3.h(123,11):
       see previous definition of 'APIENTRY'
   
-  engine.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'engine.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
   Drizzle.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
   (compiling source file 'Drizzle.cpp')
@@ -27,6 +21,28 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(1
       D:\Drizzle\Drizzle\vendor\GLFW\include\GLFW\glfw3.h(123,11):
       see previous definition of 'APIENTRY'
   
+  Vulkan.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Vulkan.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  engine.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'engine.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
+D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:         with
+D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:         [
+D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:             _First=int
+D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:         ]
+D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
+D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:         with
+D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:         [
+D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:             _First=int
+D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:         ]
   helper.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
   (compiling source file 'helper.cpp')
@@ -36,12 +52,6 @@ D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefini
   swapchain.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
   (compiling source file 'swapchain.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
-  Vulkan.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'Vulkan.cpp')
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   

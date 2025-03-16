@@ -42,11 +42,36 @@
     } while (0)
 
 namespace Drizzle {
+    struct DeletionQueue {
+        std::deque<std::function<void()>> deletors;
+
+        void push_function(std::function<void()>&& function) {
+            deletors.push_back(function);
+        }
+
+        void flush() {
+            for (auto it = deletors.rbegin(); it != deletors.rend(); it++) {
+                (*it)();
+            }
+
+            deletors.clear();
+        }
+    };
+
+    struct AllocatedImage {
+        VkImage image;
+        VkImageView imageView;
+        VmaAllocation allocation;
+        VkExtent3D imageExtent;
+        VkFormat imageFormat;
+    };
+
     struct FrameData {
         VkSemaphore _swapchainSemaphore, _renderSemaphore;
         VkFence _renderFence;
         VkCommandPool _commandPool;
         VkCommandBuffer _mainCommandBuffer;
+        DeletionQueue _deletionQueue;
     };
 
 	class Vulkan : public RenderingAPI {
@@ -75,6 +100,7 @@ namespace Drizzle {
         void init_sync_structures();
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
+        void draw_background(VkCommandBuffer cmd);
 
         FrameData& get_current_frame();
         VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags);
@@ -85,9 +111,12 @@ namespace Drizzle {
         VkSemaphoreSubmitInfo semaphore_submit_info(VkPipelineStageFlags2 stageMask, VkSemaphore semaphore);
         VkCommandBufferSubmitInfo command_buffer_submit_info(VkCommandBuffer cmd);
         VkSubmitInfo2 submit_info(VkCommandBufferSubmitInfo* cmd, VkSemaphoreSubmitInfo* signalSemaphoreInfo, VkSemaphoreSubmitInfo* waitSemaphoreInfo);
+        VkImageCreateInfo image_create_info(VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent);
+        VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
 
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
+        void copy_image_to_image(VkCommandBuffer cmd, VkImage source, VkImage destination, VkExtent2D srcSize, VkExtent2D dstSize);
 
 		Flags flags;
 		std::string name;
@@ -105,6 +134,7 @@ namespace Drizzle {
         VkSwapchainKHR _swapchain;
         VkFormat _swapchainImageFormat;
         VkQueue _graphicsQueue;
+        VmaAllocator _allocator;
 
         std::vector<VkImage> _swapchainImages;
         std::vector<VkImageView> _swapchainImageViews;
@@ -113,6 +143,9 @@ namespace Drizzle {
         FrameData _frames[FRAME_OVERLAP];
         int _frameNumber{ 0 };
         uint32_t _graphicsQueueFamily;
+        DeletionQueue _mainDeletionQueue;
+        AllocatedImage _drawImage;
+        VkExtent2D _drawExtent;
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;

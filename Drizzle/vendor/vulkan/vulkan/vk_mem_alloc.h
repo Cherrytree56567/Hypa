@@ -2808,7 +2808,7 @@ VmaVulkanFunctions::vkGetInstanceProcAddr and vkGetDeviceProcAddr as
 VmaAllocatorCreateInfo::pVulkanFunctions. Other members can be null.
 */
 #if !defined(VMA_DYNAMIC_VULKAN_FUNCTIONS)
-#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
+#define VMA_DYNAMIC_VULKAN_FUNCTIONS true
 #endif
 
 #ifndef VMA_USE_STL_SHARED_MUTEX

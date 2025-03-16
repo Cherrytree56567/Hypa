@@ -1,4 +1,6 @@
 #include "Vulkan.h"
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
 
 namespace Drizzle {
 	Vulkan::Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events) {
@@ -33,7 +35,11 @@ namespace Drizzle {
 			vkDestroyFence(_device, _frames[i]._renderFence, nullptr);
 			vkDestroySemaphore(_device, _frames[i]._renderSemaphore, nullptr);
 			vkDestroySemaphore(_device, _frames[i]._swapchainSemaphore, nullptr);
+
+			_frames[i]._deletionQueue.flush();
 		}
+
+		_mainDeletionQueue.flush();
 
 		destroy_swapchain();
 
@@ -57,6 +63,7 @@ namespace Drizzle {
 		*/
 		uint32_t swapchainImageIndex;
 		VK_CHECK(vkAcquireNextImageKHR(_device, _swapchain, 1000000000, get_current_frame()._swapchainSemaphore, nullptr, &swapchainImageIndex));
+		get_current_frame()._deletionQueue.flush();
 
 		VkCommandBuffer command = get_current_frame()._mainCommandBuffer;
 
@@ -76,36 +83,37 @@ namespace Drizzle {
 		/*
 		* Start the command buffer recording
 		*/
+		_drawExtent.width = _drawImage.imageExtent.width;
+		_drawExtent.height = _drawImage.imageExtent.height;
+
 		VK_CHECK(vkBeginCommandBuffer(command, &cmdBeginInfo));
 
 		/*
-		* Make the swapchain image into writeable mode before rendering
+		* Transition our main draw image into general layout so we can write into it
+		* We will overwrite it all so we dont care about what was the older layout
 		*/
-		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
+		draw_background(command);
 
 		/*
-		* Make a clear color from frame number.
-		* This will flash with a 120 frame period.
+		* Transition the draw image and the swapchain image into their correct transfer layouts
 		*/
-		VkClearColorValue clearValue;
-		float flash = std::abs(std::sin(_frameNumber / 120.f));
-		clearValue = { { 0.0f, 0.0f, flash, 1.0f } };
-
-		VkImageSubresourceRange clearRange = image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT);
+		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		/*
-		* Clear the image
+		* Execute a copy from the draw image into the swapchain
 		*/
-		vkCmdClearColorImage(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, &clearValue, 1, &clearRange);
+		copy_image_to_image(command, _drawImage.image, _swapchainImages[swapchainImageIndex], _drawExtent, _swapchainExtent);
 
 		/*
-		* Make the swapchain image into presentable mode
+		* Set swapchain image layout to Present so we can show it on the screen
 		*/
-		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 		/*
 		* Finalize the command buffer
-		* We can no longer add commands, but it can now be executed
 		*/
 		VK_CHECK(vkEndCommandBuffer(command));
 
