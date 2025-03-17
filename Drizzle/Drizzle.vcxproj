@@ -200,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="descriptor.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="Flags.cpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="OpenGL.cpp" />
+    <ClCompile Include="pipelines.cpp" />
     <ClCompile Include="Rendering3D.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
     <ClCompile Include="swapchain.cpp" />

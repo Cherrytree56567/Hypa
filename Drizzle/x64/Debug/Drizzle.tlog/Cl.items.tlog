@@ -1,4 +1,5 @@
 D:\Drizzle\Drizzle\App.cpp;D:\Drizzle\Drizzle\x64\Debug\App.obj
+D:\Drizzle\Drizzle\descriptor.cpp;D:\Drizzle\Drizzle\x64\Debug\descriptor.obj
 D:\Drizzle\Drizzle\engine.cpp;D:\Drizzle\Drizzle\x64\Debug\engine.obj
 D:\Drizzle\Drizzle\EventSystem.cpp;D:\Drizzle\Drizzle\x64\Debug\EventSystem.obj
 D:\Drizzle\Drizzle\Flags.cpp;D:\Drizzle\Drizzle\x64\Debug\Flags.obj
@@ -7,6 +8,7 @@ D:\Drizzle\Drizzle\helper.cpp;D:\Drizzle\Drizzle\x64\Debug\helper.obj
 D:\Drizzle\Drizzle\Layer.cpp;D:\Drizzle\Drizzle\x64\Debug\Layer.obj
 D:\Drizzle\Drizzle\Logging.cpp;D:\Drizzle\Drizzle\x64\Debug\Logging.obj
 D:\Drizzle\Drizzle\OpenGL.cpp;D:\Drizzle\Drizzle\x64\Debug\OpenGL.obj
+D:\Drizzle\Drizzle\pipelines.cpp;D:\Drizzle\Drizzle\x64\Debug\pipelines.obj
 D:\Drizzle\Drizzle\Rendering3D.cpp;D:\Drizzle\Drizzle\x64\Debug\Rendering3D.obj
 D:\Drizzle\Drizzle\RenderingAPI.cpp;D:\Drizzle\Drizzle\x64\Debug\RenderingAPI.obj
 D:\Drizzle\Drizzle\swapchain.cpp;D:\Drizzle\Drizzle\x64\Debug\swapchain.obj

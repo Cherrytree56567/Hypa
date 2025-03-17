@@ -18,6 +18,8 @@ namespace Drizzle {
 		init_swapchain();
 		init_commands();
 		init_sync_structures();
+		init_descriptors();
+		init_pipelines();
 	}
 
 	void Vulkan::OnDetach() {

@@ -42,6 +42,31 @@
     } while (0)
 
 namespace Drizzle {
+    struct DescriptorLayoutBuilder {
+
+        std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+        void add_binding(uint32_t binding, VkDescriptorType type);
+        void clear();
+        VkDescriptorSetLayout build(VkDevice device, VkShaderStageFlags shaderStages, void* pNext = nullptr, VkDescriptorSetLayoutCreateFlags flags = 0);
+    };
+
+    struct DescriptorAllocator {
+
+        struct PoolSizeRatio {
+            VkDescriptorType type;
+            float ratio;
+        };
+
+        VkDescriptorPool pool;
+
+        void init_pool(VkDevice device, uint32_t maxSets, std::span<PoolSizeRatio> poolRatios);
+        void clear_descriptors(VkDevice device);
+        void destroy_pool(VkDevice device);
+
+        VkDescriptorSet allocate(VkDevice device, VkDescriptorSetLayout layout);
+    };
+
     struct DeletionQueue {
         std::deque<std::function<void()>> deletors;
 
@@ -93,11 +118,13 @@ namespace Drizzle {
         Drizzle_API void AddUniform(std::string name, UniformBufferObject& ubo) override;
 
 	private:
-
         void init_vulkan();
         void init_swapchain();
         void init_commands();
         void init_sync_structures();
+        void init_descriptors();
+        void init_pipelines();
+        void init_background_pipelines();
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
         void draw_background(VkCommandBuffer cmd);
@@ -118,6 +145,8 @@ namespace Drizzle {
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
         void copy_image_to_image(VkCommandBuffer cmd, VkImage source, VkImage destination, VkExtent2D srcSize, VkExtent2D dstSize);
 
+        bool load_shader_module(const char* filePath, VkDevice device, VkShaderModule* outShaderModule);
+
 		Flags flags;
 		std::string name;
         std::string CurrentShaderName = "Default";
@@ -135,6 +164,10 @@ namespace Drizzle {
         VkFormat _swapchainImageFormat;
         VkQueue _graphicsQueue;
         VmaAllocator _allocator;
+        VkDescriptorSet _drawImageDescriptors;
+        VkDescriptorSetLayout _drawImageDescriptorLayout;
+        VkPipeline _gradientPipeline;
+        VkPipelineLayout _gradientPipelineLayout;
 
         std::vector<VkImage> _swapchainImages;
         std::vector<VkImageView> _swapchainImageViews;
@@ -146,6 +179,7 @@ namespace Drizzle {
         DeletionQueue _mainDeletionQueue;
         AllocatedImage _drawImage;
         VkExtent2D _drawExtent;
+        DescriptorAllocator globalDescriptorAllocator;
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;
