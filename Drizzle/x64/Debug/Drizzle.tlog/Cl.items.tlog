@@ -14,6 +14,13 @@ D:\Drizzle\Drizzle\RenderingAPI.cpp;D:\Drizzle\Drizzle\x64\Debug\RenderingAPI.ob
 D:\Drizzle\Drizzle\swapchain.cpp;D:\Drizzle\Drizzle\x64\Debug\swapchain.obj
 D:\Drizzle\Drizzle\vendor\Glad1\src\glad.c;D:\Drizzle\Drizzle\x64\Debug\glad.obj
 D:\Drizzle\Drizzle\vendor\Glad1\src\glad_wgl.c;D:\Drizzle\Drizzle\x64\Debug\glad_wgl.obj
+D:\Drizzle\Drizzle\vendor\imgui\backends\imgui_impl_glfw.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui_impl_glfw.obj
+D:\Drizzle\Drizzle\vendor\imgui\backends\imgui_impl_vulkan.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui_impl_vulkan.obj
+D:\Drizzle\Drizzle\vendor\imgui\imgui.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui.obj
+D:\Drizzle\Drizzle\vendor\imgui\imgui_demo.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui_demo.obj
+D:\Drizzle\Drizzle\vendor\imgui\imgui_draw.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui_draw.obj
+D:\Drizzle\Drizzle\vendor\imgui\imgui_tables.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui_tables.obj
+D:\Drizzle\Drizzle\vendor\imgui\imgui_widgets.cpp;D:\Drizzle\Drizzle\x64\Debug\imgui_widgets.obj
 D:\Drizzle\Drizzle\vendor\vulkan\VkBootstrap\VkBootstrap.cpp;D:\Drizzle\Drizzle\x64\Debug\VkBootstrap.obj
 D:\Drizzle\Drizzle\Vulkan.cpp;D:\Drizzle\Drizzle\x64\Debug\Vulkan.obj
 D:\Drizzle\Drizzle\Window.cpp;D:\Drizzle\Drizzle\x64\Debug\Window.obj

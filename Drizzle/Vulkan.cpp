@@ -20,6 +20,7 @@ namespace Drizzle {
 		init_sync_structures();
 		init_descriptors();
 		init_pipelines();
+		init_imgui();
 	}
 
 	void Vulkan::OnDetach() {
@@ -53,6 +54,13 @@ namespace Drizzle {
 	}
 
 	void Vulkan::Render() {
+		ImGui_ImplVulkan_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::ShowDemoWindow();
+
+		ImGui::Render();
 		/*
 		* Wait until the GPU has finished rendering the last frame.
 		* Timeout of 1s
@@ -110,6 +118,16 @@ namespace Drizzle {
 		copy_image_to_image(command, _drawImage.image, _swapchainImages[swapchainImageIndex], _drawExtent, _swapchainExtent);
 
 		/*
+		* Set swapchain image layout to Attachment Optimal so we can draw it
+		*/
+		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+		/*
+		* Draw imgui into the swapchain image
+		*/
+		draw_imgui(command, _swapchainImageViews[swapchainImageIndex]);
+
+		/*
 		* Set swapchain image layout to Present so we can show it on the screen
 		*/
 		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
@@ -144,8 +162,8 @@ namespace Drizzle {
 		* as its necessary that drawing commands have finished before the image is displayed to the user
 		*/
 		VkPresentInfoKHR presentInfo = {};
-		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-		presentInfo.pNext = nullptr;
+		//presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		//presentInfo.pNext = nullptr;
 		presentInfo.pSwapchains = &_swapchain;
 		presentInfo.swapchainCount = 1;
 

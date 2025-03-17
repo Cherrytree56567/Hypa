@@ -27,6 +27,10 @@
 #include <vk_mem_alloc.h>
 #include <VkBootstrap/VkBootstrap.h>
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_vulkan.h>
+
 #include <glm/mat4x4.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -125,6 +129,8 @@ namespace Drizzle {
         void init_descriptors();
         void init_pipelines();
         void init_background_pipelines();
+        void init_imgui();
+        void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
         void draw_background(VkCommandBuffer cmd);
@@ -144,6 +150,9 @@ namespace Drizzle {
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
         void copy_image_to_image(VkCommandBuffer cmd, VkImage source, VkImage destination, VkExtent2D srcSize, VkExtent2D dstSize);
+        void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
+        VkRenderingAttachmentInfo attachment_info(VkImageView view, VkClearValue* clear, VkImageLayout layout);
+        VkRenderingInfo rendering_info(VkExtent2D renderExtent, VkRenderingAttachmentInfo* colorAttachment, VkRenderingAttachmentInfo* depthAttachment);
 
         bool load_shader_module(const char* filePath, VkDevice device, VkShaderModule* outShaderModule);
 
@@ -168,6 +177,12 @@ namespace Drizzle {
         VkDescriptorSetLayout _drawImageDescriptorLayout;
         VkPipeline _gradientPipeline;
         VkPipelineLayout _gradientPipelineLayout;
+        /*
+        * ImGUI
+        */
+        VkFence _immFence;
+        VkCommandBuffer _immCommandBuffer;
+        VkCommandPool _immCommandPool;
 
         std::vector<VkImage> _swapchainImages;
         std::vector<VkImageView> _swapchainImageViews;
