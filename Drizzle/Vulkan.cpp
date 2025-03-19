@@ -130,7 +130,7 @@ namespace Drizzle {
 		/*
 		* Set swapchain image layout to Present so we can show it on the screen
 		*/
-		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 		/*
 		* Finalize the command buffer
@@ -162,8 +162,8 @@ namespace Drizzle {
 		* as its necessary that drawing commands have finished before the image is displayed to the user
 		*/
 		VkPresentInfoKHR presentInfo = {};
-		//presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-		//presentInfo.pNext = nullptr;
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.pNext = nullptr;
 		presentInfo.pSwapchains = &_swapchain;
 		presentInfo.swapchainCount = 1;
 
