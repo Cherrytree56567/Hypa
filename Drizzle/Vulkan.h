@@ -36,6 +36,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
+#include "RenderingAPI.h"
 #define VK_CHECK(x)                                                     \
     do {                                                                \
         VkResult err = x;                                               \
@@ -103,6 +104,15 @@ namespace Drizzle {
         DeletionQueue _deletionQueue;
     };
 
+    struct ComputeEffect {
+        const char* name;
+
+        VkPipeline pipeline;
+        VkPipelineLayout layout;
+
+        PushConstants data;
+    };
+
 	class Vulkan : public RenderingAPI {
 	public:
 		Drizzle_API Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events);
@@ -119,7 +129,7 @@ namespace Drizzle {
 
         Drizzle_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
-        Drizzle_API void AddUniform(std::string name, UniformBufferObject& ubo) override;
+        Drizzle_API PushConstants& GetPushConstants() override;
 
 	private:
         void init_vulkan();
@@ -163,6 +173,7 @@ namespace Drizzle {
         bool ShaderChanged = false;
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
+		PushConstants pc;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;
@@ -195,6 +206,8 @@ namespace Drizzle {
         AllocatedImage _drawImage;
         VkExtent2D _drawExtent;
         DescriptorAllocator globalDescriptorAllocator;
+        std::vector<ComputeEffect> backgroundEffects;
+        int currentBackgroundEffect{ 0 };
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;

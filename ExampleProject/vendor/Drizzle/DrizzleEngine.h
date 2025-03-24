@@ -734,20 +734,20 @@ namespace Drizzle {
         glm::vec3 Normals;
     };
 
-    struct UniformBufferObject {
-        alignas(16) glm::mat4 model;
-        alignas(16) glm::mat4 view;
-        alignas(16) glm::mat4 proj;
-        std::vector<std::pair<std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>, std::string>> CustomArgs;
+    struct PushConstants {
+        glm::vec4 data1;
+        glm::vec4 data2;
+        glm::vec4 data3;
+        glm::vec4 data4;
     };
 
     class RenderingAPI {
     public:
         Drizzle_API RenderingAPI() {}
 
-        Drizzle_API virtual void OnAttach() { }
-        Drizzle_API virtual void OnDetach() { }
-        Drizzle_API virtual void Render() { }
+        Drizzle_API virtual void OnAttach() {}
+        Drizzle_API virtual void OnDetach() {}
+        Drizzle_API virtual void Render() {}
 
         Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
         Drizzle_API virtual void RemoveShader(std::string name) {}
@@ -763,12 +763,12 @@ namespace Drizzle {
 
         Drizzle_API virtual const std::string& GetName() const { return name; }
 
-        Drizzle_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) = 0;
-        Drizzle_API virtual UniformBufferObject& GetUniform(std::string name) { UniformBufferObject ub; return ub; }
+        Drizzle_API virtual PushConstants& GetPushConstants() { return pc; }
 
     private:
         Flags flags;
         std::string name;
+        PushConstants pc;
     };
 
     class RenderingAPISystem {
@@ -888,42 +888,7 @@ namespace Drizzle {
 
         Drizzle_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
-        Drizzle_API void AddUniform(std::string name, UniformBufferObject& ubo) override;
-
-    private:
-
-        void init_vulkan();
-        void init_swapchain();
-        void init_commands();
-        void init_sync_structures();
-        void create_swapchain(uint32_t width, uint32_t height);
-        void destroy_swapchain();
-
-        Flags flags;
-        std::string name;
-        std::string CurrentShaderName = "Default";
-        Logging log;
-        bool ShaderChanged = false;
-        std::shared_ptr<Window> pWindow;
-        std::shared_ptr<EventSystem> pEvents;
-
-        VkInstance _instance;
-        VkDebugUtilsMessengerEXT _debug_messenger;
-        VkPhysicalDevice _chosenGPU;
-        VkDevice _device;
-        VkSurfaceKHR _surface;
-        VkSwapchainKHR _swapchain;
-        VkFormat _swapchainImageFormat;
-
-        std::vector<VkImage> _swapchainImages;
-        std::vector<VkImageView> _swapchainImageViews;
-        VkExtent2D _swapchainExtent;
-
-#ifdef NDEBUG
-        const bool bUseValidationLayers = false;
-#else
-        const bool bUseValidationLayers = true;
-#endif
+        Drizzle_API PushConstants& GetPushConstants() override;
     };
 
     /*
@@ -943,16 +908,18 @@ namespace Drizzle {
         Drizzle_API virtual void ChangeShader(std::string name) override;
         Drizzle_API virtual std::string GetCurrentShaderName() override;
 
+        Drizzle_API virtual void CreateTexture(std::string name, std::string TexturePath) override;
+        Drizzle_API virtual void RemoveTexture(std::string name) override;
+        Drizzle_API virtual void ChangeTexture(std::string name) override;
+        Drizzle_API virtual std::string GetCurrentTextureName() override;
+
         Drizzle_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
         Drizzle_API virtual const std::string& GetName() const override { return name; }
 
-        Drizzle_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) override;
-        Drizzle_API virtual UniformBufferObject& GetUniform(std::string name) override;
+        Drizzle_API virtual PushConstants& GetPushConstants() override;
 
     private:
-        std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
-
         Flags flags;
         std::string name;
         std::shared_ptr<Window> pWindow;
@@ -963,8 +930,11 @@ namespace Drizzle {
         std::vector<GLuint> IndexBuffer;
         std::vector<std::vector<uint16_t>> Indices;
         std::string CurrentShaderName = "Default";
+        std::string CurrentTextureName = "";
         bool ShaderChanged = true;
-        std::map<std::string, std::tuple<unsigned int, unsigned int, UniformBufferObject>> Shaders;
+        std::map<std::string, std::tuple<unsigned int, unsigned int>> Shaders;
+        std::map<std::string, unsigned int> Textures;
+        PushConstants pc;
     };
 
     /*
