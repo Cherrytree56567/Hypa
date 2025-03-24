@@ -5,5 +5,4 @@ D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefini
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   
-D:\Drizzle\Drizzle\RenderingAPI.h(47,1): warning C4172: returning address of local variable or temporary : ub
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

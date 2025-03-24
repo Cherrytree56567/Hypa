@@ -58,7 +58,16 @@ namespace Drizzle {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::ShowDemoWindow();
+		if (ImGui::Begin("background")) {
+
+			ImGui::Text("Selected shader: ", CurrentShaderName);
+
+			ImGui::InputFloat4("data1", (float*)&pushConstants.data1);
+			ImGui::InputFloat4("data2", (float*)&pushConstants.data2);
+			ImGui::InputFloat4("data3", (float*)&pushConstants.data3);
+			ImGui::InputFloat4("data4", (float*)&pushConstants.data4);
+		}
+		ImGui::End();
 
 		ImGui::Render();
 		/*
@@ -181,15 +190,62 @@ namespace Drizzle {
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
+		VkPipeline pipeline;
+		VkPipelineLayout pipelineLayout;
+		VkPipelineLayoutCreateInfo computeLayout{};
+		computeLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		computeLayout.pNext = nullptr;
+		computeLayout.pSetLayouts = &_drawImageDescriptorLayout;
+		computeLayout.setLayoutCount = 1;
 
+		VkPushConstantRange pushConstant{};
+		pushConstant.offset = 0;
+		pushConstant.size = sizeof(PushConstants);
+		pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+
+		computeLayout.pPushConstantRanges = &pushConstant;
+		computeLayout.pushConstantRangeCount = 1;
+
+		VK_CHECK(vkCreatePipelineLayout(_device, &computeLayout, nullptr, &pipelineLayout));
+
+		VkShaderModule computeDrawShader;
+		if (!load_shader_module(VertShaderPath.c_str(), _device, &computeDrawShader)) {
+			log.Error("Couldn't building the compute shader \n");
+		}
+
+		VkPipelineShaderStageCreateInfo stageinfo{};
+		stageinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		stageinfo.pNext = nullptr;
+		stageinfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+		stageinfo.module = computeDrawShader;
+		stageinfo.pName = "main";
+
+		VkComputePipelineCreateInfo computePipelineCreateInfo{};
+		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+		computePipelineCreateInfo.pNext = nullptr;
+		computePipelineCreateInfo.layout = pipelineLayout;
+		computePipelineCreateInfo.stage = stageinfo;
+
+		VK_CHECK(vkCreateComputePipelines(_device, VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &pipeline));
+
+		vkDestroyShaderModule(_device, computeDrawShader, nullptr);
+
+		shaders.insert(std::make_pair(name, std::make_pair(pipeline, pipelineLayout)));
+
+		_mainDeletionQueue.push_function([name, this]() {
+			vkDestroyPipelineLayout(_device, shaders[name].second, nullptr);
+			vkDestroyPipeline(_device, shaders[name].first, nullptr);
+		});
 	}
 
 	void Vulkan::RemoveShader(std::string name) {
-
+		vkDestroyPipelineLayout(_device, shaders[name].second, nullptr);
+		vkDestroyPipeline(_device, shaders[name].first, nullptr);
+		shaders.erase(name);
 	}
 
 	void Vulkan::ChangeShader(std::string name) {
-
+		CurrentShaderName = name;
 	}
 
 	std::string Vulkan::GetCurrentShaderName() {
@@ -197,10 +253,6 @@ namespace Drizzle {
 	}
 
 	void Vulkan::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-
-	}
-
-	void Vulkan::AddUniform(std::string name, UniformBufferObject& ubo) {
 
 	}
 }

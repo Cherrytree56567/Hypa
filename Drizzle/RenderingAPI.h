@@ -14,11 +14,11 @@ namespace Drizzle {
 		glm::vec3 Normals;
 	};
 
-	struct UniformBufferObject {
-		alignas(16) glm::mat4 model = glm::mat4(1.0f);
-		alignas(16) glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		alignas(16) glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 150.0f);
-		std::vector<std::pair<std::variant<int, float, double, std::string, char, char*, glm::mat2, glm::mat2x2, glm::mat2x3, glm::mat2x4, glm::mat3, glm::mat3x2, glm::mat3x3, glm::mat3x4, glm::mat4, glm::mat4x2, glm::mat4x3, glm::mat4x4, glm::vec3, glm::vec1, glm::vec2, glm::vec4>, std::string>> CustomArgs;
+	struct PushConstants {
+		glm::vec4 data1;
+		glm::vec4 data2;
+		glm::vec4 data3;
+		glm::vec4 data4;
 	};
 
 	class RenderingAPI {
@@ -43,12 +43,12 @@ namespace Drizzle {
 
 		Drizzle_API virtual const std::string& GetName() const { return name; }
 
-		Drizzle_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) = 0;
-		Drizzle_API virtual UniformBufferObject& GetUniform(std::string name) { UniformBufferObject ub; return ub; }
+		Drizzle_API virtual PushConstants& GetPushConstants() { return pushConstants; }
 
 	private:
 		Flags flags;
 		std::string name;
+		PushConstants pushConstants;
 	};
 
 	class RenderingAPISystem {

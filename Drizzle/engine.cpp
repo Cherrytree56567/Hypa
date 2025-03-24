@@ -339,14 +339,19 @@ namespace Drizzle {
 		VkImageSubresourceRange clearRange = image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT);
 
 		/*
-		* Bind the gradient drawing compute pipeline
+		* Bind the gradient drawing compute pipelinesss
 		*/
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, _gradientPipeline);
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, shaders[CurrentShaderName].first);
 
 		/*
 		* Bind the descriptor set containing the draw image for the compute pipeline
 		*/
-		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, _gradientPipelineLayout, 0, 1, &_drawImageDescriptors, 0, nullptr);
+		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, shaders[CurrentShaderName].second, 0, 1, &_drawImageDescriptors, 0, nullptr);
+
+		/*
+		* Execute the push constants.
+		*/
+		vkCmdPushConstants(cmd, shaders[CurrentShaderName].second, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(PushConstants), &pushConstants);
 
 		/*
 		* Execute the compute pipeline dispatch.We are using 16x16 workgroup size so we need to divide by it
@@ -355,41 +360,9 @@ namespace Drizzle {
 	}
 
 	void Vulkan::init_background_pipelines() {
-		VkPipelineLayoutCreateInfo computeLayout{};
-		computeLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		computeLayout.pNext = nullptr;
-		computeLayout.pSetLayouts = &_drawImageDescriptorLayout;
-		computeLayout.setLayoutCount = 1;
-
-		VK_CHECK(vkCreatePipelineLayout(_device, &computeLayout, nullptr, &_gradientPipelineLayout));
-
-		VkShaderModule computeDrawShader;
-		if (!load_shader_module("gradient.comp.spv", _device, &computeDrawShader))
-		{
-			log.Error("Couldn't building the compute shader \n");
-		}
-
-		VkPipelineShaderStageCreateInfo stageinfo{};
-		stageinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stageinfo.pNext = nullptr;
-		stageinfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-		stageinfo.module = computeDrawShader;
-		stageinfo.pName = "main";
-
-		VkComputePipelineCreateInfo computePipelineCreateInfo{};
-		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		computePipelineCreateInfo.pNext = nullptr;
-		computePipelineCreateInfo.layout = _gradientPipelineLayout;
-		computePipelineCreateInfo.stage = stageinfo;
-
-		VK_CHECK(vkCreateComputePipelines(_device, VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &_gradientPipeline));
-
-		vkDestroyShaderModule(_device, computeDrawShader, nullptr);
-
-		_mainDeletionQueue.push_function([&]() {
-			vkDestroyPipelineLayout(_device, _gradientPipelineLayout, nullptr);
-			vkDestroyPipeline(_device, _gradientPipeline, nullptr);
-		});
+		CreateShader("Default", "gradient.comp.spv", "");
+		pushConstants.data1 = glm::vec4(1, 0, 0, 1);
+		pushConstants.data2 = glm::vec4(0, 0, 1, 1);
 	}
 
 	void Vulkan::draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView) {

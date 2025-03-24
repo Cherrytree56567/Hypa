@@ -37,11 +37,10 @@ namespace Drizzle {
 
 		Drizzle_API virtual const std::string& GetName() const override { return name; }
 
-		Drizzle_API virtual void AddUniform(std::string name, UniformBufferObject& ubo) override;
-		Drizzle_API virtual UniformBufferObject& GetUniform(std::string name) override;
+		Drizzle_API virtual PushConstants& GetPushConstants() override { return pushConstants; }
 
 	private:
-		std::tuple<unsigned int, unsigned int, UniformBufferObject> GetShader(std::string name);
+		std::tuple<unsigned int, unsigned int> GetShader(std::string name);
 
 		Flags flags;
 		std::string name;
@@ -55,7 +54,8 @@ namespace Drizzle {
 		std::string CurrentShaderName = "Default";
 		std::string CurrentTextureName = "";
 		bool ShaderChanged = true;
-		std::map<std::string, std::tuple<unsigned int, unsigned int, UniformBufferObject>> Shaders;
+		std::map<std::string, std::tuple<unsigned int, unsigned int>> Shaders;
 		std::map<std::string, unsigned int> Textures;
+		PushConstants pushConstants;
 	};
 }

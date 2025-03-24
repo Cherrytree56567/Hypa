@@ -119,7 +119,7 @@ namespace Drizzle {
 
         Drizzle_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
 
-        Drizzle_API void AddUniform(std::string name, UniformBufferObject& ubo) override;
+        Drizzle_API PushConstants& GetPushConstants() override { return pushConstants; }
 
 	private:
         void init_vulkan();
@@ -163,6 +163,8 @@ namespace Drizzle {
         bool ShaderChanged = false;
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
+        PushConstants pushConstants;
+        std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;
@@ -175,8 +177,6 @@ namespace Drizzle {
         VmaAllocator _allocator;
         VkDescriptorSet _drawImageDescriptors;
         VkDescriptorSetLayout _drawImageDescriptorLayout;
-        VkPipeline _gradientPipeline;
-        VkPipelineLayout _gradientPipelineLayout;
         /*
         * ImGUI
         */
