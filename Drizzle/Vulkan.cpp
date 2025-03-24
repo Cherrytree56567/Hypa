@@ -181,55 +181,7 @@ namespace Drizzle {
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
-		VkPipelineLayoutCreateInfo computeLayout{};
-		computeLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		computeLayout.pNext = nullptr;
-		computeLayout.pSetLayouts = &_drawImageDescriptorLayout;
-		computeLayout.setLayoutCount = 1;
 
-		VkPushConstantRange pushConstant{};
-		pushConstant.offset = 0;
-		pushConstant.size = sizeof(PushConstants);
-		pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-
-		computeLayout.pPushConstantRanges = &pushConstant;
-		computeLayout.pushConstantRangeCount = 1;
-
-		VK_CHECK(vkCreatePipelineLayout(_device, &computeLayout, nullptr, &_gradientPipelineLayout));
-
-		VkShaderModule computeDrawShader;
-		if (!load_shader_module(FragShaderPath.c_str(), _device, &computeDrawShader))
-		{
-			log.Error("Couldn't building the compute shader \n");
-		}
-
-		VkPipelineShaderStageCreateInfo stageinfo{};
-		stageinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stageinfo.pNext = nullptr;
-		stageinfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-		stageinfo.module = computeDrawShader;
-		stageinfo.pName = "main";
-
-		VkComputePipelineCreateInfo computePipelineCreateInfo{};
-		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		computePipelineCreateInfo.pNext = nullptr;
-		computePipelineCreateInfo.layout = _gradientPipelineLayout;
-		computePipelineCreateInfo.stage = stageinfo;
-
-		VK_CHECK(vkCreateComputePipelines(_device, VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &_gradientPipeline));
-
-		vkDestroyShaderModule(_device, computeDrawShader, nullptr);
-
-		_mainDeletionQueue.push_function([&]() {
-			vkDestroyPipelineLayout(_device, _gradientPipelineLayout, nullptr);
-			vkDestroyPipeline(_device, _gradientPipeline, nullptr);
-			});
-
-		ComputeEffect gradient;
-		gradient.layout = _gradientPipelineLayout;
-		gradient.name = name.c_str();
-		gradient.data = {};
-		backgroundEffects.push_back(gradient);
 	}
 
 	void Vulkan::RemoveShader(std::string name) {
@@ -248,7 +200,7 @@ namespace Drizzle {
 
 	}
 
-	PushConstants& Vulkan::GetPushConstants() {
-		return pc;
+	void Vulkan::AddUniform(std::string name, UniformBufferObject& ubo) {
+
 	}
 }

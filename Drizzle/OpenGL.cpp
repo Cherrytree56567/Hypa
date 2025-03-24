@@ -38,7 +38,7 @@ namespace Drizzle {
             exit(-1);
         }
 
-        //CreateShader("Default", "vertex.glsl", "fragment.glsl");
+        CreateShader("Default", "vertex.glsl", "fragment.glsl");
         ChangeShader("Default");
 
         ShaderChanged = true;
@@ -95,7 +95,10 @@ namespace Drizzle {
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        Shaders.insert(std::make_pair(name, std::make_tuple(shaderProgram, shaderProgram)));
+        UniformBufferObject uni;
+
+        Shaders.insert(std::make_pair(name, std::make_tuple(shaderProgram, shaderProgram, uni)));
+        AddUniform(name, uni);
 	}
 
 	void OpenGL::RemoveShader(std::string name) {
@@ -153,8 +156,100 @@ namespace Drizzle {
         Indices.push_back(indices);
     }
 
-    PushConstants& OpenGL::GetPushConstants() {
-        return pc;
+	void OpenGL::AddUniform(std::string name, UniformBufferObject& ubo) {
+        GLuint shaderProgram = std::get<0>(GetShader(GetCurrentShaderName()));
+        glUseProgram(shaderProgram);
+        Shaders[name] = std::make_tuple(std::get<0>(Shaders[name]), std::get<1>(Shaders[name]), ubo);
+
+        GLuint viewMatrixLoc = glGetUniformLocation(shaderProgram, "viewMatrix");
+        GLuint projectionMatrixLoc = glGetUniformLocation(shaderProgram, "projectionMatrix");
+        GLuint modelMatrixLoc = glGetUniformLocation(shaderProgram, "modelMatrix");
+
+        glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.view));
+        glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.proj));
+        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(ubo.model));
+
+        for (const auto& [value, uniformName] : ubo.CustomArgs) {
+            GLuint uniformLocation = glGetUniformLocation(shaderProgram, uniformName.c_str());
+
+            std::visit([&](auto&& val) {
+                using T = std::decay_t<decltype(val)>;
+                if constexpr (std::is_same_v<T, int>) {
+                    glUniform1i(uniformLocation, val);
+                }
+                else if constexpr (std::is_same_v<T, float>) {
+                    glUniform1f(uniformLocation, val);
+                }
+                else if constexpr (std::is_same_v<T, double>) {
+                    glUniform1d(uniformLocation, val);
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2>) {
+                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x2>) {
+                    glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x3>) {
+                    glUniformMatrix2x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat2x4>) {
+                    glUniformMatrix2x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3>) {
+                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x2>) {
+                    glUniformMatrix3x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x3>) {
+                    glUniformMatrix3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat3x4>) {
+                    glUniformMatrix3x4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4>) {
+                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x2>) {
+                    glUniformMatrix4x2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x3>) {
+                    glUniformMatrix4x3fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::mat4x4>) {
+                    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec1>) {
+                    glUniform1fv(uniformLocation, 1, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec2>) {
+                    glUniform2fv(uniformLocation, 1, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec3>) {
+                    glUniform3fv(uniformLocation, 1, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, glm::vec4>) {
+                    glUniform4fv(uniformLocation, 1, glm::value_ptr(val));
+                }
+                else if constexpr (std::is_same_v<T, unsigned int>) {
+                    glUniform1ui(uniformLocation, val);
+                }
+                else if constexpr (std::is_same_v<T, char*>) {
+                    glUniform1i(uniformLocation, *reinterpret_cast<int*>(val));
+                }
+                else if constexpr (std::is_same_v<T, std::string>) {
+                    glUniform1i(uniformLocation, std::stoi(val));
+                }
+                }, value);
+        }
+	}
+
+    UniformBufferObject& OpenGL::GetUniform(std::string name) {
+        return std::get<2>(Shaders[name]);
+    }
+
+    std::tuple<unsigned int, unsigned int, UniformBufferObject> OpenGL::GetShader(std::string name) {
+        return Shaders[name];
     }
 
     void OpenGL::CreateTexture(std::string name, std::string TexturePath) {
