@@ -113,12 +113,16 @@ namespace Drizzle {
 		*/
 		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
-		draw_background(command);
+		//draw_background(command);
+
+		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+		draw_geometry(command);
 
 		/*
-		* Transition the draw image and the swapchain image into their correct transfer layouts
+		* Transtion the draw image and the swapchain image into their correct transfer layouts
 		*/
-		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		transition_image(command, _swapchainImages[swapchainImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		/*
@@ -192,43 +196,46 @@ namespace Drizzle {
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
 		VkPipeline pipeline;
 		VkPipelineLayout pipelineLayout;
-		VkPipelineLayoutCreateInfo computeLayout{};
-		computeLayout.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		computeLayout.pNext = nullptr;
-		computeLayout.pSetLayouts = &_drawImageDescriptorLayout;
-		computeLayout.setLayoutCount = 1;
-
-		VkPushConstantRange pushConstant{};
-		pushConstant.offset = 0;
-		pushConstant.size = sizeof(PushConstants);
-		pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-
-		computeLayout.pPushConstantRanges = &pushConstant;
-		computeLayout.pushConstantRangeCount = 1;
-
-		VK_CHECK(vkCreatePipelineLayout(_device, &computeLayout, nullptr, &pipelineLayout));
-
-		VkShaderModule computeDrawShader;
-		if (!load_shader_module(VertShaderPath.c_str(), _device, &computeDrawShader)) {
-			log.Error("Couldn't building the compute shader \n");
+		VkShaderModule FragShader;
+		if (!load_shader_module(FragShaderPath.c_str(), _device, &FragShader)) {
+			log.Error("Couldn't Build the fragment shader module.");
+		} else {
+			log.Info("fragment shader succesfully loaded.");
 		}
 
-		VkPipelineShaderStageCreateInfo stageinfo{};
-		stageinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stageinfo.pNext = nullptr;
-		stageinfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-		stageinfo.module = computeDrawShader;
-		stageinfo.pName = "main";
+		VkShaderModule VertexShader;
+		if (!load_shader_module(VertShaderPath.c_str(), _device, &VertexShader)) {
+			log.Error("Couldn't build the vertex shader module");
+		}
+		else {
+			log.Info("vertex shader succesfully loaded.");
+		}
 
-		VkComputePipelineCreateInfo computePipelineCreateInfo{};
-		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		computePipelineCreateInfo.pNext = nullptr;
-		computePipelineCreateInfo.layout = pipelineLayout;
-		computePipelineCreateInfo.stage = stageinfo;
+		/*
+		* Build the pipeline layout that controls the inputs / outputs of the shader
+		* We are not using descriptor sets or other systems yet, so no need to use anything other than empty default
+		*/
+		VkPipelineLayoutCreateInfo pipeline_layout_info = pipeline_layout_create_info();
+		VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &pipelineLayout));
 
-		VK_CHECK(vkCreateComputePipelines(_device, VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &pipeline));
+		PipelineBuilder pipelineBuilder;
 
-		vkDestroyShaderModule(_device, computeDrawShader, nullptr);
+		pipelineBuilder._pipelineLayout = pipelineLayout;
+		pipelineBuilder.set_shaders(VertexShader, FragShader);
+		pipelineBuilder.set_input_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+		pipelineBuilder.set_polygon_mode(VK_POLYGON_MODE_FILL);
+		pipelineBuilder.set_cull_mode(VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE);
+		pipelineBuilder.set_multisampling_none();
+		pipelineBuilder.disable_blending();
+		pipelineBuilder.disable_depthtest();
+
+		pipelineBuilder.set_color_attachment_format(_drawImage.imageFormat);
+		pipelineBuilder.set_depth_format(VK_FORMAT_UNDEFINED);
+
+		pipeline = pipelineBuilder.build_pipeline(_device);
+
+		vkDestroyShaderModule(_device, FragShader, nullptr);
+		vkDestroyShaderModule(_device, VertexShader, nullptr);
 
 		shaders.insert(std::make_pair(name, std::make_pair(pipeline, pipelineLayout)));
 

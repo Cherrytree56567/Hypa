@@ -359,8 +359,42 @@ namespace Drizzle {
 		vkCmdDispatch(cmd, std::ceil(_drawExtent.width / 16.0), std::ceil(_drawExtent.height / 16.0), 1);
 	}
 
+	void Vulkan::draw_geometry(VkCommandBuffer cmd) {
+		/*
+		* Begin a render pass  connected to our draw image
+		*/
+		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, nullptr);
+		vkCmdBeginRendering(cmd, &renderInfo);
+
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].first);
+
+		VkViewport viewport = {};
+		viewport.x = 0;
+		viewport.y = 0;
+		viewport.width = _drawExtent.width;
+		viewport.height = _drawExtent.height;
+		viewport.minDepth = 0.f;
+		viewport.maxDepth = 1.f;
+
+		vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+		VkRect2D scissor = {};
+		scissor.offset.x = 0;
+		scissor.offset.y = 0;
+		scissor.extent.width = _drawExtent.width;
+		scissor.extent.height = _drawExtent.height;
+
+		vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+		vkCmdDraw(cmd, 3, 1, 0, 0);
+
+		vkCmdEndRendering(cmd);
+	}
+
 	void Vulkan::init_background_pipelines() {
-		CreateShader("Default", "gradient.comp.spv", "");
+		CreateShader("Default", "vert.spv", "frag.spv");
 		pushConstants.data1 = glm::vec4(1, 0, 0, 1);
 		pushConstants.data2 = glm::vec4(0, 0, 1, 1);
 	}

@@ -103,6 +103,38 @@ namespace Drizzle {
         DeletionQueue _deletionQueue;
     };
 
+    VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shaderModule, const char* entry = "main");
+
+    class PipelineBuilder {
+    public:
+        std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
+
+        VkPipelineInputAssemblyStateCreateInfo _inputAssembly;
+        VkPipelineRasterizationStateCreateInfo _rasterizer;
+        VkPipelineColorBlendAttachmentState _colorBlendAttachment;
+        VkPipelineMultisampleStateCreateInfo _multisampling;
+        VkPipelineLayout _pipelineLayout;
+        VkPipelineDepthStencilStateCreateInfo _depthStencil;
+        VkPipelineRenderingCreateInfo _renderInfo;
+        VkFormat _colorAttachmentformat;
+
+        PipelineBuilder() { clear(); }
+
+        void clear();
+
+        VkPipeline build_pipeline(VkDevice device);
+
+        void set_shaders(VkShaderModule vertexShader, VkShaderModule fragmentShader);
+        void set_input_topology(VkPrimitiveTopology topology);
+        void set_polygon_mode(VkPolygonMode mode);
+        void set_multisampling_none();
+        void disable_blending();
+        void set_color_attachment_format(VkFormat format);
+        void set_depth_format(VkFormat format);
+        void disable_depthtest();
+        void set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace);
+    };
+
 	class Vulkan : public RenderingAPI {
 	public:
 		Drizzle_API Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events);
@@ -134,6 +166,7 @@ namespace Drizzle {
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
         void draw_background(VkCommandBuffer cmd);
+        void draw_geometry(VkCommandBuffer cmd);
 
         FrameData& get_current_frame();
         VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags);
@@ -146,6 +179,7 @@ namespace Drizzle {
         VkSubmitInfo2 submit_info(VkCommandBufferSubmitInfo* cmd, VkSemaphoreSubmitInfo* signalSemaphoreInfo, VkSemaphoreSubmitInfo* waitSemaphoreInfo);
         VkImageCreateInfo image_create_info(VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent);
         VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
+        VkPipelineLayoutCreateInfo pipeline_layout_create_info();
 
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
