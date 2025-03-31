@@ -51,7 +51,7 @@ namespace Drizzle {
         }
 
         const aiMesh* mesh = scene->mMeshes[0];
-
+        /*
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex;
 
@@ -76,6 +76,6 @@ namespace Drizzle {
             }
         }
 
-        return std::make_pair(vertices, indices);
+        return std::make_pair(vertices, indices);*/
     }
 }

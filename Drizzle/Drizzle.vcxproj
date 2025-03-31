@@ -208,6 +208,7 @@
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="mesh.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="pipelines.cpp" />
     <ClCompile Include="Rendering3D.cpp" />

@@ -121,7 +121,7 @@ namespace Drizzle {
         glGenVertexArrays(1, &CurrentVertexArray);
         glGenBuffers(1, &CurrentVertexBuffer);
         glGenBuffers(1, &CurrentIndexBuffer);
-        //
+        /*
         glBindVertexArray(CurrentVertexArray);
 
         glBindBuffer(GL_ARRAY_BUFFER, CurrentVertexBuffer);
@@ -151,6 +151,7 @@ namespace Drizzle {
         VertexBuffer.push_back(CurrentVertexBuffer);
         IndexBuffer.push_back(CurrentIndexBuffer);
         Indices.push_back(indices);
+        */
     }
 
     std::tuple<unsigned int, unsigned int> OpenGL::GetShader(std::string name) {

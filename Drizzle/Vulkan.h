@@ -95,12 +95,29 @@ namespace Drizzle {
         VkFormat imageFormat;
     };
 
+    struct AllocatedBuffer {
+        VkBuffer buffer;
+        VmaAllocation allocation;
+        VmaAllocationInfo info;
+    };
+
     struct FrameData {
         VkSemaphore _swapchainSemaphore, _renderSemaphore;
         VkFence _renderFence;
         VkCommandPool _commandPool;
         VkCommandBuffer _mainCommandBuffer;
         DeletionQueue _deletionQueue;
+    };
+
+    struct GPUMeshBuffers {
+        AllocatedBuffer indexBuffer;
+        AllocatedBuffer vertexBuffer;
+        VkDeviceAddress vertexBufferAddress;
+    };
+
+    struct GPUDrawPushConstants {
+        glm::mat4 worldMatrix;
+        VkDeviceAddress vertexBuffer;
     };
 
     VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shaderModule, const char* entry = "main");
@@ -162,6 +179,7 @@ namespace Drizzle {
         void init_pipelines();
         void init_background_pipelines();
         void init_imgui();
+        void init_default_data();
         void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
@@ -180,6 +198,11 @@ namespace Drizzle {
         VkImageCreateInfo image_create_info(VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent);
         VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
         VkPipelineLayoutCreateInfo pipeline_layout_create_info();
+        AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
+
+        void destroy_buffer(const AllocatedBuffer& buffer);
+
+        GPUMeshBuffers uploadMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
@@ -199,6 +222,8 @@ namespace Drizzle {
         std::shared_ptr<EventSystem> pEvents;
         PushConstants pushConstants;
         std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
+
+        GPUMeshBuffers rectangle;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;

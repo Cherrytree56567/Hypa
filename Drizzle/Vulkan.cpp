@@ -21,6 +21,7 @@ namespace Drizzle {
 		init_descriptors();
 		init_pipelines();
 		init_imgui();
+		init_default_data();
 	}
 
 	void Vulkan::OnDetach() {
@@ -200,7 +201,7 @@ namespace Drizzle {
 		if (!load_shader_module(FragShaderPath.c_str(), _device, &FragShader)) {
 			log.Error("Couldn't Build the fragment shader module.");
 		} else {
-			log.Info("fragment shader succesfully loaded.");
+			log.Info("Fragment shader succesfully loaded.");
 		}
 
 		VkShaderModule VertexShader;
@@ -208,14 +209,21 @@ namespace Drizzle {
 			log.Error("Couldn't build the vertex shader module");
 		}
 		else {
-			log.Info("vertex shader succesfully loaded.");
+			log.Info("Vertex shader succesfully loaded.");
 		}
 
 		/*
 		* Build the pipeline layout that controls the inputs / outputs of the shader
 		* We are not using descriptor sets or other systems yet, so no need to use anything other than empty default
 		*/
+		VkPushConstantRange bufferRange{};
+		bufferRange.offset = 0;
+		bufferRange.size = sizeof(GPUDrawPushConstants);
+		bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
 		VkPipelineLayoutCreateInfo pipeline_layout_info = pipeline_layout_create_info();
+		pipeline_layout_info.pPushConstantRanges = &bufferRange;
+		pipeline_layout_info.pushConstantRangeCount = 1;
 		VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &pipelineLayout));
 
 		PipelineBuilder pipelineBuilder;

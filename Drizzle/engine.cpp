@@ -368,8 +368,6 @@ namespace Drizzle {
 		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, nullptr);
 		vkCmdBeginRendering(cmd, &renderInfo);
 
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].first);
-
 		VkViewport viewport = {};
 		viewport.x = 0;
 		viewport.y = 0;
@@ -388,15 +386,54 @@ namespace Drizzle {
 
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-		vkCmdDraw(cmd, 3, 1, 0, 0);
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].first);
+
+		GPUDrawPushConstants push_constants;
+		push_constants.worldMatrix = glm::mat4{ 1.f };
+		push_constants.vertexBuffer = rectangle.vertexBufferAddress;
+
+		vkCmdPushConstants(cmd, shaders[CurrentShaderName].second, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
+		vkCmdBindIndexBuffer(cmd, rectangle.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+		vkCmdDrawIndexed(cmd, 6, 1, 0, 0, 0);
 
 		vkCmdEndRendering(cmd);
 	}
 
 	void Vulkan::init_background_pipelines() {
 		CreateShader("Default", "vert.spv", "frag.spv");
-		pushConstants.data1 = glm::vec4(1, 0, 0, 1);
-		pushConstants.data2 = glm::vec4(0, 0, 1, 1);
+	}
+
+	void Vulkan::init_default_data() {
+		std::array<Vertex, 4> rect_vertices;
+
+		rect_vertices[0].position = { 0.5,-0.5, 0 };
+		rect_vertices[1].position = { 0.5,0.5, 0 };
+		rect_vertices[2].position = { -0.5,-0.5, 0 };
+		rect_vertices[3].position = { -0.5,0.5, 0 };
+
+		rect_vertices[0].color = { 0,0, 0,1 };
+		rect_vertices[1].color = { 0.5,0.5,0.5 ,1 };
+		rect_vertices[2].color = { 1,0, 0,1 };
+		rect_vertices[3].color = { 0,1, 0,1 };
+
+		std::array<uint32_t, 6> rect_indices;
+
+		rect_indices[0] = 0;
+		rect_indices[1] = 1;
+		rect_indices[2] = 2;
+
+		rect_indices[3] = 2;
+		rect_indices[4] = 1;
+		rect_indices[5] = 3;
+
+		rectangle = uploadMesh(rect_indices, rect_vertices);
+
+		_mainDeletionQueue.push_function([&]() {
+			destroy_buffer(rectangle.indexBuffer);
+			destroy_buffer(rectangle.vertexBuffer);
+			});
+
 	}
 
 	void Vulkan::draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView) {
@@ -408,5 +445,9 @@ namespace Drizzle {
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
 		vkCmdEndRendering(cmd);
+	}
+
+	void Vulkan::destroy_buffer(const AllocatedBuffer& buffer) {
+		vmaDestroyBuffer(_allocator, buffer.buffer, buffer.allocation);
 	}
 }
