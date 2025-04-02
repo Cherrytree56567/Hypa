@@ -7,6 +7,7 @@ namespace Drizzle {
 		name = "Vulkan";
         pWindow = window;
         pEvents = Events;
+		indis.resize(0);
 	}
 
 	const std::string& Vulkan::GetName() const {
@@ -268,6 +269,10 @@ namespace Drizzle {
 	}
 
 	void Vulkan::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
+		uint16_t offset = static_cast<uint16_t>(verts.size());
+		indis.insert(indis.end(), indices.begin(), indices.end());
+		verts.insert(verts.end(), vertices.begin(), vertices.end());
 
+		main = uploadMesh(indis, verts);
 	}
 }

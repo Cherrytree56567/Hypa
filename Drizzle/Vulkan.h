@@ -21,6 +21,8 @@
 #include <deque>
 #include <set>
 #include <variant>
+#include <unordered_map>
+#include <filesystem>
 
 #include <vulkan/vulkan.h>
 #include <vulkan/vk_enum_string_helper.h>
@@ -202,7 +204,7 @@ namespace Drizzle {
 
         void destroy_buffer(const AllocatedBuffer& buffer);
 
-        GPUMeshBuffers uploadMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
+        GPUMeshBuffers uploadMesh(std::span<uint16_t> indices, std::span<Vertex> vertices);
 
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
@@ -222,8 +224,10 @@ namespace Drizzle {
         std::shared_ptr<EventSystem> pEvents;
         PushConstants pushConstants;
         std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
+        std::vector<Vertex> verts;
+        std::vector<uint16_t> indis;
 
-        GPUMeshBuffers rectangle;
+        GPUMeshBuffers main;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;

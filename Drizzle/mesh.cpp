@@ -1,9 +1,9 @@
 #include "Vulkan.h"
 
 namespace Drizzle {
-	GPUMeshBuffers Vulkan::uploadMesh(std::span<uint32_t> indices, std::span<Vertex> vertices) {
+	GPUMeshBuffers Vulkan::uploadMesh(std::span<uint16_t> indices, std::span<Vertex> vertices) {
 		const size_t vertexBufferSize = vertices.size() * sizeof(Vertex);
-		const size_t indexBufferSize = indices.size() * sizeof(uint32_t);
+		const size_t indexBufferSize = indices.size() * sizeof(uint16_t);
 
 		GPUMeshBuffers newSurface;
 
