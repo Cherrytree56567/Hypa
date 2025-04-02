@@ -7,7 +7,6 @@ namespace Drizzle {
 		name = "Vulkan";
         pWindow = window;
         pEvents = Events;
-		indis.resize(0);
 	}
 
 	const std::string& Vulkan::GetName() const {
@@ -56,6 +55,33 @@ namespace Drizzle {
 	}
 
 	void Vulkan::Render() {
+		std::vector<Vertex> rect_vertices;
+
+		rect_vertices.resize(4);
+
+		rect_vertices[0].position = pushConstants.data1;
+		rect_vertices[1].position = pushConstants.data2;
+		rect_vertices[2].position = pushConstants.data3;
+		rect_vertices[3].position = pushConstants.data4;
+
+		rect_vertices[0].color = { 0,0, 0,1 };
+		rect_vertices[1].color = { 0.5,0.5,0.5 ,1 };
+		rect_vertices[2].color = { 1,0, 0,1 };
+		rect_vertices[3].color = { 0,1, 0,1 };
+
+		std::vector<uint16_t> rect_indices;
+
+		rect_indices.resize(6);
+
+		rect_indices[0] = 0;
+		rect_indices[1] = 1;
+		rect_indices[2] = 2;
+
+		rect_indices[3] = 2;
+		rect_indices[4] = 1;
+		rect_indices[5] = 3;
+
+		DrawVerts(rect_vertices, rect_indices);
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -64,10 +90,10 @@ namespace Drizzle {
 
 			ImGui::Text("Selected shader: ", CurrentShaderName);
 
-			ImGui::InputFloat4("data1", (float*)&pushConstants.data1);
-			ImGui::InputFloat4("data2", (float*)&pushConstants.data2);
-			ImGui::InputFloat4("data3", (float*)&pushConstants.data3);
-			ImGui::InputFloat4("data4", (float*)&pushConstants.data4);
+			ImGui::InputFloat3("data1", (float*)&pushConstants.data1);
+			ImGui::InputFloat3("data2", (float*)&pushConstants.data2);
+			ImGui::InputFloat3("data3", (float*)&pushConstants.data3);
+			ImGui::InputFloat3("data4", (float*)&pushConstants.data4);
 		}
 		ImGui::End();
 
@@ -269,10 +295,12 @@ namespace Drizzle {
 	}
 
 	void Vulkan::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-		uint16_t offset = static_cast<uint16_t>(verts.size());
-		indis.insert(indis.end(), indices.begin(), indices.end());
-		verts.insert(verts.end(), vertices.begin(), vertices.end());
+		GPUMeshBuffers main = uploadMesh(indices, vertices);
+		meshes.push_back(std::make_pair(main, indices.size()));
 
-		main = uploadMesh(indis, verts);
+		_mainDeletionQueue.push_function([&]() {
+			destroy_buffer(meshes[meshes.size()].first.indexBuffer);
+			destroy_buffer(meshes[meshes.size()].first.vertexBuffer);
+		});
 	}
 }

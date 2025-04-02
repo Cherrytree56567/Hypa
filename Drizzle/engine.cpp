@@ -390,14 +390,19 @@ namespace Drizzle {
 
 		GPUDrawPushConstants push_constants;
 		push_constants.worldMatrix = glm::mat4{ 1.f };
-		push_constants.vertexBuffer = main.vertexBufferAddress;
 
-		if (indis.size() != 0) {
+		for (size_t i = 0; i < meshes.size(); i++) {
+			push_constants.vertexBuffer = meshes[i].first.vertexBufferAddress;
+
 			vkCmdPushConstants(cmd, shaders[CurrentShaderName].second, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
-			vkCmdBindIndexBuffer(cmd, main.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(cmd, meshes[i].first.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-			vkCmdDrawIndexed(cmd, indis.size(), 1, 0, 0, 0);
+			vkCmdDrawIndexed(cmd, meshes[i].second, 1, 0, 0, 0);
+
+			
 		}
+		
+		meshes.clear();
 
 		vkCmdEndRendering(cmd);
 	}
@@ -407,38 +412,7 @@ namespace Drizzle {
 	}
 
 	void Vulkan::init_default_data() {
-		std::vector<Vertex> rect_vertices;
-
-		rect_vertices.resize(4);
-
-		rect_vertices[0].position = { 0.5,-0.5, 0 };
-		rect_vertices[1].position = { 0.5,0.5, 0 };
-		rect_vertices[2].position = { -0.5,-0.5, 0 };
-		rect_vertices[3].position = { -0.5,0.5, 0 };
-
-		rect_vertices[0].color = { 0,0, 0,1 };
-		rect_vertices[1].color = { 0.5,0.5,0.5 ,1 };
-		rect_vertices[2].color = { 1,0, 0,1 };
-		rect_vertices[3].color = { 0,1, 0,1 };
-
-		std::vector<uint16_t> rect_indices;
-
-		rect_indices.resize(6);
-
-		rect_indices[0] = 0;
-		rect_indices[1] = 1;
-		rect_indices[2] = 2;
-
-		rect_indices[3] = 2;
-		rect_indices[4] = 1;
-		rect_indices[5] = 3;
-
-		DrawVerts(rect_vertices, rect_indices);
-
-		_mainDeletionQueue.push_function([&]() {
-			destroy_buffer(main.indexBuffer);
-			destroy_buffer(main.vertexBuffer);
-		});
+		
 	}
 
 	void Vulkan::draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView) {

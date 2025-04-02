@@ -224,10 +224,7 @@ namespace Drizzle {
         std::shared_ptr<EventSystem> pEvents;
         PushConstants pushConstants;
         std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
-        std::vector<Vertex> verts;
-        std::vector<uint16_t> indis;
-
-        GPUMeshBuffers main;
+		std::vector<std::pair<GPUMeshBuffers, int>> meshes;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;

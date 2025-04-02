@@ -51,20 +51,23 @@ namespace Drizzle {
         }
 
         const aiMesh* mesh = scene->mMeshes[0];
-        /*
+        
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex;
 
-            vertex.pos = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+            vertex.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 
             if (mesh->mTextureCoords[0]) {
-                vertex.TexCoords = glm::vec3(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y, 0.0f);
+                vertex.uv_x = mesh->mTextureCoords[0][i].x;
+				vertex.uv_y = mesh->mTextureCoords[0][i].y;
             }
             else {
-                vertex.TexCoords = glm::vec3(0.0f, 0.0f, 0.0f);
+				vertex.uv_x = 0.0f;
+				vertex.uv_y = 0.0f;
             }
 
-            vertex.Normals = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+            vertex.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+            vertex.color = { 0.5,0.5,0.5 ,1 };
 
             vertices.push_back(vertex);
         }
@@ -76,6 +79,6 @@ namespace Drizzle {
             }
         }
 
-        return std::make_pair(vertices, indices);*/
+        return std::make_pair(vertices, indices);
     }
 }
