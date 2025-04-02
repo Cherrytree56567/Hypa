@@ -1,16 +1,12 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Hypa.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Rendering3D.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'Rendering3D.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
   Vulkan.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
   (compiling source file 'Vulkan.cpp')
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   
+D:\Drizzle\Drizzle\Vulkan.cpp(63,89): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\Vulkan.cpp(64,86): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\utility(292,61): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\utility(292,61): warning C4267:         with
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\utility(292,61): warning C4267:         [
@@ -19,10 +15,9 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.3443
   (compiling source file 'Vulkan.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\utility(292,61):
       the template instantiation context (the oldest one first) is
-          D:\Drizzle\Drizzle\Vulkan.cpp(299,34):
+          D:\Drizzle\Drizzle\Vulkan.cpp(291,34):
           see reference to function template instantiation 'std::pair<Drizzle::GPUMeshBuffers,int>::pair<Drizzle::GPUMeshBuffers,unsigned __int64,0>(std::pair<Drizzle::GPUMeshBuffers,unsigned __int64> &&) noexcept' being compiled
-              D:\Drizzle\Drizzle\Vulkan.cpp(299,19):
+              D:\Drizzle\Drizzle\Vulkan.cpp(291,19):
               see the first reference to 'std::pair<Drizzle::GPUMeshBuffers,int>::pair' in 'Drizzle::Vulkan::DrawVerts'
   
-  Generating Code...
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

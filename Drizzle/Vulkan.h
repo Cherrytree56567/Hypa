@@ -152,6 +152,8 @@ namespace Drizzle {
         void set_depth_format(VkFormat format);
         void disable_depthtest();
         void set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace);
+        void enable_blending_additive();
+        void enable_blending_alphablend();
     };
 
 	class Vulkan : public RenderingAPI {
@@ -187,6 +189,7 @@ namespace Drizzle {
         void destroy_swapchain();
         void draw_background(VkCommandBuffer cmd);
         void draw_geometry(VkCommandBuffer cmd);
+        void resize_swapchain();
 
         FrameData& get_current_frame();
         VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags);
@@ -201,7 +204,6 @@ namespace Drizzle {
         VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
         VkPipelineLayoutCreateInfo pipeline_layout_create_info();
         AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
-
         void destroy_buffer(const AllocatedBuffer& buffer);
 
         GPUMeshBuffers uploadMesh(std::span<uint16_t> indices, std::span<Vertex> vertices);
@@ -237,6 +239,12 @@ namespace Drizzle {
         VmaAllocator _allocator;
         VkDescriptorSet _drawImageDescriptors;
         VkDescriptorSetLayout _drawImageDescriptorLayout;
+        VkExtent2D _swapchainExtent;
+        DeletionQueue _mainDeletionQueue;
+        AllocatedImage _drawImage;
+        VkExtent2D _drawExtent;
+        VkExtent2D _windowExtent;
+        DescriptorAllocator globalDescriptorAllocator;
         /*
         * ImGUI
         */
@@ -246,15 +254,13 @@ namespace Drizzle {
 
         std::vector<VkImage> _swapchainImages;
         std::vector<VkImageView> _swapchainImageViews;
-        VkExtent2D _swapchainExtent;
+        
         static const unsigned int FRAME_OVERLAP = 2;
         FrameData _frames[FRAME_OVERLAP];
         int _frameNumber{ 0 };
         uint32_t _graphicsQueueFamily;
-        DeletionQueue _mainDeletionQueue;
-        AllocatedImage _drawImage;
-        VkExtent2D _drawExtent;
-        DescriptorAllocator globalDescriptorAllocator;
+        bool resize_requested = false;
+        float renderScale = 1.f;
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;

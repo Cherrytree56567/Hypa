@@ -398,13 +398,11 @@ namespace Drizzle {
 			vkCmdBindIndexBuffer(cmd, meshes[i].first.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
 			vkCmdDrawIndexed(cmd, meshes[i].second, 1, 0, 0, 0);
-
-			
 		}
-		
-		meshes.clear();
 
 		vkCmdEndRendering(cmd);
+
+		meshes.clear();
 	}
 
 	void Vulkan::init_background_pipelines() {
@@ -424,6 +422,19 @@ namespace Drizzle {
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
 		vkCmdEndRendering(cmd);
+	}
+
+	void Vulkan::resize_swapchain() {
+		vkDeviceWaitIdle(_device);
+
+		destroy_swapchain();
+
+		_windowExtent.width = std::get<int>(pWindow->GetFlags()->GetFlag("Width"));
+		_windowExtent.height = std::get<int>(pWindow->GetFlags()->GetFlag("Height"));
+
+		create_swapchain(_windowExtent.width, _windowExtent.height);
+
+		resize_requested = false;
 	}
 
 	void Vulkan::destroy_buffer(const AllocatedBuffer& buffer) {
