@@ -202,7 +202,8 @@ namespace Drizzle {
 		*/
 		std::vector<DescriptorAllocator::PoolSizeRatio> sizes =
 		{
-			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 }
+			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
 		};
 
 		globalDescriptorAllocator.init_pool(_device, 10, sizes);
@@ -212,8 +213,14 @@ namespace Drizzle {
 		*/
 		{
 			DescriptorLayoutBuilder builder;
-			builder.add_binding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);
-			_drawImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_COMPUTE_BIT);
+			builder.add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+			_gpuSceneDataDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+		}
+
+		{
+			DescriptorLayoutBuilder builder;
+			builder.add_binding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE); // or whatever binding you need
+			_drawImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT); // or proper stage
 		}
 
 		/*
@@ -221,21 +228,10 @@ namespace Drizzle {
 		*/
 		_drawImageDescriptors = globalDescriptorAllocator.allocate(_device, _drawImageDescriptorLayout);
 
-		VkDescriptorImageInfo imgInfo{};
-		imgInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-		imgInfo.imageView = _drawImage.imageView;
+		DescriptorWriter writer;
+		writer.write_image(0, _drawImage.imageView, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_GENERAL, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);
 
-		VkWriteDescriptorSet drawImageWrite = {};
-		drawImageWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		drawImageWrite.pNext = nullptr;
-
-		drawImageWrite.dstBinding = 0;
-		drawImageWrite.dstSet = _drawImageDescriptors;
-		drawImageWrite.descriptorCount = 1;
-		drawImageWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-		drawImageWrite.pImageInfo = &imgInfo;
-
-		vkUpdateDescriptorSets(_device, 1, &drawImageWrite, 0, nullptr);
+		writer.update_set(_device, _drawImageDescriptors);
 
 		/*
 		* Make sure both the descriptor allocator and the new layout get cleaned up properly
@@ -244,6 +240,25 @@ namespace Drizzle {
 			globalDescriptorAllocator.destroy_pool(_device);
 			vkDestroyDescriptorSetLayout(_device, _drawImageDescriptorLayout, nullptr);
 		});
+
+		for (int i = 0; i < FRAME_OVERLAP; i++) {
+			/*
+			* Create a descriptor pool
+			*/
+			std::vector<DescriptorAllocatorGrowable::PoolSizeRatio> frame_sizes = {
+				{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 3 },
+				{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3 },
+				{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 },
+				{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4 },
+			};
+
+			_frames[i]._frameDescriptors = DescriptorAllocatorGrowable{};
+			_frames[i]._frameDescriptors.init(_device, 1000, frame_sizes);
+
+			_mainDeletionQueue.push_function([&, i]() {
+				_frames[i]._frameDescriptors.destroy_pools(_device);
+			});
+		}
 	}
 
 	void Vulkan::init_pipelines() {
@@ -386,6 +401,36 @@ namespace Drizzle {
 
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+		/*
+		* Allocate a new uniform buffer for the scene data
+		*/
+		AllocatedBuffer gpuSceneDataBuffer = create_buffer(sizeof(GPUSceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+		/*
+		* Add it to the deletion queue of this frame so it gets deleted once its been used
+		*/
+		get_current_frame()._deletionQueue.push_function([=, this]() {
+			destroy_buffer(gpuSceneDataBuffer);
+		});
+
+		/*
+		* Write the buffer
+		*/
+		void* data;
+		vmaMapMemory(_allocator, gpuSceneDataBuffer.allocation, &data);
+		GPUSceneData* sceneUniformData = (GPUSceneData*)data;
+		*sceneUniformData = sceneData;
+		vmaUnmapMemory(_allocator, gpuSceneDataBuffer.allocation);
+
+		/*
+		* Create a descriptor set that binds that buffer and update it
+		*/
+		VkDescriptorSet globalDescriptor = get_current_frame()._frameDescriptors.allocate(_device, _gpuSceneDataDescriptorLayout);
+
+		DescriptorWriter writer;
+		writer.write_buffer(0, gpuSceneDataBuffer.buffer, sizeof(GPUSceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+		writer.update_set(_device, globalDescriptor);
+
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].first);
 
 		GPUDrawPushConstants push_constants;
@@ -402,7 +447,7 @@ namespace Drizzle {
 
 		vkCmdEndRendering(cmd);
 
-		meshes.clear();
+		
 	}
 
 	void Vulkan::init_background_pipelines() {

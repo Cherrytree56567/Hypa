@@ -73,6 +73,41 @@ namespace Drizzle {
         VkDescriptorSet allocate(VkDevice device, VkDescriptorSetLayout layout);
     };
 
+    struct DescriptorAllocatorGrowable {
+    public:
+        struct PoolSizeRatio {
+            VkDescriptorType type;
+            float ratio;
+        };
+
+        void init(VkDevice device, uint32_t initialSets, std::span<PoolSizeRatio> poolRatios);
+        void clear_pools(VkDevice device);
+        void destroy_pools(VkDevice device);
+
+        VkDescriptorSet allocate(VkDevice device, VkDescriptorSetLayout layout, void* pNext = nullptr);
+    private:
+        VkDescriptorPool get_pool(VkDevice device);
+        VkDescriptorPool create_pool(VkDevice device, uint32_t setCount, std::span<PoolSizeRatio> poolRatios);
+
+        std::vector<PoolSizeRatio> ratios;
+        std::vector<VkDescriptorPool> fullPools;
+        std::vector<VkDescriptorPool> readyPools;
+        uint32_t setsPerPool;
+
+    };
+
+    struct DescriptorWriter {
+        std::deque<VkDescriptorImageInfo> imageInfos;
+        std::deque<VkDescriptorBufferInfo> bufferInfos;
+        std::vector<VkWriteDescriptorSet> writes;
+
+        void write_image(int binding, VkImageView image, VkSampler sampler, VkImageLayout layout, VkDescriptorType type);
+        void write_buffer(int binding, VkBuffer buffer, size_t size, size_t offset, VkDescriptorType type);
+
+        void clear();
+        void update_set(VkDevice device, VkDescriptorSet set);
+    };
+
     struct DeletionQueue {
         std::deque<std::function<void()>> deletors;
 
@@ -106,15 +141,27 @@ namespace Drizzle {
     struct FrameData {
         VkSemaphore _swapchainSemaphore, _renderSemaphore;
         VkFence _renderFence;
+
         VkCommandPool _commandPool;
         VkCommandBuffer _mainCommandBuffer;
+
         DeletionQueue _deletionQueue;
+        DescriptorAllocatorGrowable _frameDescriptors;
     };
 
     struct GPUMeshBuffers {
         AllocatedBuffer indexBuffer;
         AllocatedBuffer vertexBuffer;
         VkDeviceAddress vertexBufferAddress;
+    };
+
+    struct GPUSceneData {
+        glm::mat4 view;
+        glm::mat4 proj;
+        glm::mat4 viewproj;
+        glm::vec4 ambientColor;
+        glm::vec4 sunlightDirection; // w for sun power
+        glm::vec4 sunlightColor;
     };
 
     struct GPUDrawPushConstants {
@@ -244,7 +291,7 @@ namespace Drizzle {
         AllocatedImage _drawImage;
         VkExtent2D _drawExtent;
         VkExtent2D _windowExtent;
-        DescriptorAllocator globalDescriptorAllocator;
+        VkDescriptorSetLayout _gpuSceneDataDescriptorLayout;
         /*
         * ImGUI
         */
@@ -261,6 +308,8 @@ namespace Drizzle {
         uint32_t _graphicsQueueFamily;
         bool resize_requested = false;
         float renderScale = 1.f;
+        DescriptorAllocator globalDescriptorAllocator;
+        GPUSceneData sceneData;
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;

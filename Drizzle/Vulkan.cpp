@@ -82,6 +82,9 @@ namespace Drizzle {
 		* Timeout of 1s
 		*/
 		VK_CHECK(vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000));
+
+		get_current_frame()._deletionQueue.flush();
+		get_current_frame()._frameDescriptors.clear_pools(_device);
 		VK_CHECK(vkResetFences(_device, 1, &get_current_frame()._renderFence));
 
 		/*
@@ -206,6 +209,7 @@ namespace Drizzle {
 		* Increase the number of frames drawn
 		*/
 		_frameNumber++;
+		meshes.clear();
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
