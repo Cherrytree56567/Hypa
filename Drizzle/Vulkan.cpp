@@ -242,6 +242,8 @@ namespace Drizzle {
 		VkPipelineLayoutCreateInfo pipeline_layout_info = pipeline_layout_create_info();
 		pipeline_layout_info.pPushConstantRanges = &bufferRange;
 		pipeline_layout_info.pushConstantRangeCount = 1;
+		pipeline_layout_info.pSetLayouts = &_singleImageDescriptorLayout;
+		pipeline_layout_info.setLayoutCount = 1;
 		VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &pipelineLayout));
 
 		PipelineBuilder pipelineBuilder;

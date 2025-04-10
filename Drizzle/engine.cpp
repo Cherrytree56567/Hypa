@@ -213,14 +213,18 @@ namespace Drizzle {
 		*/
 		{
 			DescriptorLayoutBuilder builder;
-			builder.add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-			_gpuSceneDataDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
-		}
-
-		{
-			DescriptorLayoutBuilder builder;
 			builder.add_binding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE); // or whatever binding you need
 			_drawImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT); // or proper stage
+		}
+		{
+			DescriptorLayoutBuilder builder;
+			builder.add_binding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+			_singleImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_FRAGMENT_BIT);
+		}
+		{
+			DescriptorLayoutBuilder builder;
+			builder.add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+			_gpuSceneDataDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		}
 
 		/*
@@ -433,8 +437,32 @@ namespace Drizzle {
 
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].first);
 
+		VkDescriptorSet imageSet = get_current_frame()._frameDescriptors.allocate(_device, _singleImageDescriptorLayout);
+		{
+			DescriptorWriter writer;
+			writer.write_image(0, _errorCheckerboardImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+
+			writer.update_set(_device, imageSet);
+		}
+
+		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].second, 0, 1, &imageSet, 0, nullptr);
+
+		glm::mat4 model = glm::mat4(1.0f);
+
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -5));
+		/*
+		* Camera projection
+		*/
+		glm::mat4 projection = glm::perspective(glm::radians(70.f), (float)_drawExtent.width / (float)_drawExtent.height, 0.1f, 10000.f);
+
+		/*
+		* Invert the Y direction on projection matrix so that we are more similar
+		* to opengl and gltf axis
+		*/
+		projection[1][1] *= -1;
+
 		GPUDrawPushConstants push_constants;
-		push_constants.worldMatrix = glm::mat4{ 1.f };
+		push_constants.worldMatrix = projection * view * model;
 
 		for (size_t i = 0; i < meshes.size(); i++) {
 			push_constants.vertexBuffer = meshes[i].first.vertexBufferAddress;
@@ -446,8 +474,6 @@ namespace Drizzle {
 		}
 
 		vkCmdEndRendering(cmd);
-
-		
 	}
 
 	void Vulkan::init_background_pipelines() {
@@ -455,7 +481,51 @@ namespace Drizzle {
 	}
 
 	void Vulkan::init_default_data() {
-		
+		//3 default textures, white, grey, black. 1 pixel each
+		uint32_t white = glm::packUnorm4x8(glm::vec4(1, 1, 1, 1));
+		_whiteImage = create_image((void*)&white, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM,
+			VK_IMAGE_USAGE_SAMPLED_BIT);
+
+		uint32_t grey = glm::packUnorm4x8(glm::vec4(0.66f, 0.66f, 0.66f, 1));
+		_greyImage = create_image((void*)&grey, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM,
+			VK_IMAGE_USAGE_SAMPLED_BIT);
+
+		uint32_t black = glm::packUnorm4x8(glm::vec4(0, 0, 0, 0));
+		_blackImage = create_image((void*)&black, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM,
+			VK_IMAGE_USAGE_SAMPLED_BIT);
+
+		//checkerboard image
+		uint32_t magenta = glm::packUnorm4x8(glm::vec4(1, 0, 1, 1));
+		std::array<uint32_t, 16 * 16 > pixels; //for 16x16 checkerboard texture
+		for (int x = 0; x < 16; x++) {
+			for (int y = 0; y < 16; y++) {
+				pixels[y * 16 + x] = ((x % 2) ^ (y % 2)) ? magenta : black;
+			}
+		}
+		_errorCheckerboardImage = create_image(pixels.data(), VkExtent3D{ 16, 16, 1 }, VK_FORMAT_R8G8B8A8_UNORM,
+			VK_IMAGE_USAGE_SAMPLED_BIT);
+
+		VkSamplerCreateInfo sampl = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
+
+		sampl.magFilter = VK_FILTER_NEAREST;
+		sampl.minFilter = VK_FILTER_NEAREST;
+
+		vkCreateSampler(_device, &sampl, nullptr, &_defaultSamplerNearest);
+
+		sampl.magFilter = VK_FILTER_LINEAR;
+		sampl.minFilter = VK_FILTER_LINEAR;
+		vkCreateSampler(_device, &sampl, nullptr, &_defaultSamplerLinear);
+
+		_mainDeletionQueue.push_function([&]() {
+			vkDestroySampler(_device, _defaultSamplerNearest, nullptr);
+			vkDestroySampler(_device, _defaultSamplerLinear, nullptr);
+
+			destroy_image(_whiteImage);
+			destroy_image(_greyImage);
+			destroy_image(_blackImage);
+			destroy_image(_errorCheckerboardImage);
+			});
+
 	}
 
 	void Vulkan::draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView) {

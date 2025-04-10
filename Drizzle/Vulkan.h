@@ -253,6 +253,10 @@ namespace Drizzle {
         AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
         void destroy_buffer(const AllocatedBuffer& buffer);
 
+        AllocatedImage create_image(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped = false);
+        AllocatedImage create_image(void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped = false);
+        void destroy_image(const AllocatedImage& img);
+
         GPUMeshBuffers uploadMesh(std::span<uint16_t> indices, std::span<Vertex> vertices);
 
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
@@ -292,6 +296,7 @@ namespace Drizzle {
         VkExtent2D _drawExtent;
         VkExtent2D _windowExtent;
         VkDescriptorSetLayout _gpuSceneDataDescriptorLayout;
+        VkDescriptorSetLayout _singleImageDescriptorLayout;
         /*
         * ImGUI
         */
@@ -310,6 +315,14 @@ namespace Drizzle {
         float renderScale = 1.f;
         DescriptorAllocator globalDescriptorAllocator;
         GPUSceneData sceneData;
+
+        AllocatedImage _whiteImage;
+        AllocatedImage _blackImage;
+        AllocatedImage _greyImage;
+        AllocatedImage _errorCheckerboardImage;
+
+        VkSampler _defaultSamplerLinear;
+        VkSampler _defaultSamplerNearest;
 
 #ifdef NDEBUG
         const bool bUseValidationLayers = false;
