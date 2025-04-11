@@ -25,8 +25,8 @@ namespace Drizzle {
 		Drizzle_API void UseNoClientApi();
 
 	private:
-		int width = 800;
-		int height = 600;
+		int width = 1080;
+		int height = 720;
 		std::string title = "New Drizzle Game";
 		int WindowX = 100;
 		int WindowY = 100;

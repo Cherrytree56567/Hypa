@@ -307,4 +307,53 @@ namespace Drizzle {
 
         return renderInfo;
     }
+
+    VkPhysicalDevice Vulkan::pick_gpu(const std::vector<VkPhysicalDevice>& devices) {
+        VkPhysicalDevice selectedDevice = VK_NULL_HANDLE;
+		std::string chosenDeviceName = "Unknown";
+        uint64_t maxMemory = 0;
+
+        for (const auto& device : devices) {
+            VkPhysicalDeviceProperties deviceProperties;
+            vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+            /*
+            * Print available GPUs with their properties using string concatenation
+            */
+            log.Info("Device Name: " + std::string(deviceProperties.deviceName));
+            log.Info("  Device Type: " + std::to_string(deviceProperties.deviceType));
+            log.Info("  API Version: " + std::to_string(deviceProperties.apiVersion));
+            log.Info("  Driver Version: " + std::to_string(deviceProperties.driverVersion));
+
+            VkPhysicalDeviceMemoryProperties memoryProperties;
+            vkGetPhysicalDeviceMemoryProperties(device, &memoryProperties);
+
+            uint64_t deviceMemory = 0;
+            for (uint32_t i = 0; i < memoryProperties.memoryHeapCount; ++i) {
+                if (memoryProperties.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) {
+                    deviceMemory = std::max(deviceMemory, memoryProperties.memoryHeaps[i].size);
+                }
+            }
+
+            log.Info("  VRAM: " + std::to_string(deviceMemory) + " bytes");
+
+            /*
+            * Choose Device based on VRAM
+            */
+            if ((!useDedicated || deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) && deviceMemory > maxMemory) {
+                maxMemory = deviceMemory;
+                selectedDevice = device;
+				chosenDeviceName = std::string(deviceProperties.deviceName);
+            }
+        }
+
+        if (useDedicated) {
+            log.Info("Prefering Dedicated GPU");
+        } else {
+            log.Info("Prefering All GPUs");
+        }
+        log.Info("Selected Device: " + chosenDeviceName);
+
+        return selectedDevice;
+    }
 }

@@ -5,18 +5,25 @@ D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefini
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   
-D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
-D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:         with
-D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:         [
-D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:             _First=int
-D:\Drizzle\Drizzle\engine.cpp(98,17): warning C4838:         ]
-D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
-D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:         with
-D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:         [
-D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:             _First=int
-D:\Drizzle\Drizzle\engine.cpp(99,17): warning C4838:         ]
-D:\Drizzle\Drizzle\engine.cpp(373,68): warning C4244: 'argument': conversion from 'double' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(373,31): warning C4244: 'argument': conversion from 'double' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(390,31): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(391,32): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
+D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
+D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:         with
+D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:         [
+D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:             _First=int
+D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:         ]
+D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
+D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         with
+D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         [
+D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:             _First=int
+D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         ]
+D:\Drizzle\Drizzle\engine.cpp(388,68): warning C4244: 'argument': conversion from 'double' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\engine.cpp(388,31): warning C4244: 'argument': conversion from 'double' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\engine.cpp(405,31): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
+D:\Drizzle\Drizzle\engine.cpp(406,32): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
+  helper.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'helper.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  Generating Code...
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

@@ -45,12 +45,27 @@ namespace Drizzle {
 		* Use vkbootstrap to select a GPU.
 		* We want a GPU that can write to the SDL surface and supports vulkan 1.3 with the correct features.
 		*/
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
+		std::vector<VkPhysicalDevice> devices(deviceCount);
+		vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data());
+
+		VkPhysicalDevice chosenDevice = pick_gpu(devices);
+		VkPhysicalDeviceProperties props;
+		vkGetPhysicalDeviceProperties(chosenDevice, &props);
+
+		if (chosenDevice == VK_NULL_HANDLE) {
+			log.Error("No suitable GPU found.");
+			return;
+		}
+
 		vkb::PhysicalDeviceSelector selector{ vkb_inst };
 		vkb::PhysicalDevice physicalDevice = selector
 			.set_minimum_version(1, 3)
 			.set_required_features_13(features)
 			.set_required_features_12(features12)
 			.set_surface(_surface)
+			.set_name(props.deviceName)
 			.select()
 			.value();
 
@@ -520,6 +535,14 @@ namespace Drizzle {
 
 		_windowExtent.width = std::get<int>(pWindow->GetFlags()->GetFlag("Width"));
 		_windowExtent.height = std::get<int>(pWindow->GetFlags()->GetFlag("Height"));
+		if (_windowExtent.width == 0 || _windowExtent.height == 0) {
+			_windowExtent.width = 1;
+			_windowExtent.height = 1;
+		}
+		_drawExtent.width = _windowExtent.width;
+		_drawExtent.height = _windowExtent.height;
+
+		ImGui::GetIO().DisplaySize = ImVec2((float)_windowExtent.width, (float)_windowExtent.height);
 
 		create_swapchain(_windowExtent.width, _windowExtent.height);
 

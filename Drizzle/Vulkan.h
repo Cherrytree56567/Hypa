@@ -229,6 +229,8 @@ namespace Drizzle {
         void draw_geometry(VkCommandBuffer cmd);
         void resize_swapchain();
 
+        VkPhysicalDevice pick_gpu(const std::vector<VkPhysicalDevice>& devices);
+
         FrameData& get_current_frame();
         VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags);
         VkCommandBufferAllocateInfo command_buffer_allocate_info(VkCommandPool pool, uint32_t count);
@@ -304,6 +306,7 @@ namespace Drizzle {
         bool resize_requested = false;
         float renderScale = 1.f;
         DescriptorAllocator globalDescriptorAllocator;
+        bool useDedicated;
 
         AllocatedImage _whiteImage;
         AllocatedImage _blackImage;
