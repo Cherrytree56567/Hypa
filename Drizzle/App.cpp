@@ -1,5 +1,7 @@
 #include "App.h"
 
+struct Stats engineStats = Stats();
+
 namespace Drizzle {
 	App::App() {
 		Events = std::make_shared<EventSystem>();
@@ -17,7 +19,12 @@ namespace Drizzle {
 		Layerdispatch->DispatchLayerAttach();
 	}
 
+	App::~App() {
+
+	}
+
 	bool App::Update() {
+		auto start = std::chrono::system_clock::now();
 		Events->ResetEvents();
 		window->Update();
 		Events->AddEvent(std::make_shared<AppTickEvent>());
@@ -30,6 +37,10 @@ namespace Drizzle {
 			rAPIsystem->GetCurrentRenderingAPI()->OnDetach();
 			Layerdispatch->DispatchLayerDetach();
 		}
+		auto end = std::chrono::system_clock::now();
+
+		auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		engineStats.frametime = elapsed.count() / 1000.f;
 		return !window->shouldClose();
 	}
 

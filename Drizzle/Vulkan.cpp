@@ -45,6 +45,11 @@ namespace Drizzle {
 			_frames[i]._deletionQueue.flush();
 		}
 
+		for (int i = 0; i < objects.size(); i++) {
+			destroy_buffer(objects[i].first.indexBuffer);
+			destroy_buffer(objects[i].first.vertexBuffer);
+		}
+
 		_mainDeletionQueue.flush();
 
 		destroy_swapchain();
@@ -75,6 +80,14 @@ namespace Drizzle {
 			ImGui::InputFloat3("data2", (float*)&pushConstants.worldMatrix[1]);
 			ImGui::InputFloat3("data3", (float*)&pushConstants.worldMatrix[2]);
 			ImGui::InputFloat3("data4", (float*)&pushConstants.worldMatrix[3]);
+
+			float fps = 1000.0f / engineStats.frametime;
+			ImGui::Text("frametime %f ms", engineStats.frametime);
+			ImGui::Text("fps %f", fps);
+			ImGui::Text("draw time %f ms", engineStats.mesh_draw_time);
+			ImGui::Text("update time %f ms", engineStats.scene_update_time);
+			ImGui::Text("triangles %i", engineStats.triangle_count);
+			ImGui::Text("draws %i", engineStats.drawcall_count);
 		}
 		ImGui::End();
 
@@ -211,7 +224,6 @@ namespace Drizzle {
 		* Increase the number of frames drawn
 		*/
 		_frameNumber++;
-		meshes.clear();
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
@@ -289,8 +301,55 @@ namespace Drizzle {
 		return CurrentShaderName;
 	}
 
-	void Vulkan::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-		GPUMeshBuffers main = uploadMesh(indices, vertices);
-		meshes.push_back(std::make_pair(main, indices.size()));
+	void Vulkan::AddObject(APIObject obj) {
+		GPUMeshBuffers main = uploadMesh(obj.indices, obj.vertices);
+		objects.push_back(std::make_pair(main, obj));
+	}
+
+	void Vulkan::RemoveObject(std::string name) {
+		for (size_t i = 0; i < objects.size(); i++) {
+			if (objects[i].second.name == name) {
+				destroy_buffer(objects[i].first.vertexBuffer);
+				destroy_buffer(objects[i].first.indexBuffer);
+				objects.erase(objects.begin() + i);
+				return;
+			}
+		}
+	}
+
+	void Vulkan::VisibilityObject(std::string name, bool visibility) {
+		for (size_t i = 0; i < objects.size(); i++) {
+			if (objects[i].second.name == name) {
+				objects[i].second.hidden = visibility;
+				return;
+			}
+		}
+	}
+
+	APIObject& Vulkan::GetObject(std::string name) {
+		for (size_t i = 0; i < objects.size(); i++) {
+			if (objects[i].second.name == name) {
+				return objects[i].second;
+			} else {
+				APIObject obj;
+				return obj;
+			}
+		}
+	}
+
+	void Vulkan::CreateTexture(std::string name, std::string TexturePath) {
+
+	}
+
+	void Vulkan::RemoveTexture(std::string name) {
+
+	}
+
+	void Vulkan::ChangeTexture(std::string name) {
+
+	}
+
+	std::string Vulkan::GetCurrentTextureName() {
+		return "";
 	}
 }

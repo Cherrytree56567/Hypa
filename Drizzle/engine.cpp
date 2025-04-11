@@ -218,7 +218,7 @@ namespace Drizzle {
 		std::vector<DescriptorAllocator::PoolSizeRatio> sizes =
 		{
 			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
 		};
 
 		globalDescriptorAllocator.init_pool(_device, 10, sizes);
@@ -228,8 +228,8 @@ namespace Drizzle {
 		*/
 		{
 			DescriptorLayoutBuilder builder;
-			builder.add_binding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE); // or whatever binding you need
-			_drawImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT); // or proper stage
+			builder.add_binding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);
+			_drawImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		}
 		{
 			DescriptorLayoutBuilder builder;
@@ -357,40 +357,13 @@ namespace Drizzle {
 		});
 	}
 
-	void Vulkan::draw_background(VkCommandBuffer cmd) {
-		/*
-		 * Make a clear color from frame number.This will flash with a 120 frame period.
-		 */
-		VkClearColorValue clearValue;
-		float flash = std::abs(std::sin(_frameNumber / 120.f));
-		clearValue = { { 0.0f, 0.0f, flash, 1.0f } };
-
-		VkImageSubresourceRange clearRange = image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT);
-
-		/*
-		* Bind the gradient drawing compute pipelinesss
-		*/
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, shaders[CurrentShaderName].first);
-
-		/*
-		* Bind the descriptor set containing the draw image for the compute pipeline
-		*/
-		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, shaders[CurrentShaderName].second, 0, 1, &_drawImageDescriptors, 0, nullptr);
-
-		/*
-		* Execute the push constants.
-		*/
-		vkCmdPushConstants(cmd, shaders[CurrentShaderName].second, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(PushConstants), &pushConstants);
-
-		/*
-		* Execute the compute pipeline dispatch.We are using 16x16 workgroup size so we need to divide by it
-		*/
-		vkCmdDispatch(cmd, std::ceil(_drawExtent.width / 16.0), std::ceil(_drawExtent.height / 16.0), 1);
-	}
-
 	void Vulkan::draw_geometry(VkCommandBuffer cmd) {
+		engineStats.drawcall_count = 0;
+		engineStats.triangle_count = 0;
+		//begin clock
+		auto start = std::chrono::system_clock::now();
 		/*
-		* Begin a render pass  connected to our draw image
+		* Begin a render pass connected to our draw image
 		*/
 		VkClearValue clearColor = {};
 		clearColor.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
@@ -432,16 +405,26 @@ namespace Drizzle {
 		GPUDrawPushConstants push_constants;
 		push_constants.worldMatrix = pushConstants.worldMatrix;
 
-		for (size_t i = 0; i < meshes.size(); i++) {
-			push_constants.vertexBuffer = meshes[i].first.vertexBufferAddress;
+		for (size_t i = 0; i < objects.size(); i++) {
+			if (objects[i].second.hidden) {
+				continue;
+			}
+			push_constants.vertexBuffer = objects[i].first.vertexBufferAddress;
 
 			vkCmdPushConstants(cmd, shaders[CurrentShaderName].second, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
-			vkCmdBindIndexBuffer(cmd, meshes[i].first.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(cmd, objects[i].first.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-			vkCmdDrawIndexed(cmd, meshes[i].second, 1, 0, 0, 0);
+			vkCmdDrawIndexed(cmd, objects[i].second.indices.size(), 1, 0, 0, 0);
+
+			engineStats.drawcall_count++;
+			engineStats.triangle_count += objects[i].second.indices.size()  / 3;
 		}
 
 		vkCmdEndRendering(cmd);
+		auto end = std::chrono::system_clock::now();
+
+		auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		engineStats.mesh_draw_time = elapsed.count() / 1000.f;
 	}
 
 	void Vulkan::init_background_pipelines() {
@@ -513,8 +496,7 @@ namespace Drizzle {
 			destroy_image(_greyImage);
 			destroy_image(_blackImage);
 			destroy_image(_errorCheckerboardImage);
-			});
-
+		});
 	}
 
 	void Vulkan::draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView) {

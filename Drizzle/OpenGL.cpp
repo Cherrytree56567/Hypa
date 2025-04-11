@@ -116,43 +116,6 @@ namespace Drizzle {
 		return CurrentShaderName;
 	}
 
-    void OpenGL::DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-        GLuint CurrentVertexArray, CurrentVertexBuffer, CurrentIndexBuffer;
-        glGenVertexArrays(1, &CurrentVertexArray);
-        glGenBuffers(1, &CurrentVertexBuffer);
-        glGenBuffers(1, &CurrentIndexBuffer);
-        /*
-        glBindVertexArray(CurrentVertexArray);
-
-        glBindBuffer(GL_ARRAY_BUFFER, CurrentVertexBuffer);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-        // Vertex Positions
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-        glEnableVertexAttribArray(0);
-
-        // Texture Coordinates
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-        glEnableVertexAttribArray(1);
-
-        // Normals
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normals));
-        glEnableVertexAttribArray(2);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CurrentIndexBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), indices.data(), GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
-
-        glBindVertexArray(CurrentVertexArray);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
-
-        VertexArray.push_back(CurrentVertexArray);
-        VertexBuffer.push_back(CurrentVertexBuffer);
-        IndexBuffer.push_back(CurrentIndexBuffer);
-        Indices.push_back(indices);
-        */
-    }
 
     std::tuple<unsigned int, unsigned int> OpenGL::GetShader(std::string name) {
         return Shaders[name];

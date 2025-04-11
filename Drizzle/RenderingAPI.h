@@ -20,6 +20,15 @@ namespace Drizzle {
 		glm::mat4 worldMatrix;
 	};
 
+	struct APIObject {
+		std::vector<Vertex> vertices;
+		std::vector<uint16_t> indices;
+		std::string name;
+		std::string shaderName;
+		std::string textureName;
+		bool hidden = false;
+	};
+
 	class RenderingAPI {
 	public:
 		Drizzle_API RenderingAPI() {}
@@ -38,7 +47,10 @@ namespace Drizzle {
 		Drizzle_API virtual void ChangeTexture(std::string name) {}
 		Drizzle_API virtual std::string GetCurrentTextureName() { return ""; }
 
-		Drizzle_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
+		Drizzle_API virtual void AddObject(APIObject obj) {}
+		Drizzle_API virtual void RemoveObject(std::string name) {}
+		Drizzle_API virtual void VisibilityObject(std::string name, bool visibility) {}
+		Drizzle_API virtual APIObject& GetObject(std::string name) { APIObject s; return s; }
 
 		Drizzle_API virtual const std::string& GetName() const { return name; }
 

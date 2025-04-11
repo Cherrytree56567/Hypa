@@ -208,7 +208,15 @@ namespace Drizzle {
         Drizzle_API void ChangeShader(std::string name) override;
         Drizzle_API std::string GetCurrentShaderName() override;
 
-        Drizzle_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
+        Drizzle_API void CreateTexture(std::string name, std::string TexturePath) override;
+        Drizzle_API void RemoveTexture(std::string name) override;
+        Drizzle_API void ChangeTexture(std::string name) override;
+        Drizzle_API std::string GetCurrentTextureName() override;
+
+        Drizzle_API void AddObject(APIObject obj) override;
+        Drizzle_API void RemoveObject(std::string name) override;
+        Drizzle_API void VisibilityObject(std::string name, bool visibility) override;
+        Drizzle_API APIObject& GetObject(std::string name) override;
 
         Drizzle_API PushConstants& GetPushConstants() override { return pushConstants; }
 
@@ -225,7 +233,6 @@ namespace Drizzle {
         void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
-        void draw_background(VkCommandBuffer cmd);
         void draw_geometry(VkCommandBuffer cmd);
         void resize_swapchain();
 
@@ -270,7 +277,7 @@ namespace Drizzle {
         std::shared_ptr<EventSystem> pEvents;
         PushConstants pushConstants;
         std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
-		std::vector<std::pair<GPUMeshBuffers, int>> meshes;
+		std::vector<std::pair<GPUMeshBuffers, APIObject>> objects;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;

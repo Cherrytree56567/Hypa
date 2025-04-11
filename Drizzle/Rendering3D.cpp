@@ -17,9 +17,6 @@ namespace Drizzle {
 
     void Rendering3D::Render() {
         rAPISystem->GetCurrentRenderingAPI()->Render();
-        for (auto obj : Objects) {
-            rAPISystem->GetCurrentRenderingAPI()->DrawVerts(obj.second.vertices, obj.second.indices);
-        }
 	}
 
 	bool Rendering3D::IsShown() const {
@@ -34,11 +31,12 @@ namespace Drizzle {
 		show = value;
 	}
 
-	void Rendering3D::CreateObject(std::string name, std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-        Objects.push_back({ name, { vertices, indices } });
+	void Rendering3D::CreateObject(std::string name, APIObject obj) {
+		obj.name = name;
+        rAPISystem->GetCurrentRenderingAPI()->AddObject(obj);
 	}
 
-    std::pair<std::vector<Vertex>, std::vector<uint16_t>> LoadObjFile(const std::string& filePath) {
+    APIObject LoadObjFile(const std::string& filePath) {
         std::vector<Vertex> vertices;
         std::vector<uint16_t> indices;
 
@@ -47,7 +45,7 @@ namespace Drizzle {
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
             std::cerr << "Error loading OBJ file: " << importer.GetErrorString() << std::endl;
-            return std::make_pair(vertices, indices);
+			return APIObject();
         }
 
         const aiMesh* mesh = scene->mMeshes[0];
@@ -79,6 +77,10 @@ namespace Drizzle {
             }
         }
 
-        return std::make_pair(vertices, indices);
+		APIObject obj;
+		obj.indices = indices;
+		obj.vertices = vertices;
+
+        return obj;
     }
 }

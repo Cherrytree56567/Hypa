@@ -33,8 +33,6 @@ namespace Drizzle {
 		Drizzle_API virtual void ChangeTexture(std::string name) override;
 		Drizzle_API virtual std::string GetCurrentTextureName() override;
 
-		Drizzle_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
-
 		Drizzle_API virtual const std::string& GetName() const override { return name; }
 
 		Drizzle_API virtual PushConstants& GetPushConstants() override { return pushConstants; }

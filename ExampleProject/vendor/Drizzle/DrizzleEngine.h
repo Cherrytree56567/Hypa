@@ -741,6 +741,15 @@ namespace Drizzle {
         glm::vec4 data4;
     };
 
+    struct APIObject {
+        std::vector<Vertex> vertices;
+        std::vector<uint16_t> indices;
+        std::string name;
+        std::string shaderName;
+        std::string textureName;
+        bool hidden = false;
+    };
+
     class RenderingAPI {
     public:
         Drizzle_API RenderingAPI() {}
@@ -759,7 +768,10 @@ namespace Drizzle {
         Drizzle_API virtual void ChangeTexture(std::string name) {}
         Drizzle_API virtual std::string GetCurrentTextureName() { return ""; }
 
-        Drizzle_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
+        Drizzle_API virtual void AddObject(APIObject obj) {}
+        Drizzle_API virtual void RemoveObject(std::string name) {}
+        Drizzle_API virtual void VisibilityObject(std::string name, bool visibility) {}
+        Drizzle_API virtual APIObject& GetObject(std::string name) { APIObject s; return s; }
 
         Drizzle_API virtual const std::string& GetName() const { return name; }
 
@@ -833,11 +845,9 @@ namespace Drizzle {
         Drizzle_API Layer(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("Layer"), pWindow(window), rAPISystem(rAPIsys) {}
 
         Drizzle_API virtual ~Layer() = default;
-        Drizzle_API virtual void OnAttach() { }
-        Drizzle_API virtual void OnDetach() { }
-        Drizzle_API virtual void Render() { }
-
-        Drizzle_API virtual void DrawObject(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {}
+        Drizzle_API virtual void OnAttach() {}
+        Drizzle_API virtual void OnDetach() {}
+        Drizzle_API virtual void Render() {}
 
         Drizzle_API virtual bool IsShown() const { return show; }
         Drizzle_API virtual const std::string& GetName() const { return name; }
@@ -886,7 +896,15 @@ namespace Drizzle {
         Drizzle_API void ChangeShader(std::string name) override;
         Drizzle_API std::string GetCurrentShaderName() override;
 
-        Drizzle_API void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
+        Drizzle_API void CreateTexture(std::string name, std::string TexturePath) override;
+        Drizzle_API void RemoveTexture(std::string name) override;
+        Drizzle_API void ChangeTexture(std::string name) override;
+        Drizzle_API std::string GetCurrentTextureName() override;
+
+        Drizzle_API void AddObject(APIObject obj) override;
+        Drizzle_API void RemoveObject(std::string name) override;
+        Drizzle_API void VisibilityObject(std::string name, bool visibility) override;
+        Drizzle_API APIObject& GetObject(std::string name) override;
 
         Drizzle_API PushConstants& GetPushConstants() override { return pushConstants; }
 
@@ -899,11 +917,6 @@ namespace Drizzle {
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
         PushConstants pushConstants;
-#ifdef NDEBUG
-        const bool bUseValidationLayers = false;
-#else
-        const bool bUseValidationLayers = true;
-#endif
     };
 
     /*
@@ -928,8 +941,6 @@ namespace Drizzle {
         Drizzle_API virtual void ChangeTexture(std::string name) override;
         Drizzle_API virtual std::string GetCurrentTextureName() override;
 
-        Drizzle_API virtual void DrawVerts(std::vector<Vertex> vertices, std::vector<uint16_t> indices) override;
-
         Drizzle_API virtual const std::string& GetName() const override { return name; }
 
         Drizzle_API virtual PushConstants& GetPushConstants() override { return pushConstants; }
@@ -942,6 +953,9 @@ namespace Drizzle {
         std::shared_ptr<Window> pWindow;
         std::shared_ptr<EventSystem> pEvents;
         Logging log;
+        std::vector<GLuint> VertexArray;
+        std::vector<GLuint> VertexBuffer;
+        std::vector<GLuint> IndexBuffer;
         std::vector<std::vector<uint16_t>> Indices;
         std::string CurrentShaderName = "Default";
         std::string CurrentTextureName = "";
@@ -955,12 +969,7 @@ namespace Drizzle {
     * Rendering3D
     */
 
-    struct Object {
-        std::vector<Vertex> vertices;
-        std::vector<uint16_t> indices;
-    };
-
-    Drizzle_API std::pair<std::vector<Vertex>, std::vector<uint16_t>> LoadObjFile(const std::string& filePath);
+    Drizzle_API APIObject LoadObjFile(const std::string& filePath);
 
     class Rendering3D : public Layer {
     public:
@@ -975,13 +984,12 @@ namespace Drizzle {
         Drizzle_API virtual const std::string& GetName() const override;
         Drizzle_API virtual void SetShow(bool value) override;
 
-        Drizzle_API void CreateObject(std::string name, std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+        Drizzle_API void CreateObject(std::string name, APIObject obj);
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
-        std::vector<std::pair<std::string, Object>> Objects;
     };
 
 	/*
@@ -991,6 +999,7 @@ namespace Drizzle {
     class App {
     public:
         Drizzle_API App();
+        Drizzle_API ~App();
 
         Drizzle_API bool Update();
 
