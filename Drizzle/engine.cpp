@@ -221,11 +221,6 @@ namespace Drizzle {
 			builder.add_binding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 			_singleImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_FRAGMENT_BIT);
 		}
-		{
-			DescriptorLayoutBuilder builder;
-			builder.add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-			_gpuSceneDataDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
-		}
 
 		/*
 		* Allocate a descriptor set for our draw image
@@ -382,7 +377,9 @@ namespace Drizzle {
 		/*
 		* Begin a render pass  connected to our draw image
 		*/
-		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		VkClearValue clearColor = {};
+		clearColor.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
+		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, &clearColor, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, nullptr);
 		vkCmdBeginRendering(cmd, &renderInfo);
@@ -405,36 +402,6 @@ namespace Drizzle {
 
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-		/*
-		* Allocate a new uniform buffer for the scene data
-		*/
-		AllocatedBuffer gpuSceneDataBuffer = create_buffer(sizeof(GPUSceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-
-		/*
-		* Add it to the deletion queue of this frame so it gets deleted once its been used
-		*/
-		get_current_frame()._deletionQueue.push_function([=, this]() {
-			destroy_buffer(gpuSceneDataBuffer);
-		});
-
-		/*
-		* Write the buffer
-		*/
-		void* data;
-		vmaMapMemory(_allocator, gpuSceneDataBuffer.allocation, &data);
-		GPUSceneData* sceneUniformData = (GPUSceneData*)data;
-		*sceneUniformData = sceneData;
-		vmaUnmapMemory(_allocator, gpuSceneDataBuffer.allocation);
-
-		/*
-		* Create a descriptor set that binds that buffer and update it
-		*/
-		VkDescriptorSet globalDescriptor = get_current_frame()._frameDescriptors.allocate(_device, _gpuSceneDataDescriptorLayout);
-
-		DescriptorWriter writer;
-		writer.write_buffer(0, gpuSceneDataBuffer.buffer, sizeof(GPUSceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		writer.update_set(_device, globalDescriptor);
-
 		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].first);
 
 		VkDescriptorSet imageSet = get_current_frame()._frameDescriptors.allocate(_device, _singleImageDescriptorLayout);
@@ -447,22 +414,8 @@ namespace Drizzle {
 
 		vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[CurrentShaderName].second, 0, 1, &imageSet, 0, nullptr);
 
-		glm::mat4 model = glm::mat4(1.0f);
-
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -5));
-		/*
-		* Camera projection
-		*/
-		glm::mat4 projection = glm::perspective(glm::radians(70.f), (float)_drawExtent.width / (float)_drawExtent.height, 0.1f, 10000.f);
-
-		/*
-		* Invert the Y direction on projection matrix so that we are more similar
-		* to opengl and gltf axis
-		*/
-		projection[1][1] *= -1;
-
 		GPUDrawPushConstants push_constants;
-		push_constants.worldMatrix = projection * view * model;
+		push_constants.worldMatrix = pushConstants.worldMatrix;
 
 		for (size_t i = 0; i < meshes.size(); i++) {
 			push_constants.vertexBuffer = meshes[i].first.vertexBufferAddress;
@@ -481,6 +434,27 @@ namespace Drizzle {
 	}
 
 	void Vulkan::init_default_data() {
+		/*
+		* Default
+		*/
+		glm::mat4 model = glm::mat4(1.0f);
+		/*
+		* Viewing Location
+		*/
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -5));
+		/*
+		* Camera projection
+		*/
+		glm::mat4 projection = glm::perspective(glm::radians(70.f), (float)_drawExtent.width / (float)_drawExtent.height, 0.1f, 10000.f);
+
+		/*
+		* Invert the Y direction on projection matrix so that we are more similar
+		* to opengl and gltf axis
+		*/
+		projection[1][1] *= -1;
+
+		pushConstants.worldMatrix = projection * view * model;
+
 		//3 default textures, white, grey, black. 1 pixel each
 		uint32_t white = glm::packUnorm4x8(glm::vec4(1, 1, 1, 1));
 		_whiteImage = create_image((void*)&white, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM,

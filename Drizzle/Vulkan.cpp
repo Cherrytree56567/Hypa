@@ -69,10 +69,10 @@ namespace Drizzle {
 			ImGui::Text("Selected shader: ", CurrentShaderName);
 
 			ImGui::SliderFloat("Render Scale", &renderScale, 0.3f, 1.f);
-			ImGui::InputFloat3("data1", (float*)&pushConstants.data1);
-			ImGui::InputFloat3("data2", (float*)&pushConstants.data2);
-			ImGui::InputFloat3("data3", (float*)&pushConstants.data3);
-			ImGui::InputFloat3("data4", (float*)&pushConstants.data4);
+			ImGui::InputFloat3("data1", (float*)&pushConstants.worldMatrix[0]);
+			ImGui::InputFloat3("data2", (float*)&pushConstants.worldMatrix[1]);
+			ImGui::InputFloat3("data3", (float*)&pushConstants.worldMatrix[2]);
+			ImGui::InputFloat3("data4", (float*)&pushConstants.worldMatrix[3]);
 		}
 		ImGui::End();
 

@@ -17,10 +17,7 @@ namespace Drizzle {
 	};
 
 	struct PushConstants {
-		glm::vec3 data1;
-		glm::vec3 data2;
-		glm::vec3 data3;
-		glm::vec3 data4;
+		glm::mat4 worldMatrix;
 	};
 
 	class RenderingAPI {

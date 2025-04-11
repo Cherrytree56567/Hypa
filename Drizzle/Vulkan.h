@@ -155,15 +155,6 @@ namespace Drizzle {
         VkDeviceAddress vertexBufferAddress;
     };
 
-    struct GPUSceneData {
-        glm::mat4 view;
-        glm::mat4 proj;
-        glm::mat4 viewproj;
-        glm::vec4 ambientColor;
-        glm::vec4 sunlightDirection; // w for sun power
-        glm::vec4 sunlightColor;
-    };
-
     struct GPUDrawPushConstants {
         glm::mat4 worldMatrix;
         VkDeviceAddress vertexBuffer;
@@ -295,7 +286,6 @@ namespace Drizzle {
         AllocatedImage _drawImage;
         VkExtent2D _drawExtent;
         VkExtent2D _windowExtent;
-        VkDescriptorSetLayout _gpuSceneDataDescriptorLayout;
         VkDescriptorSetLayout _singleImageDescriptorLayout;
         /*
         * ImGUI
@@ -314,7 +304,6 @@ namespace Drizzle {
         bool resize_requested = false;
         float renderScale = 1.f;
         DescriptorAllocator globalDescriptorAllocator;
-        GPUSceneData sceneData;
 
         AllocatedImage _whiteImage;
         AllocatedImage _blackImage;
