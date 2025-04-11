@@ -1,23 +1,37 @@
 #version 450
+#extension GL_EXT_buffer_reference : require
 
-layout(push_constant) uniform PushConstants {
-    float customFloat;
+layout (location = 0) out vec3 outColor;
+layout (location = 1) out vec2 outUV;
+
+struct Vertex {
+
+	vec3 position;
+	float uv_x;
+	vec3 normal;
+	float uv_y;
+	vec4 color;
+}; 
+
+layout(buffer_reference, std430) readonly buffer VertexBuffer{ 
+	Vertex vertices[];
 };
 
-layout(set = 0, binding = 0) uniform UniformBufferObject {
-    mat4 model;
-    mat4 view;
-    mat4 proj;
-};
+//push constants block
+layout( push_constant ) uniform constants
+{	
+	mat4 render_matrix;
+	VertexBuffer vertexBuffer;
+} PushConstants;
 
-layout(location = 0) in vec2 inPosition;
-layout(location = 1) in vec3 inColor;
+void main() 
+{	
+	//load vertex data from device adress
+	Vertex v = PushConstants.vertexBuffer.vertices[gl_VertexIndex];
 
-layout(location = 0) out vec3 fragColor;
-layout(location = 1) out float frg;
-
-void main() {
-    gl_Position = proj * view * model * vec4(inPosition, 0.0, 1.0);
-    fragColor = inColor;
-    frg = customFloat;
+	//output data
+	gl_Position = PushConstants.render_matrix *vec4(v.position, 1.0f);
+	outColor = v.color.xyz;
+	outUV.x = v.uv_x;
+	outUV.y = v.uv_y;
 }

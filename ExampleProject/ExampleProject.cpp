@@ -16,9 +16,10 @@ int main() {
 	//app.GetWindow()->GetFlags()->ChangeFlag("Width", 800);
 	//app.GetWindow()->GetFlags()->ChangeFlag("Height", 800);
 
-	//app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->CreateShader("NewShader", "NewVertex.glsl", "NewFragment.glsl");
+	app.GetRenderingAPISystem()->GetCurrentRenderingAPI()->CreateShader("NewShader", "NewVert.spv", "NewFrag.spv");
 
 	duck.textureName = "DuckTex";
+	cube.shaderName = "NewShader";
 
 	app.GetRendering3D()->CreateObject("Cube", cube);
 	app.GetRendering3D()->CreateObject("Duck", duck);
