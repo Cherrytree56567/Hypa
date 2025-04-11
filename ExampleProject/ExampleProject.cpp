@@ -5,9 +5,6 @@
 
 int main() {
 	Drizzle::App app;
-	bool ALT = false;
-    bool LLL = false;
-    float i = 0;
 	auto cube = Drizzle::LoadObjFile("lost_empire.obj");
 	auto duck = Drizzle::LoadObjFile("duck.obj");
 

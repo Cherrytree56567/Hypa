@@ -52,6 +52,7 @@ namespace Drizzle {
 			destroy_buffer(objects[i].first.vertexBuffer);
 		}
 
+		_texDeletionQueue.flush();
 		_mainDeletionQueue.flush();
 
 		destroy_swapchain();
@@ -353,7 +354,7 @@ namespace Drizzle {
 				tex = create_image(data, VkExtent3D{ (unsigned int)width, (unsigned int)height, 1 }, VK_FORMAT_R8G8B8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
 			}
 
-			_mainDeletionQueue.push_function([&]() {
+			_texDeletionQueue.push_function([&]() {
 				if (textures.find(name) != textures.end()) {
 					destroy_image(tex);
 				}

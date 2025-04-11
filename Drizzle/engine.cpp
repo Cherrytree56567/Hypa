@@ -491,7 +491,7 @@ namespace Drizzle {
 		sampl.minFilter = VK_FILTER_LINEAR;
 		vkCreateSampler(_device, &sampl, nullptr, &_defaultSamplerLinear);
 
-		_mainDeletionQueue.push_function([&]() {
+		_texDeletionQueue.push_function([&]() {
 			vkDestroySampler(_device, _defaultSamplerNearest, nullptr);
 			vkDestroySampler(_device, _defaultSamplerLinear, nullptr);
 

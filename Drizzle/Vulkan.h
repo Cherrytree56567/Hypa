@@ -292,6 +292,7 @@ namespace Drizzle {
         VkDescriptorSetLayout _drawImageDescriptorLayout;
         VkExtent2D _swapchainExtent;
         DeletionQueue _mainDeletionQueue;
+        DeletionQueue _texDeletionQueue;
         AllocatedImage _drawImage;
         VkExtent2D _drawExtent;
         VkExtent2D _windowExtent;

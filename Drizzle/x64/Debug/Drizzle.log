@@ -5,31 +5,9 @@ D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefini
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   
-D:\Drizzle\Drizzle\Vulkan.cpp(67,89): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\Vulkan.cpp(68,86): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
-  engine.cpp
-D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'engine.cpp')
-      D:\Drizzle\Drizzle\base.h(2,9):
-      'Drizzle_EXPORTS' previously declared on the command line
-  
-D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
-D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:         with
-D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:         [
-D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:             _First=int
-D:\Drizzle\Drizzle\engine.cpp(113,17): warning C4838:         ]
-D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838: conversion from '_First' to 'uint32_t' requires a narrowing conversion
-D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         with
-D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         [
-D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:             _First=int
-D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         ]
-D:\Drizzle\Drizzle\engine.cpp(378,31): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(379,32): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(430,56): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(433,68): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
-  Generating Code...
+D:\Drizzle\Drizzle\Vulkan.cpp(68,89): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\Vulkan.cpp(69,86): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
 D:\Drizzle\Drizzle\RenderingAPI.h(53,1): warning C4172: returning address of local variable or temporary : s
-D:\Drizzle\Drizzle\RenderingAPI.h(53,1): warning C4172: returning address of local variable or temporary : s
-D:\Drizzle\Drizzle\Vulkan.cpp(340,1): warning C4715: 'Drizzle::Vulkan::GetObject': not all control paths return a value
-D:\Drizzle\Drizzle\Vulkan.cpp(337,1): warning C4172: returning address of local variable or temporary : obj
+D:\Drizzle\Drizzle\Vulkan.cpp(341,1): warning C4715: 'Drizzle::Vulkan::GetObject': not all control paths return a value
+D:\Drizzle\Drizzle\Vulkan.cpp(338,1): warning C4172: returning address of local variable or temporary : obj
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll
