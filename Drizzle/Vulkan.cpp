@@ -1,6 +1,8 @@
 #include "Vulkan.h"
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 namespace Drizzle {
 	Vulkan::Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events) {
@@ -338,18 +340,33 @@ namespace Drizzle {
 	}
 
 	void Vulkan::CreateTexture(std::string name, std::string TexturePath) {
+		AllocatedImage tex;
+		int width, height, channels;
+		unsigned char* data = stbi_load(TexturePath.c_str(), &width, &height, &channels, 0);
+		if (!data) {
+			tex = _errorCheckerboardImage;
+			log.Error("Couldn't load texture: " + TexturePath);
+		} else {
+			if (channels == 4) {
+				tex = create_image(data, VkExtent3D{ (unsigned int)width, (unsigned int)height, 1 }, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
+			} else if (channels == 3) {
+				tex = create_image(data, VkExtent3D{ (unsigned int)width, (unsigned int)height, 1 }, VK_FORMAT_R8G8B8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
+			}
 
+			_mainDeletionQueue.push_function([&]() {
+				if (textures.find(name) != textures.end()) {
+					destroy_image(tex);
+				}
+			});
+		}
+
+		stbi_image_free(data);
+
+		textures[name] = tex;
 	}
 
 	void Vulkan::RemoveTexture(std::string name) {
-
-	}
-
-	void Vulkan::ChangeTexture(std::string name) {
-
-	}
-
-	std::string Vulkan::GetCurrentTextureName() {
-		return "";
+		destroy_image(textures[name]);
+		textures.erase(name);
 	}
 }

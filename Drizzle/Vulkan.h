@@ -38,6 +38,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
+#include <stb/stb_image.h>
 #define VK_CHECK(x)                                                     \
     do {                                                                \
         VkResult err = x;                                               \
@@ -210,8 +211,6 @@ namespace Drizzle {
 
         Drizzle_API void CreateTexture(std::string name, std::string TexturePath) override;
         Drizzle_API void RemoveTexture(std::string name) override;
-        Drizzle_API void ChangeTexture(std::string name) override;
-        Drizzle_API std::string GetCurrentTextureName() override;
 
         Drizzle_API void AddObject(APIObject obj) override;
         Drizzle_API void RemoveObject(std::string name) override;
@@ -278,6 +277,7 @@ namespace Drizzle {
         PushConstants pushConstants;
         std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
 		std::vector<std::pair<GPUMeshBuffers, APIObject>> objects;
+		std::map<std::string, AllocatedImage> textures;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;
@@ -314,11 +314,9 @@ namespace Drizzle {
         float renderScale = 1.f;
         DescriptorAllocator globalDescriptorAllocator;
         bool useDedicated;
-
-        AllocatedImage _whiteImage;
-        AllocatedImage _blackImage;
-        AllocatedImage _greyImage;
+        
         AllocatedImage _errorCheckerboardImage;
+        AllocatedImage _whiteImage;
 
         VkSampler _defaultSamplerLinear;
         VkSampler _defaultSamplerNearest;
