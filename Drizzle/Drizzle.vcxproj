@@ -190,6 +190,7 @@
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Logging.h" />
+    <ClInclude Include="math.h" />
     <ClInclude Include="MouseEvents.h" />
     <ClInclude Include="MouseCodes.h" />
     <ClInclude Include="OpenGL.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="math.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="pipelines.cpp" />

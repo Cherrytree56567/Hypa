@@ -17,7 +17,7 @@ namespace Drizzle {
 
 	void Vulkan::OnAttach() {
 		flags.AddFlag("UseDedicatedGPU", &useDedicated);
-		flags.ChangeFlag("UseDedicatedGPU", true);
+		flags.ChangeFlag("UseDedicatedGPU", false);
 		init_vulkan();
 		init_swapchain();
 		init_commands();

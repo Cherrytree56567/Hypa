@@ -39,6 +39,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
 #include <stb/stb_image.h>
+
+#include "math.h"
 #define VK_CHECK(x)                                                     \
     do {                                                                \
         VkResult err = x;                                               \

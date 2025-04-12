@@ -61,6 +61,9 @@
     <Filter Include="Header Files\imgui">
       <UniqueIdentifier>{e3ca257d-d61f-43b9-aae0-c26a04a7e3cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{f04b5445-b910-44b2-b35b-a337b5a0cbbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -147,6 +150,9 @@
     <ClCompile Include="mesh.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -196,6 +202,9 @@
     </ClInclude>
     <ClInclude Include="OpenGL.h">
       <Filter>Source Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="math.h">
+      <Filter>Source Files\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

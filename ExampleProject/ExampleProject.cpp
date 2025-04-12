@@ -8,7 +8,7 @@ int main() {
 	auto r3D = app.GetRendering3D();
 	auto rAPI = app.GetRenderingAPISystem()->GetCurrentRenderingAPI();
 
-	///r3D->LoadOBJ("Lost Empire", "dungeon.obj");
+	r3D->LoadOBJ("Lost Empire", "dungeon.obj");
 	r3D->LoadOBJ("Duck", "duck.obj");
 
 	Drizzle::APIObject& duck = r3D->GetObject("Duck");
