@@ -26,6 +26,7 @@ namespace Drizzle {
 		std::string name;
 		std::string shaderName;
 		std::string textureName;
+		std::string groupName;
 		bool hidden = false;
 	};
 
@@ -35,7 +36,9 @@ namespace Drizzle {
 
 		Drizzle_API virtual void OnAttach() { }
 		Drizzle_API virtual void OnDetach() { }
-		Drizzle_API virtual void Render() { }
+		Drizzle_API virtual void RenderBefore() {}
+		Drizzle_API virtual void RenderAfter() {}
+		Drizzle_API virtual void Render3D(std::vector<APIObject> objs) {}
 
 		Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
 		Drizzle_API virtual void RemoveShader(std::string name) {}
@@ -45,15 +48,12 @@ namespace Drizzle {
 		Drizzle_API virtual void CreateTexture(std::string name, std::string TexturePath) {}
 		Drizzle_API virtual void RemoveTexture(std::string name) {}
 		Drizzle_API virtual void ChangeTexture(std::string name) {}
-		Drizzle_API virtual std::string GetCurrentTextureName() { return ""; }
+		Drizzle_API virtual bool TextureExists(std::string name) { return false; }
 
 		Drizzle_API virtual void AddObject(APIObject obj) {}
 		Drizzle_API virtual void RemoveObject(std::string name) {}
-		Drizzle_API virtual void VisibilityObject(std::string name, bool visibility) {}
-		Drizzle_API virtual APIObject& GetObject(std::string name) { APIObject s; return s; }
 
 		Drizzle_API virtual const std::string& GetName() const { return name; }
-
 		Drizzle_API virtual PushConstants& GetPushConstants() { return pushConstants; }
 
 	private:

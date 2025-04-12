@@ -756,7 +756,9 @@ namespace Drizzle {
 
         Drizzle_API virtual void OnAttach() {}
         Drizzle_API virtual void OnDetach() {}
-        Drizzle_API virtual void Render() {}
+        Drizzle_API virtual void RenderBefore() {}
+        Drizzle_API virtual void RenderAfter() {}
+        Drizzle_API virtual void Render3D(std::vector<APIObject> objs) {}
 
         Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
         Drizzle_API virtual void RemoveShader(std::string name) {}
@@ -770,11 +772,8 @@ namespace Drizzle {
 
         Drizzle_API virtual void AddObject(APIObject obj) {}
         Drizzle_API virtual void RemoveObject(std::string name) {}
-        Drizzle_API virtual void VisibilityObject(std::string name, bool visibility) {}
-        Drizzle_API virtual APIObject& GetObject(std::string name) { APIObject s; return s; }
 
         Drizzle_API virtual const std::string& GetName() const { return name; }
-
         Drizzle_API virtual PushConstants& GetPushConstants() { return pushConstants; }
 
     private:
@@ -888,7 +887,9 @@ namespace Drizzle {
 
         Drizzle_API void OnAttach() override;
         Drizzle_API void OnDetach() override;
-        Drizzle_API void Render() override;
+        Drizzle_API void RenderBefore() override;
+        Drizzle_API void RenderAfter() override;
+        Drizzle_API void Render3D(std::vector<APIObject> objs) override;
 
         Drizzle_API const std::string& GetName() const override;
         Drizzle_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
@@ -898,13 +899,9 @@ namespace Drizzle {
 
         Drizzle_API void CreateTexture(std::string name, std::string TexturePath) override;
         Drizzle_API void RemoveTexture(std::string name) override;
-        Drizzle_API void ChangeTexture(std::string name) override;
-        Drizzle_API std::string GetCurrentTextureName() override;
 
         Drizzle_API void AddObject(APIObject obj) override;
         Drizzle_API void RemoveObject(std::string name) override;
-        Drizzle_API void VisibilityObject(std::string name, bool visibility) override;
-        Drizzle_API APIObject& GetObject(std::string name) override;
 
         Drizzle_API PushConstants& GetPushConstants() override { return pushConstants; }
 
@@ -929,7 +926,6 @@ namespace Drizzle {
 
         Drizzle_API virtual void OnAttach() override;
         Drizzle_API virtual void OnDetach() override;
-        Drizzle_API virtual void Render() override;
 
         Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
         Drizzle_API virtual void RemoveShader(std::string name) override;
@@ -969,8 +965,6 @@ namespace Drizzle {
     * Rendering3D
     */
 
-    Drizzle_API APIObject LoadObjFile(const std::string& filePath);
-
     class Rendering3D : public Layer {
     public:
         Drizzle_API Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys);
@@ -985,6 +979,9 @@ namespace Drizzle {
         Drizzle_API virtual void SetShow(bool value) override;
 
         Drizzle_API void CreateObject(std::string name, APIObject obj);
+        Drizzle_API void RemoveObject(std::string name, bool grouped = false);
+        Drizzle_API APIObject& GetObject(std::string name);
+        Drizzle_API void LoadOBJ(std::string name, const std::string& filePath, const std::string& mtlPath = "");
     private:
         bool show = false;
         std::string name;

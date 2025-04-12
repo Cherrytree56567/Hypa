@@ -357,17 +357,13 @@ namespace Drizzle {
 		});
 	}
 
-	void Vulkan::draw_geometry(VkCommandBuffer cmd) {
-		engineStats.drawcall_count = 0;
-		engineStats.triangle_count = 0;
-		//begin clock
-		auto start = std::chrono::system_clock::now();
+	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects) {
 		/*
 		* Begin a render pass connected to our draw image
 		*/
-		VkClearValue clearColor = {};
-		clearColor.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
-		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, &clearColor, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		VkClearValue clearValue = {};
+		clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, &clearValue, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, nullptr);
 		vkCmdBeginRendering(cmd, &renderInfo);
@@ -391,22 +387,22 @@ namespace Drizzle {
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
 		for (size_t i = 0; i < objects.size(); i++) {
-			if (objects[i].second.hidden) {
+			if (objects[i].hidden) {
 				continue;
 			}
 
 			std::string shader = CurrentShaderName;
-			if (objects[i].second.shaderName != "" && shaders.find(shader) != shaders.end()) {
-				shader = objects[i].second.shaderName;
+			if (objects[i].shaderName != "" && shaders.find(shader) != shaders.end()) {
+				shader = objects[i].shaderName;
 			}
 			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].first);
 
 			VkDescriptorSet imageSet = get_current_frame()._frameDescriptors.allocate(_device, _singleImageDescriptorLayout);
 			{
 				DescriptorWriter writer;
-				if (objects[i].second.textureName != "") {
-					if (textures.find(objects[i].second.textureName) != textures.end()) {
-						writer.write_image(0, textures[objects[i].second.textureName].imageView, _defaultSamplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+				if (objects[i].textureName != "") {
+					if (textures.find(objects[i].textureName) != textures.end()) {
+						writer.write_image(0, textures[objects[i].textureName].imageView, _defaultSamplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 					} else {
 						writer.write_image(0, _errorCheckerboardImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 					}
@@ -422,22 +418,18 @@ namespace Drizzle {
 			GPUDrawPushConstants push_constants;
 			push_constants.worldMatrix = pushConstants.worldMatrix;
 
-			push_constants.vertexBuffer = objects[i].first.vertexBufferAddress;
+			push_constants.vertexBuffer = meshes[objects[i].name].vertexBufferAddress;
 
 			vkCmdPushConstants(cmd, shaders[shader].second, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
-			vkCmdBindIndexBuffer(cmd, objects[i].first.indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(cmd, meshes[objects[i].name].indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
 
-			vkCmdDrawIndexed(cmd, objects[i].second.indices.size(), 1, 0, 0, 0);
+			vkCmdDrawIndexed(cmd, objects[i].indices.size(), 1, 0, 0, 0);
 
 			engineStats.drawcall_count++;
-			engineStats.triangle_count += objects[i].second.indices.size()  / 3;
+			engineStats.triangle_count += objects[i].indices.size() / 3;
 		}
 
 		vkCmdEndRendering(cmd);
-		auto end = std::chrono::system_clock::now();
-
-		auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-		engineStats.mesh_draw_time = elapsed.count() / 1000.f;
 	}
 
 	void Vulkan::init_background_pipelines() {

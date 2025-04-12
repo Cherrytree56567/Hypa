@@ -47,9 +47,9 @@ namespace Drizzle {
 			_frames[i]._deletionQueue.flush();
 		}
 
-		for (int i = 0; i < objects.size(); i++) {
-			destroy_buffer(objects[i].first.indexBuffer);
-			destroy_buffer(objects[i].first.vertexBuffer);
+		for (auto mesh : meshes) {
+			destroy_buffer(mesh.second.indexBuffer);
+			destroy_buffer(mesh.second.vertexBuffer);
 		}
 
 		_texDeletionQueue.flush();
@@ -64,7 +64,7 @@ namespace Drizzle {
 		vkDestroyInstance(_instance, nullptr);
 	}
 
-	void Vulkan::Render() {
+	void Vulkan::RenderBefore() {
 		_drawExtent.height = std::min(_swapchainExtent.height, _drawImage.imageExtent.height) * renderScale;
 		_drawExtent.width = std::min(_swapchainExtent.width, _drawImage.imageExtent.width) * renderScale;
 		if (resize_requested) {
@@ -79,10 +79,10 @@ namespace Drizzle {
 			ImGui::Text("Selected shader: ", CurrentShaderName);
 
 			ImGui::SliderFloat("Render Scale", &renderScale, 0.3f, 1.f);
-			ImGui::InputFloat3("data1", (float*)&pushConstants.worldMatrix[0]);
-			ImGui::InputFloat3("data2", (float*)&pushConstants.worldMatrix[1]);
-			ImGui::InputFloat3("data3", (float*)&pushConstants.worldMatrix[2]);
-			ImGui::InputFloat3("data4", (float*)&pushConstants.worldMatrix[3]);
+			ImGui::InputFloat4("data1", (float*)&pushConstants.worldMatrix[0]);
+			ImGui::InputFloat4("data2", (float*)&pushConstants.worldMatrix[1]);
+			ImGui::InputFloat4("data3", (float*)&pushConstants.worldMatrix[2]);
+			ImGui::InputFloat4("data4", (float*)&pushConstants.worldMatrix[3]);
 
 			float fps = 1000.0f / engineStats.frametime;
 			ImGui::Text("frametime %f ms", engineStats.frametime);
@@ -108,7 +108,6 @@ namespace Drizzle {
 		/*
 		* Request image from the swapchain
 		*/
-		uint32_t swapchainImageIndex;
 		VkResult e = vkAcquireNextImageKHR(_device, _swapchain, 1000000000, get_current_frame()._swapchainSemaphore, nullptr, &swapchainImageIndex);
 		if (e == VK_ERROR_OUT_OF_DATE_KHR) {
 			resize_requested = true;
@@ -117,17 +116,17 @@ namespace Drizzle {
 
 		get_current_frame()._deletionQueue.flush();
 
-		VkCommandBuffer command = get_current_frame()._mainCommandBuffer;
+		command = get_current_frame()._mainCommandBuffer;
 
 		/*
-		* Now that we are sure that the commands finished executing, 
+		* Now that we are sure that the commands finished executing,
 		* we can safely reset the command buffer to begin recording again.
 		*/
 		VK_CHECK(vkResetCommandBuffer(command, 0));
 
 		/*
 		* Begin the command buffer recording.
-		* We will use this command buffer exactly once, 
+		* We will use this command buffer exactly once,
 		* so we want to let Vulkan know that.
 		*/
 		VkCommandBufferBeginInfo cmdBeginInfo = command_buffer_begin_info(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -146,12 +145,28 @@ namespace Drizzle {
 		*/
 		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
-		//draw_background(command);
-
 		transition_image(command, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-		draw_geometry(command);
+		renderBefore = true;
 
+		engineStats.drawcall_count = 0;
+		engineStats.triangle_count = 0;
+
+		start = std::chrono::system_clock::now();
+	}
+
+	void Vulkan::RenderAfter() {
+		if (renderBefore == false) {
+			log.Error("RenderBefore was not called before RenderAfter");
+			return;
+		} else {
+			renderBefore = false;
+		}
+
+		auto end = std::chrono::system_clock::now();
+
+		auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		engineStats.mesh_draw_time = elapsed.count() / 1000.f;
 		/*
 		* Transtion the draw image and the swapchain image into their correct transfer layouts
 		*/
@@ -227,6 +242,14 @@ namespace Drizzle {
 		* Increase the number of frames drawn
 		*/
 		_frameNumber++;
+	}
+
+	void Vulkan::Render3D(std::vector<APIObject> objs) {
+		if (renderBefore == false) {
+			log.Error("RenderBefore was not called before Render3D");
+			return;
+		}
+		draw_geometry(command, objs);
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
@@ -306,37 +329,15 @@ namespace Drizzle {
 
 	void Vulkan::AddObject(APIObject obj) {
 		GPUMeshBuffers main = uploadMesh(obj.indices, obj.vertices);
-		objects.push_back(std::make_pair(main, obj));
+		meshes[obj.name] = main;
 	}
 
 	void Vulkan::RemoveObject(std::string name) {
-		for (size_t i = 0; i < objects.size(); i++) {
-			if (objects[i].second.name == name) {
-				destroy_buffer(objects[i].first.vertexBuffer);
-				destroy_buffer(objects[i].first.indexBuffer);
-				objects.erase(objects.begin() + i);
-				return;
-			}
-		}
-	}
-
-	void Vulkan::VisibilityObject(std::string name, bool visibility) {
-		for (size_t i = 0; i < objects.size(); i++) {
-			if (objects[i].second.name == name) {
-				objects[i].second.hidden = visibility;
-				return;
-			}
-		}
-	}
-
-	APIObject& Vulkan::GetObject(std::string name) {
-		for (size_t i = 0; i < objects.size(); i++) {
-			if (objects[i].second.name == name) {
-				return objects[i].second;
-			} else {
-				APIObject obj;
-				return obj;
-			}
+		if (meshes.contains(name)) {
+			destroy_buffer(meshes[name].vertexBuffer);
+			destroy_buffer(meshes[name].indexBuffer);
+			meshes.erase(name);
+			return;
 		}
 	}
 
@@ -369,5 +370,9 @@ namespace Drizzle {
 	void Vulkan::RemoveTexture(std::string name) {
 		destroy_image(textures[name]);
 		textures.erase(name);
+	}
+
+	bool Vulkan::TextureExists(std::string name) {
+		return textures.find(name) != textures.end();
 	}
 }

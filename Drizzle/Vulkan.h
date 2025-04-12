@@ -201,7 +201,9 @@ namespace Drizzle {
 
 		Drizzle_API void OnAttach() override;
 		Drizzle_API void OnDetach() override;
-		Drizzle_API void Render() override;
+        Drizzle_API void RenderBefore() override;
+        Drizzle_API void RenderAfter() override;
+        Drizzle_API void Render3D(std::vector<APIObject> objs) override;
 
 		Drizzle_API const std::string& GetName() const override;
         Drizzle_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
@@ -211,11 +213,10 @@ namespace Drizzle {
 
         Drizzle_API void CreateTexture(std::string name, std::string TexturePath) override;
         Drizzle_API void RemoveTexture(std::string name) override;
+        Drizzle_API bool TextureExists(std::string name) override;
 
         Drizzle_API void AddObject(APIObject obj) override;
         Drizzle_API void RemoveObject(std::string name) override;
-        Drizzle_API void VisibilityObject(std::string name, bool visibility) override;
-        Drizzle_API APIObject& GetObject(std::string name) override;
 
         Drizzle_API PushConstants& GetPushConstants() override { return pushConstants; }
 
@@ -232,7 +233,7 @@ namespace Drizzle {
         void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
-        void draw_geometry(VkCommandBuffer cmd);
+        void draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects);
         void resize_swapchain();
 
         VkPhysicalDevice pick_gpu(const std::vector<VkPhysicalDevice>& devices);
@@ -276,8 +277,8 @@ namespace Drizzle {
         std::shared_ptr<EventSystem> pEvents;
         PushConstants pushConstants;
         std::map<std::string, std::pair<VkPipeline, VkPipelineLayout>> shaders;
-		std::vector<std::pair<GPUMeshBuffers, APIObject>> objects;
 		std::map<std::string, AllocatedImage> textures;
+        std::map<std::string, GPUMeshBuffers> meshes;
 
         VkInstance _instance;
         VkDebugUtilsMessengerEXT _debug_messenger;
@@ -315,6 +316,12 @@ namespace Drizzle {
         float renderScale = 1.f;
         DescriptorAllocator globalDescriptorAllocator;
         bool useDedicated;
+        std::chrono::system_clock::time_point start;
+
+		bool renderBefore = false;
+        
+        uint32_t swapchainImageIndex;
+        VkCommandBuffer command;
         
         AllocatedImage _errorCheckerboardImage;
         AllocatedImage _whiteImage;

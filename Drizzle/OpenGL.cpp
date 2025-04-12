@@ -50,10 +50,6 @@ namespace Drizzle {
 		pWindow->UseNoClientApi();
 	}
 
-    void OpenGL::Render() {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
 
 	void OpenGL::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
         const char* vertexShaderSource = readFile(VertShaderPath.c_str());
@@ -137,9 +133,5 @@ namespace Drizzle {
 
     void OpenGL::ChangeTexture(std::string name) {
 
-    }
-
-    std::string OpenGL::GetCurrentTextureName() {
-        return CurrentTextureName;
     }
 }

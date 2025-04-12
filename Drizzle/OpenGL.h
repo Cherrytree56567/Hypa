@@ -21,7 +21,6 @@ namespace Drizzle {
 
 		Drizzle_API virtual void OnAttach() override;
 		Drizzle_API virtual void OnDetach() override;
-		Drizzle_API virtual void Render() override;
 
 		Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
 		Drizzle_API virtual void RemoveShader(std::string name) override;
@@ -31,7 +30,6 @@ namespace Drizzle {
 		Drizzle_API virtual void CreateTexture(std::string name, std::string TexturePath) override;
 		Drizzle_API virtual void RemoveTexture(std::string name) override;
 		Drizzle_API virtual void ChangeTexture(std::string name) override;
-		Drizzle_API virtual std::string GetCurrentTextureName() override;
 
 		Drizzle_API virtual const std::string& GetName() const override { return name; }
 
