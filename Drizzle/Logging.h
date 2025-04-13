@@ -15,6 +15,7 @@ namespace Drizzle {
 	public:
 		Drizzle_API Logging();
 
+		Drizzle_API void Critical(std::string message, std::string who = "[Drizzle::Core] ");
 		Drizzle_API void Error(std::string message, std::string who = "[Drizzle::Core] ");
 		Drizzle_API void Warning(std::string message, std::string who = "[Drizzle::Core] ");
 		Drizzle_API void Info(std::string message, std::string who = "[Drizzle::Core] ");

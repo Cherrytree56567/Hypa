@@ -189,6 +189,7 @@ namespace Drizzle {
         void set_polygon_mode(VkPolygonMode mode);
         void set_multisampling_none();
         void disable_blending();
+        void enable_depthtest(bool depthWriteEnable, VkCompareOp op);
         void set_color_attachment_format(VkFormat format);
         void set_depth_format(VkFormat format);
         void disable_depthtest();
@@ -257,6 +258,7 @@ namespace Drizzle {
 
         AllocatedImage create_image(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped = false);
         AllocatedImage create_image(void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped = false);
+        VkImageView create_depth_image_view(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceMemory& depthImageMemory, VkImage& depthImage, VkFormat depthFormat, uint32_t width, uint32_t height);
         void destroy_image(const AllocatedImage& img);
 
         GPUMeshBuffers uploadMesh(std::span<uint16_t> indices, std::span<Vertex> vertices);
@@ -300,6 +302,7 @@ namespace Drizzle {
         VkExtent2D _drawExtent;
         VkExtent2D _windowExtent;
         VkDescriptorSetLayout _singleImageDescriptorLayout;
+        VkImageView _depthImageView;
         /*
         * ImGUI
         */
@@ -319,8 +322,12 @@ namespace Drizzle {
         DescriptorAllocator globalDescriptorAllocator;
         bool useDedicated;
         std::chrono::system_clock::time_point start;
+		bool useVSync = true;
 
 		bool renderBefore = false;
+
+        VkDeviceMemory depthImageMemory;
+        VkImage depthImage;
         
         uint32_t swapchainImageIndex;
         VkCommandBuffer command;

@@ -365,7 +365,12 @@ namespace Drizzle {
 		clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
 		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, &clearValue, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, nullptr);
+		VkClearValue depthClear = {};
+		depthClear.depthStencil = {1.0f};
+
+		VkRenderingAttachmentInfo depthAttachment = attachment_info(_depthImageView, &depthClear, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+
+		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, &depthAttachment);
 		vkCmdBeginRendering(cmd, &renderInfo);
 
 		VkViewport viewport = {};
@@ -509,6 +514,21 @@ namespace Drizzle {
 
 	void Vulkan::resize_swapchain() {
 		vkDeviceWaitIdle(_device);
+
+		if (_depthImageView != VK_NULL_HANDLE) {
+			vkDestroyImageView(_device, _depthImageView, nullptr);
+			_depthImageView = VK_NULL_HANDLE;
+		}
+
+		if (depthImageMemory != VK_NULL_HANDLE) {
+			vkFreeMemory(_device, depthImageMemory, nullptr);
+			depthImageMemory = VK_NULL_HANDLE;
+		}
+
+		if (depthImage != VK_NULL_HANDLE) {
+			vkDestroyImage(_device, depthImage, nullptr);
+			depthImage = VK_NULL_HANDLE;
+		}
 
 		destroy_swapchain();
 

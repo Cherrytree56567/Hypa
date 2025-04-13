@@ -212,6 +212,18 @@ namespace Drizzle {
         _depthStencil.maxDepthBounds = 1.f;
     }
 
+    void PipelineBuilder::enable_depthtest(bool depthWriteEnable, VkCompareOp op) {
+        _depthStencil.depthTestEnable = VK_TRUE;
+        _depthStencil.depthWriteEnable = depthWriteEnable;
+        _depthStencil.depthCompareOp = op;
+        _depthStencil.depthBoundsTestEnable = VK_FALSE;
+        _depthStencil.stencilTestEnable = VK_FALSE;
+        _depthStencil.front = {};
+        _depthStencil.back = {};
+        _depthStencil.minDepthBounds = 0.f;
+        _depthStencil.maxDepthBounds = 1.f;
+    }
+
     void PipelineBuilder::enable_blending_additive() {
         _colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
         _colorBlendAttachment.blendEnable = VK_TRUE;

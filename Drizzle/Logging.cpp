@@ -12,6 +12,11 @@ namespace Drizzle {
 
 	}
 
+	void Logging::Critical(std::string message, std::string who) {
+		std::cout << who << "Critical: " << message << "\n";
+		throw std::runtime_error(message);
+	}
+
 	void Logging::Error(std::string message, std::string who) {
 		std::cout << who << "Error: " << message << "\n";
 	}

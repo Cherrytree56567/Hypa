@@ -17,6 +17,7 @@ namespace Drizzle {
 
 	void Vulkan::OnAttach() {
 		flags.AddFlag("UseDedicatedGPU", &useDedicated);
+		flags.AddFlag("UseVSync", &useVSync);
 		flags.ChangeFlag("UseDedicatedGPU", true);
 		init_vulkan();
 		init_swapchain();
@@ -75,6 +76,8 @@ namespace Drizzle {
 		ImGui::NewFrame();
 
 		if (ImGui::Begin("background")) {
+
+			ImGui::Checkbox("Use VSync", &useVSync);
 
 			ImGui::Text("Selected shader: ", CurrentShaderName);
 
@@ -292,13 +295,13 @@ namespace Drizzle {
 		pipelineBuilder.set_shaders(VertexShader, FragShader);
 		pipelineBuilder.set_input_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 		pipelineBuilder.set_polygon_mode(VK_POLYGON_MODE_FILL);
-		pipelineBuilder.set_cull_mode(VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE);
+		pipelineBuilder.set_cull_mode(VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE);
 		pipelineBuilder.set_multisampling_none();
-		pipelineBuilder.enable_blending_additive();
-		pipelineBuilder.disable_depthtest();
+		pipelineBuilder.disable_blending();
+		pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_LESS);
 
 		pipelineBuilder.set_color_attachment_format(_drawImage.imageFormat);
-		pipelineBuilder.set_depth_format(VK_FORMAT_UNDEFINED);
+		pipelineBuilder.set_depth_format(VK_FORMAT_D32_SFLOAT);
 
 		pipeline = pipelineBuilder.build_pipeline(_device);
 

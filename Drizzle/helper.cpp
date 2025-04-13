@@ -356,4 +356,73 @@ namespace Drizzle {
 
         return selectedDevice;
     }
+
+    uint32_t find_memory_type(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+        VkPhysicalDeviceMemoryProperties memProperties;
+        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
+            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+                return i;
+            }
+        }
+		Logging().Critical("Failed to find suitable memory type!");
+    }
+
+    VkImageView Vulkan::create_depth_image_view(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceMemory& depthImageMemory, VkImage& depthImage, VkFormat depthFormat, uint32_t width, uint32_t height) {
+        VkImageCreateInfo imageInfo{};
+        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageInfo.format = depthFormat;
+        imageInfo.extent = { width, height, 1 };
+        imageInfo.mipLevels = 1;
+        imageInfo.arrayLayers = 1;
+        imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        VkResult result = vkCreateImage(device, &imageInfo, nullptr, &depthImage);
+        if (result != VK_SUCCESS) {
+             log.Critical("Failed to create depth image!");
+        }
+
+        VkMemoryRequirements memRequirements;
+        vkGetImageMemoryRequirements(device, depthImage, &memRequirements);
+
+        VkMemoryAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = find_memory_type(_chosenGPU, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        result = vkAllocateMemory(device, &allocInfo, nullptr, &depthImageMemory);
+        if (result != VK_SUCCESS) {
+            log.Critical("Failed to allocate memory for depth image!");
+        }
+
+        result = vkBindImageMemory(device, depthImage, depthImageMemory, 0);
+        if (result != VK_SUCCESS) {
+            log.Critical("Failed to bind depth image memory!");
+        }
+
+        VkImageViewCreateInfo viewInfo{};
+        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.image = depthImage;
+        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.format = depthFormat;
+        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        viewInfo.subresourceRange.baseMipLevel = 0;
+        viewInfo.subresourceRange.levelCount = 1;
+        viewInfo.subresourceRange.baseArrayLayer = 0;
+        viewInfo.subresourceRange.layerCount = 1;
+
+        VkImageView depthImageView;
+        result = vkCreateImageView(device, &viewInfo, nullptr, &depthImageView);
+        if (result != VK_SUCCESS) {
+            log.Critical("Failed to create depth image view!");
+        }
+
+        return depthImageView;
+    }
 }
