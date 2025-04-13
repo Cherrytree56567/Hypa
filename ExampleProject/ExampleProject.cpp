@@ -24,6 +24,6 @@ int main() {
 	//cube.shaderName = "NewShader";
 
 	while (app.Update()) {
-
+		r3D->GetCamera()->AddMoveTo({ 0.1f, 0.0f, 0.0f });
 	}
 }

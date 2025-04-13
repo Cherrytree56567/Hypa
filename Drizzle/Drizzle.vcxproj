@@ -184,6 +184,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="AppEvent.h" />
     <ClInclude Include="base.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="Flags.h" />
     <ClInclude Include="KeyboardEvent.h" />
@@ -201,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="descriptor.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="EventSystem.cpp" />

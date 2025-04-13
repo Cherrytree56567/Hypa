@@ -64,6 +64,9 @@
     <Filter Include="Source Files\Math">
       <UniqueIdentifier>{f04b5445-b910-44b2-b35b-a337b5a0cbbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{091f6338-a777-419b-8f35-3ee84f9a42b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -153,6 +156,9 @@
     <ClCompile Include="math.cpp">
       <Filter>Source Files\Math</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -205,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="math.h">
       <Filter>Source Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Source Files\Camera</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,10 +1,29 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Hypa.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Vulkan.cpp
+  Camera.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'Vulkan.cpp')
+  (compiling source file 'Camera.cpp')
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   
-D:\Drizzle\Drizzle\Vulkan.cpp(69,89): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\Vulkan.cpp(70,86): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
+  Drizzle.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Drizzle.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'Drizzle.cpp')
+      D:\Drizzle\Drizzle\vendor\GLFW\include\GLFW\glfw3.h(123,11):
+      see previous definition of 'APIENTRY'
+  
+  Rendering3D.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Rendering3D.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  Generating Code...
+D:\Drizzle\Drizzle\Rendering3D.cpp(189,1): warning C4715: 'Drizzle::Rendering3D::GetObject': not all control paths return a value
+     Creating library D:\Drizzle\x64\Debug\Drizzle.lib and object D:\Drizzle\x64\Debug\Drizzle.exp
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

@@ -939,7 +939,6 @@ namespace Drizzle {
         Drizzle_API virtual void CreateTexture(std::string name, std::string TexturePath) override;
         Drizzle_API virtual void RemoveTexture(std::string name) override;
         Drizzle_API virtual void ChangeTexture(std::string name) override;
-        Drizzle_API virtual std::string GetCurrentTextureName() override;
 
         Drizzle_API virtual const std::string& GetName() const override { return name; }
 
@@ -966,6 +965,59 @@ namespace Drizzle {
     };
 
     /*
+    * Camera
+    */
+
+    enum class ProjectionType {
+        Perspective,
+        Orthographic
+    };
+
+    class Camera {
+    public:
+        Camera(glm::mat4* externalProjectionMatrix);
+
+        void MoveTo(const glm::vec3& newPos);
+        void LookAt(const glm::vec3& target);
+        void SetUp(const glm::vec3& newUp);
+
+        void AddMoveTo(const glm::vec3& newPos);
+        void AddLookAt(const glm::vec3& target);
+        void AddSetUp(const glm::vec3& newUp);
+
+        void SetPerspective(float fovDegrees, float aspect, float nearClip, float farClip);
+        void SetOrthographic(float orthoSize, float aspect, float nearClip, float farClip);
+
+        void SetFov(float fovDegrees);
+        void SetAspectRatio(float aspect);
+        void SetNearClip(float nearClip);
+        void SetFarClip(float farClip);
+        void SetOrthoSize(float size);
+        void SetProjectionType(ProjectionType type);
+        void AddFov(float fovDegrees);
+        void AddAspectRatio(float aspect);
+        void AddNearClip(float nearClip);
+        void AddFarClip(float farClip);
+        void AddOrthoSize(float size);
+    private:
+        void UpdateProjection();
+
+        glm::vec3 position;
+        glm::vec3 forward;
+        glm::vec3 up;
+
+        ProjectionType projectionType;
+
+        float fov;
+        float aspectRatio;
+        float nearClip;
+        float farClip;
+        float orthoSize;
+
+        glm::mat4* Matrix;
+    };
+
+    /*
     * Rendering3D
     */
 
@@ -986,11 +1038,16 @@ namespace Drizzle {
         Drizzle_API void RemoveObject(std::string name, bool grouped = false);
         Drizzle_API APIObject& GetObject(std::string name);
         Drizzle_API void LoadOBJ(std::string name, const std::string& filePath, const std::string& mtlPath = "");
+
+        Drizzle_API std::shared_ptr<Camera> GetCamera();
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+        std::shared_ptr<Camera> camera;
+        std::vector<APIObject> objects;
+        Logging log;
     };
 
 	/*

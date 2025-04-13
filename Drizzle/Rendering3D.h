@@ -2,6 +2,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Camera.h"
 #include <fstream>
 #include <filesystem>
 #include "base.h"
@@ -25,11 +26,14 @@ namespace Drizzle {
 		Drizzle_API void RemoveObject(std::string name, bool grouped = false);
         Drizzle_API APIObject& GetObject(std::string name);
         Drizzle_API void LoadOBJ(std::string name, const std::string& filePath, const std::string& mtlPath = "");
+
+		Drizzle_API std::shared_ptr<Camera> GetCamera() { return camera; }
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
+		std::shared_ptr<Camera> camera;
         std::vector<APIObject> objects;
         Logging log;
 	};

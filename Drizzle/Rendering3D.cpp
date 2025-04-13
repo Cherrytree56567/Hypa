@@ -6,7 +6,7 @@ namespace Drizzle {
 	}
 
 	Rendering3D::Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("3DLayer"), pWindow(window), rAPISystem(rAPIsys), show(true) {
-
+		camera = std::make_shared<Camera>(&rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix);
 	}
 
 	void Rendering3D::OnAttach() {
