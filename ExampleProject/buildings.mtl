@@ -1,0 +1,132 @@
+# Blender 4.1.0 MTL File: 'untitled.blend'
+# www.blender.org
+
+newmtl Industrial_Bridgemetal_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_21.png
+
+newmtl Industrial_Facade_Flr_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_0.png
+
+newmtl Industrial_Maskedstuff_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_18.png
+
+newmtl Industrial_Roof_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_3.png
+
+newmtl Industrial_Trim_FLR_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_12.png
+
+newmtl Industrial_Trim_FLR_1_Dif
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_12.png
+
+newmtl Industrial_Walls_FLR_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_6.png
+
+newmtl Industrial_Walls_FLR_2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_9.png
+
+newmtl Industrial_Walls_FLR_2_Dif
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_9.png
+
+newmtl Industrial_Walls_FLR_4
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_24.png
+
+newmtl Industrial_Windows_FLR_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_15.png
+
+newmtl Material_140
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_12.png
+
+newmtl Material_2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/ronit/Documents/Blender/Testing/textures/Image_0.png

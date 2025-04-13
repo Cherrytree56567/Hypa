@@ -1,7 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "RenderingAPI.h"
+#include <array>
 
 namespace Drizzle {
-	bool is_outside_view(const glm::mat4& viewProj, const glm::vec3& center, float radius);
+    glm::vec3 TransformPoint(const glm::mat4& mat, const glm::vec3& v);
+    std::array<glm::vec3, 8> GetBoxCorners(const glm::vec3& min, const glm::vec3& max);
+    bool IsBoxVisible(const glm::vec3& minBound, const glm::vec3& maxBound, const glm::mat4& model, const glm::mat4& viewProj);
 }

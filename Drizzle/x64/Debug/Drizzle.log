@@ -1,10 +1,8 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Hypa.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Vulkan.cpp
+  swapchain.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
-  (compiling source file 'Vulkan.cpp')
+  (compiling source file 'swapchain.cpp')
       D:\Drizzle\Drizzle\base.h(2,9):
       'Drizzle_EXPORTS' previously declared on the command line
   
-D:\Drizzle\Drizzle\Vulkan.cpp(68,89): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\Vulkan.cpp(69,86): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

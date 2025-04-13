@@ -106,6 +106,25 @@ namespace Drizzle {
 				vertices.push_back(vertex);
 			}
 
+			glm::vec3 minBound = { FLT_MAX, FLT_MAX, FLT_MAX };
+			glm::vec3 maxBound = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+			for (const auto& v : vertices) {
+				if (v.position.x < minBound.x) minBound.x = v.position.x;
+				if (v.position.y < minBound.y) minBound.y = v.position.y;
+				if (v.position.z < minBound.z) minBound.z = v.position.z;
+
+				if (v.position.x > maxBound.x) maxBound.x = v.position.x;
+				if (v.position.y > maxBound.y) maxBound.y = v.position.y;
+				if (v.position.z > maxBound.z) maxBound.z = v.position.z;
+			}
+
+			glm::vec3 center = {
+				(minBound.x + maxBound.x) / 2.0f,
+				(minBound.y + maxBound.y) / 2.0f,
+				(minBound.z + maxBound.z) / 2.0f
+			};
+
 			for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
 				const aiFace& face = mesh->mFaces[i];
 				for (unsigned int j = 0; j < face.mNumIndices; ++j) {
@@ -116,6 +135,9 @@ namespace Drizzle {
 			APIObject obj;
 			obj.indices = indices;
 			obj.vertices = vertices;
+			obj.minBound = minBound;
+			obj.maxBound = maxBound;
+			obj.center = center;
 
 			if (MtlExists) {
 				aiString texPath;

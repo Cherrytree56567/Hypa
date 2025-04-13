@@ -744,6 +744,10 @@ namespace Drizzle {
     struct APIObject {
         std::vector<Vertex> vertices;
         std::vector<uint16_t> indices;
+        glm::mat4 modelMatrix;
+        glm::vec3 minBound;
+        glm::vec3 maxBound;
+        glm::vec3 center;
         std::string name;
         std::string shaderName;
         std::string textureName;

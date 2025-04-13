@@ -391,26 +391,9 @@ namespace Drizzle {
 				continue;
 			}
 
-			glm::vec3 localCenter(0.0f);
-			float localRadius = 0.0f;
-			if (!objects[i].vertices.empty()) {
-				// Compute AABB from vertices.
-				glm::vec3 minPos = objects[i].vertices[0].position;
-				glm::vec3 maxPos = objects[i].vertices[0].position;
-				for (size_t j = 1; j < objects[i].vertices.size(); j++) {
-					const glm::vec3& pos = objects[i].vertices[j].position;
-					minPos = glm::min(minPos, pos);
-					maxPos = glm::max(maxPos, pos);
-				}
-				localCenter = (minPos + maxPos) * 0.5f;
-				// Approximate radius: distance from center to one AABB corner.
-				localRadius = glm::length(maxPos - localCenter);
+			if (!IsBoxVisible(objects[i].minBound, objects[i].maxBound, glm::mat4(1.0f), pushConstants.worldMatrix)) {
+				continue;
 			}
-
-			// Use pushConstants.worldMatrix as our view-projection matrix.
-			// Transform the local bounding center.
-			if (is_outside_view(pushConstants.worldMatrix, localCenter, localRadius))
-				continue;  // Skip rendering this object if it is fully outside the view.
 
 			std::string shader = CurrentShaderName;
 			if (objects[i].shaderName != "" && shaders.find(shader) != shaders.end()) {

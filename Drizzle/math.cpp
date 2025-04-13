@@ -1,53 +1,51 @@
-#include "math.h"
-
-/*
-* TODO: Add transforms to the object and compute the AABB in world space.
-* Also add Frustrum Culling.
-*/
+﻿#include "math.h"
 
 namespace Drizzle {
-    bool is_visible(const APIObject& obj, const glm::mat4& viewproj) {
-        std::array<glm::vec3, 8> corners{
-            glm::vec3{ 1,  1,  1 },
-            glm::vec3{ 1,  1, -1 },
-            glm::vec3{ 1, -1,  1 },
-            glm::vec3{ 1, -1, -1 },
-            glm::vec3{-1,  1,  1 },
-            glm::vec3{-1,  1, -1 },
-            glm::vec3{-1, -1,  1 },
-            glm::vec3{-1, -1, -1 },
-        };
-
-        // Combine view-projection and object transform.
-        glm::mat4 matrix = viewproj * obj.transform;
-
-        // Initialize min/max for the clip-space bounding box.
-        glm::vec3 minClip{ 1.5f, 1.5f, 1.5f };
-        glm::vec3 maxClip{ -1.5f, -1.5f, -1.5f };
-
-        for (int c = 0; c < 8; c++) {
-            // For each corner of the OBB, compute its world-space corner:
-            glm::vec4 v = matrix * glm::vec4(obj.bounds.origin + (corners[c] * obj.bounds.extents), 1.f);
-            // Perspective division.
-            v.x /= v.w;
-            v.y /= v.w;
-            v.z /= v.w;
-
-            minClip = glm::min(glm::vec3{ v.x, v.y, v.z }, minClip);
-            maxClip = glm::max(glm::vec3{ v.x, v.y, v.z }, maxClip);
-        }
-
-        // For Vulkan, x,y clip coordinates are in [-1,1] and z in [0,1].
-        // If the clip-space bounding box is entirely outside, then the object is invisible.
-        if (minClip.z > 1.f || maxClip.z < 0.f ||
-            minClip.x > 1.f || maxClip.x < -1.f ||
-            minClip.y > 1.f || maxClip.y < -1.f)
-        {
-            return false;
-        }
-        else {
-            return true;
-        }
+    glm::vec3 TransformPoint(const glm::mat4& mat, const glm::vec3& v) {
+        glm::vec4 transformed = mat * glm::vec4(v, 1.0f);
+        return glm::vec3(transformed) / transformed.w;
     }
 
+    std::array<glm::vec3, 8> GetBoxCorners(const glm::vec3& min, const glm::vec3& max) {
+        return {
+            glm::vec3{min.x, min.y, min.z},
+            glm::vec3{max.x, min.y, min.z},
+            glm::vec3{min.x, max.y, min.z},
+            glm::vec3{max.x, max.y, min.z},
+            glm::vec3{min.x, min.y, max.z},
+            glm::vec3{max.x, min.y, max.z},
+            glm::vec3{min.x, max.y, max.z},
+            glm::vec3{max.x, max.y, max.z}
+        };
+    }
+
+    bool IsBoxVisible(const glm::vec3& minBound, const glm::vec3& maxBound, const glm::mat4& model, const glm::mat4& viewProj) {
+        auto corners = GetBoxCorners(minBound, maxBound);
+
+        int outside[6] = { 0, 0, 0, 0, 0, 0 };
+
+        for (const auto& corner : corners) {
+            glm::vec4 local = { corner.x, corner.y, corner.z, 1.0f };
+            glm::vec4 world = model * local;
+            glm::vec4 clip = viewProj * world;
+
+            if (clip.w == 0.0f) continue;
+            float x = clip.x / clip.w;
+            float y = clip.y / clip.w;
+            float z = clip.z / clip.w;
+
+            if (x < -1) outside[0]++; 
+            if (x > 1) outside[1]++; 
+            if (y < -1) outside[2]++; 
+            if (y > 1) outside[3]++; 
+            if (z < -1) outside[4]++; 
+            if (z > 1) outside[5]++; 
+        }
+
+        for (int i = 0; i < 6; ++i)
+            if (outside[i] == 8)
+                return false;
+
+        return true;
+    }
 }
