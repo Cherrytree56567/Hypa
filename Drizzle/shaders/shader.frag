@@ -14,6 +14,7 @@ struct Light {
 
 layout (location = 0) in vec3 inColor;
 layout (location = 1) in vec2 inUV;
+layout (location = 2) in vec3 inNormal;
 layout (location = 0) out vec4 outFragColor;
 
 layout(set = 0, binding = 0) uniform sampler2D displayTexture;
@@ -25,10 +26,10 @@ const int MAX_LIGHTS = 128;
 
 void main() {
 	vec4 baseColor = texture(displayTexture, inUV);
-    vec3 finalColor = vec3(1.0);
+    vec3 finalColor = vec3(0.0);
 
     vec2 fragPos = inUV * 2.0 - 1.0; // Screen-space [-1, 1]
-    vec3 normal = vec3(0.0, 0.0, 1.0); // Assume flat normal
+    vec3 normal = normalize(inNormal);
 
     for (int i = 0; i < MAX_LIGHTS; ++i) {
         Light light = lights[i];
@@ -43,7 +44,7 @@ void main() {
             if (dist > light.radius) continue;
 
             attenuation = 1.0 - (dist / light.radius);
-            lightDir = normalize(vec3(toLight, 0.0));
+            lightDir = normalize(vec3(toLight, 1.0));
 
         } else if (light.lightType == 1) { // Directional
             lightDir = normalize(-light.direction);
@@ -74,6 +75,7 @@ void main() {
         float NdotL = max(dot(normal, lightDir), 1.0);
         vec3 lightContribution = light.color * light.intensity * NdotL * attenuation;
         finalColor += lightContribution;
+        //outFragColor = vec4(vec3(NdotL), 1.0);
     }
 
     finalColor = baseColor.rgb * finalColor;
