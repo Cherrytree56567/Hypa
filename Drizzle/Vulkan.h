@@ -307,9 +307,7 @@ namespace Drizzle {
         VkExtent2D _windowExtent;
         VkDescriptorSetLayout _singleImageDescriptorLayout;
         VkImageView _depthImageView;
-        VkDescriptorSetLayout _lightDescriptorLayout;
         AllocatedBuffer _lightBuffer;
-        VkDescriptorSet _lightDescriptors;
         /*
         * ImGUI
         */

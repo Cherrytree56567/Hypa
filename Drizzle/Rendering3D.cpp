@@ -208,4 +208,25 @@ namespace Drizzle {
 	void Rendering3D::SetCurrentCamera(std::string name) {
 		CurrentCamera = name;
 	}
+
+	void Rendering3D::AddLight(Lighting light) {
+		lights.push_back(light);
+	}
+
+	void Rendering3D::RemoveLight(std::string name) {
+		for (auto it = lights.begin(); it != lights.end(); ++it) {
+			if (it->getName() == name) {
+				lights.erase(it);
+				break;
+			}
+		}
+	}
+
+	Lighting& Rendering3D::GetLight(std::string name) {
+		for (auto it = lights.begin(); it != lights.end(); ++it) {
+			if (it->getName() == name) {
+				return *it;
+			}
+		}
+	}
 }

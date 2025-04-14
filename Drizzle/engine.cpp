@@ -240,19 +240,14 @@ namespace Drizzle {
 		{
 			DescriptorLayoutBuilder builder;
 			builder.add_binding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+			builder.add_binding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 			_singleImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_FRAGMENT_BIT);
-		}
-		{
-			DescriptorLayoutBuilder builder;
-			builder.add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-			_lightDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		}
 
 		/*
 		* Allocate a descriptor set for our draw image
 		*/
 		_drawImageDescriptors = globalDescriptorAllocator.allocate(_device, _drawImageDescriptorLayout);
-		_lightDescriptors = globalDescriptorAllocator.allocate(_device, _lightDescriptorLayout);
 
 		DescriptorWriter writer;
 		writer.write_image(0, _drawImage.imageView, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_GENERAL, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);
@@ -266,7 +261,6 @@ namespace Drizzle {
 			globalDescriptorAllocator.destroy_pool(_device);
 			vkDestroyDescriptorSetLayout(_device, _singleImageDescriptorLayout, nullptr);
 			vkDestroyDescriptorSetLayout(_device, _drawImageDescriptorLayout, nullptr);
-			vkDestroyDescriptorSetLayout(_device, _lightDescriptorLayout, nullptr);
 		});
 
 		for (int i = 0; i < FRAME_OVERLAP; i++) {
@@ -412,13 +406,22 @@ namespace Drizzle {
 				lightData[i] = {};
 				continue;
 			}
-			lightData[i] = lights[i].GetLight();
+			lightData[i] = PointLight("Main", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 1.0f).GetLight();
 		}
 
-		DescriptorWriter writer;
-		writer.clear();
-		writer.write_buffer(0, _lightBuffer.buffer, sizeof(Light) * MAX_LIGHTS, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		writer.update_set(_device, _lightDescriptors); 
+		void* mappedMemory;
+		VkResult result = vmaMapMemory(_allocator, _lightBuffer.allocation, &mappedMemory);
+		if (result != VK_SUCCESS) {
+			// Handle error if mapping fails
+			return;
+		}
+
+		// Step 2: Copy light data to the mapped memory
+		// Assuming `lightData` is an array of Light structs
+		memcpy(mappedMemory, lightData, sizeof(Light) * MAX_LIGHTS);
+
+		// Step 3: Unmap the memory after the write
+		vmaUnmapMemory(_allocator, _lightBuffer.allocation);
 
 		for (size_t i = 0; i < objects.size(); i++) {
 			if (objects[i].hidden) {
@@ -448,11 +451,12 @@ namespace Drizzle {
 					writer.write_image(0, _whiteImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 				}
 
+				writer.write_buffer(1, _lightBuffer.buffer, sizeof(Light) * 128, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+
 				writer.update_set(_device, imageSet);
 			}
 
 			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].second, 0, 1, &imageSet, 0, nullptr);
-			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].second, 1, 1, &_lightDescriptors, 0, nullptr);
 
 			GPUDrawPushConstants push_constants;
 			push_constants.worldMatrix = pushConstants.worldMatrix;

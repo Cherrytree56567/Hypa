@@ -22,7 +22,9 @@ int main() {
 
 	duck.textureName = "DuckTex";
 
-	r3D->GetCurrentCamera().MoveTo(glm::vec3(0.0f, -50.0f, 0.0f));
+	r3D->AddLight(Drizzle::PointLight("Main", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1.0f, 100.0f));
+
+	r3D->GetCurrentCamera().MoveTo(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	while (app.Update()) {
 		r3D->GetCurrentCamera().AddMoveTo(glm::vec3(0.1f, 0.0f, 0.0f));
