@@ -1,6 +1,7 @@
 #pragma once
 #include "base.h"
 #include "Flags.h"
+#include "Lighting.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/fwd.hpp>
@@ -42,7 +43,7 @@ namespace Drizzle {
 		Drizzle_API virtual void OnDetach() { }
 		Drizzle_API virtual void RenderBefore() {}
 		Drizzle_API virtual void RenderAfter() {}
-		Drizzle_API virtual void Render3D(std::vector<APIObject> objs) {}
+		Drizzle_API virtual void Render3D(std::vector<APIObject> objs, std::vector<Lighting> lights) {}
 
 		Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
 		Drizzle_API virtual void RemoveShader(std::string name) {}

@@ -185,7 +185,12 @@ namespace Drizzle {
 
 		VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immCommandBuffer));
 
+		VkDeviceSize bufferSize = sizeof(Light) * MAX_LIGHTS;
+
+		_lightBuffer = create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
 		_mainDeletionQueue.push_function([=]() {
+			destroy_buffer(_lightBuffer);
 			vkDestroyCommandPool(_device, _immCommandPool, nullptr);
 		});
 	}
@@ -218,6 +223,7 @@ namespace Drizzle {
 		std::vector<DescriptorAllocator::PoolSizeRatio> sizes =
 		{
 			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 },
 			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
 		};
 
@@ -236,11 +242,17 @@ namespace Drizzle {
 			builder.add_binding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 			_singleImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_FRAGMENT_BIT);
 		}
+		{
+			DescriptorLayoutBuilder builder;
+			builder.add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+			_lightDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+		}
 
 		/*
 		* Allocate a descriptor set for our draw image
 		*/
 		_drawImageDescriptors = globalDescriptorAllocator.allocate(_device, _drawImageDescriptorLayout);
+		_lightDescriptors = globalDescriptorAllocator.allocate(_device, _lightDescriptorLayout);
 
 		DescriptorWriter writer;
 		writer.write_image(0, _drawImage.imageView, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_GENERAL, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);
@@ -254,6 +266,7 @@ namespace Drizzle {
 			globalDescriptorAllocator.destroy_pool(_device);
 			vkDestroyDescriptorSetLayout(_device, _singleImageDescriptorLayout, nullptr);
 			vkDestroyDescriptorSetLayout(_device, _drawImageDescriptorLayout, nullptr);
+			vkDestroyDescriptorSetLayout(_device, _lightDescriptorLayout, nullptr);
 		});
 
 		for (int i = 0; i < FRAME_OVERLAP; i++) {
@@ -358,7 +371,7 @@ namespace Drizzle {
 		});
 	}
 
-	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects) {
+	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<Lighting> lights) {
 		/*
 		* Begin a render pass connected to our draw image
 		*/
@@ -392,6 +405,21 @@ namespace Drizzle {
 
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+		Light lightData[MAX_LIGHTS];
+
+		for (int i = 0; i < MAX_LIGHTS; i++) {
+			if (i >= lights.size()) {
+				lightData[i] = {};
+				continue;
+			}
+			lightData[i] = lights[i].GetLight();
+		}
+
+		DescriptorWriter writer;
+		writer.clear();
+		writer.write_buffer(0, _lightBuffer.buffer, sizeof(Light) * MAX_LIGHTS, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+		writer.update_set(_device, _lightDescriptors); 
+
 		for (size_t i = 0; i < objects.size(); i++) {
 			if (objects[i].hidden) {
 				continue;
@@ -424,6 +452,7 @@ namespace Drizzle {
 			}
 
 			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].second, 0, 1, &imageSet, 0, nullptr);
+			vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].second, 1, 1, &_lightDescriptors, 0, nullptr);
 
 			GPUDrawPushConstants push_constants;
 			push_constants.worldMatrix = pushConstants.worldMatrix;

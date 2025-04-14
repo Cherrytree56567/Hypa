@@ -67,6 +67,12 @@
     <Filter Include="Source Files\Camera">
       <UniqueIdentifier>{091f6338-a777-419b-8f35-3ee84f9a42b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Lighting">
+      <UniqueIdentifier>{7b1370a5-9ca5-4d58-a70b-f0b246547a7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vulkan\Shaders">
+      <UniqueIdentifier>{89b5e09c-b7a2-4f80-b964-f2c5cfcaad12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -159,6 +165,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Lighting.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -215,5 +224,16 @@
     <ClInclude Include="Camera.h">
       <Filter>Source Files\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="Lighting.h">
+      <Filter>Source Files\Lighting</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\shader.frag">
+      <Filter>Source Files\Vulkan\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\shader.vert">
+      <Filter>Source Files\Vulkan\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

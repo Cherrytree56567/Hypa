@@ -6,9 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <chrono>
-#include "base.h"
-#include "Window.h"
-#include "RenderingAPI.h"
 #include <memory>
 #include <optional>
 #include <string>
@@ -40,14 +37,19 @@
 #include <glm/vec4.hpp>
 #include <stb/stb_image.h>
 
+#include "base.h"
+#include "Window.h"
+#include "RenderingAPI.h"
 #include "math.h"
-#define VK_CHECK(x)                                                     \
-    do {                                                                \
-        VkResult err = x;                                               \
-        if (err) {                                                      \
-            std::cout << "Detected Vulkan error: " << string_VkResult(err); \
-            abort();                                                    \
-        }                                                               \
+#include "Lighting.h"
+#include "Logging.h"
+#define VK_CHECK(x)                                                            \
+    do {                                                                       \
+        VkResult err = x;                                                      \
+        if (err) {                                                             \
+            Logging().Error("Detected Vulkan error: " + std::string(string_VkResult(err))); \
+            abort();                                                           \
+        }                                                                      \
     } while (0)
 
 namespace Drizzle {
@@ -198,6 +200,8 @@ namespace Drizzle {
         void enable_blending_alphablend();
     };
 
+    constexpr int MAX_LIGHTS = 128;
+
 	class Vulkan : public RenderingAPI {
 	public:
 		Drizzle_API Vulkan(std::shared_ptr<Window> window, std::shared_ptr<EventSystem> Events);
@@ -206,7 +210,7 @@ namespace Drizzle {
 		Drizzle_API void OnDetach() override;
         Drizzle_API void RenderBefore() override;
         Drizzle_API void RenderAfter() override;
-        Drizzle_API void Render3D(std::vector<APIObject> objs) override;
+        Drizzle_API void Render3D(std::vector<APIObject> objs, std::vector<Lighting> lights) override;
 
 		Drizzle_API const std::string& GetName() const override;
         Drizzle_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
@@ -236,7 +240,7 @@ namespace Drizzle {
         void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
-        void draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects);
+        void draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<Lighting> lights);
         void resize_swapchain();
 
         VkPhysicalDevice pick_gpu(const std::vector<VkPhysicalDevice>& devices);
@@ -303,6 +307,9 @@ namespace Drizzle {
         VkExtent2D _windowExtent;
         VkDescriptorSetLayout _singleImageDescriptorLayout;
         VkImageView _depthImageView;
+        VkDescriptorSetLayout _lightDescriptorLayout;
+        AllocatedBuffer _lightBuffer;
+        VkDescriptorSet _lightDescriptors;
         /*
         * ImGUI
         */

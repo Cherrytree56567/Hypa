@@ -262,12 +262,12 @@ namespace Drizzle {
 		_frameNumber++;
 	}
 
-	void Vulkan::Render3D(std::vector<APIObject> objs) {
+	void Vulkan::Render3D(std::vector<APIObject> objs, std::vector<Lighting> lights) {
 		if (renderBefore == false) {
 			log.Error("RenderBefore was not called before Render3D");
 			return;
 		}
-		draw_geometry(command, objs);
+		draw_geometry(command, objs, lights);
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
@@ -297,11 +297,16 @@ namespace Drizzle {
 		bufferRange.size = sizeof(GPUDrawPushConstants);
 		bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+		VkDescriptorSetLayout setLayouts[] = {
+			_singleImageDescriptorLayout, 
+			_lightDescriptorLayout
+		};
+
 		VkPipelineLayoutCreateInfo pipeline_layout_info = pipeline_layout_create_info();
 		pipeline_layout_info.pPushConstantRanges = &bufferRange;
 		pipeline_layout_info.pushConstantRangeCount = 1;
-		pipeline_layout_info.pSetLayouts = &_singleImageDescriptorLayout;
-		pipeline_layout_info.setLayoutCount = 1;
+		pipeline_layout_info.pSetLayouts = setLayouts;
+		pipeline_layout_info.setLayoutCount = 2;
 		VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &pipelineLayout));
 
 		PipelineBuilder pipelineBuilder;

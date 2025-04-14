@@ -2,11 +2,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "Camera.h"
 #include <fstream>
 #include <filesystem>
+#include "Camera.h"
 #include "base.h"
 #include "Layer.h"
+#include "Lighting.h"
 
 namespace Drizzle {
 	class Rendering3D : public Layer {
@@ -39,6 +40,7 @@ namespace Drizzle {
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
         std::map<std::string, Camera> cameras;
 		std::string CurrentCamera = "Default";
+        std::vector<Lighting> lights;
         std::vector<APIObject> objects;
         Logging log;
 	};

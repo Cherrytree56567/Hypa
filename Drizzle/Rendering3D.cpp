@@ -20,7 +20,7 @@ namespace Drizzle {
     void Rendering3D::Render() {
 		if (show) {
 			rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix = cameras[CurrentCamera].GetMatrix();
-			rAPISystem->GetCurrentRenderingAPI()->Render3D(objects);
+			rAPISystem->GetCurrentRenderingAPI()->Render3D(objects, lights);
 		}
 	}
 

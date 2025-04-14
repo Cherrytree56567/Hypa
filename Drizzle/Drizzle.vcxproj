@@ -179,6 +179,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <FxCompile Include="shaders\shader.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </FxCompile>
+    <FxCompile Include="shaders\shader.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -190,6 +198,7 @@
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="Layer.h" />
+    <ClInclude Include="Lighting.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="MouseEvents.h" />
@@ -210,6 +219,7 @@
     <ClCompile Include="Drizzle.cpp" />
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="Lighting.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="mesh.cpp" />
