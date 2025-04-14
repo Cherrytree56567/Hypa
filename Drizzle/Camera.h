@@ -12,7 +12,7 @@ namespace Drizzle {
 
     class Camera {
     public:
-        Drizzle_API Camera(glm::mat4* externalProjectionMatrix);
+        Drizzle_API Camera(glm::mat4 mat = glm::mat4(1.0f));
 
         Drizzle_API void MoveTo(const glm::vec3& newPos);
         Drizzle_API void LookAt(const glm::vec3& target);
@@ -36,7 +36,9 @@ namespace Drizzle {
         Drizzle_API void AddNearClip(float nearClip);
         Drizzle_API void AddFarClip(float farClip);
         Drizzle_API void AddOrthoSize(float size);
+
+		Drizzle_API glm::mat4 GetMatrix() const;
     private:
-        glm::mat4* Matrix;
+        glm::mat4 Matrix;
     };
 }

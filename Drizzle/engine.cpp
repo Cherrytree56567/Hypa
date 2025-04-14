@@ -252,6 +252,7 @@ namespace Drizzle {
 		*/
 		_mainDeletionQueue.push_function([&]() {
 			globalDescriptorAllocator.destroy_pool(_device);
+			vkDestroyDescriptorSetLayout(_device, _singleImageDescriptorLayout, nullptr);
 			vkDestroyDescriptorSetLayout(_device, _drawImageDescriptorLayout, nullptr);
 		});
 

@@ -27,13 +27,18 @@ namespace Drizzle {
         Drizzle_API APIObject& GetObject(std::string name);
         Drizzle_API void LoadOBJ(std::string name, const std::string& filePath, const std::string& mtlPath = "");
 
-		Drizzle_API std::shared_ptr<Camera> GetCamera() { return camera; }
+		Drizzle_API void AddCamera(std::string name, Camera camera);
+		Drizzle_API void RemoveCamera(std::string name);
+		Drizzle_API Camera& GetCamera(std::string name);
+        Drizzle_API Camera& GetCurrentCamera();
+		Drizzle_API void SetCurrentCamera(std::string name);
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
-		std::shared_ptr<Camera> camera;
+        std::map<std::string, Camera> cameras;
+		std::string CurrentCamera = "Default";
         std::vector<APIObject> objects;
         Logging log;
 	};

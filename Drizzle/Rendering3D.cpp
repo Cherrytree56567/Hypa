@@ -6,7 +6,7 @@ namespace Drizzle {
 	}
 
 	Rendering3D::Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("3DLayer"), pWindow(window), rAPISystem(rAPIsys), show(true) {
-		camera = std::make_shared<Camera>(&rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix);
+		cameras["Default"] = rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix;
 	}
 
 	void Rendering3D::OnAttach() {
@@ -19,6 +19,7 @@ namespace Drizzle {
 
     void Rendering3D::Render() {
 		if (show) {
+			rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix = cameras[CurrentCamera].GetMatrix();
 			rAPISystem->GetCurrentRenderingAPI()->Render3D(objects);
 		}
 	}
@@ -186,5 +187,25 @@ namespace Drizzle {
 				return *it;
 			}
 		}
+	}
+
+	void Rendering3D::AddCamera(std::string name, Camera camera) {
+		cameras[name] = camera;
+	}
+
+	void Rendering3D::RemoveCamera(std::string name) {
+		cameras.erase(name);
+	}
+
+	Camera& Rendering3D::GetCamera(std::string name) {
+		return cameras[name];
+	}
+
+	Camera& Rendering3D::GetCurrentCamera() {
+		return cameras[CurrentCamera];
+	}
+
+	void Rendering3D::SetCurrentCamera(std::string name) {
+		CurrentCamera = name;
 	}
 }

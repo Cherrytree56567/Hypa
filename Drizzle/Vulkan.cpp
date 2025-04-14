@@ -53,6 +53,21 @@ namespace Drizzle {
 			destroy_buffer(mesh.second.vertexBuffer);
 		}
 
+		if (_depthImageView != VK_NULL_HANDLE) {
+			vkDestroyImageView(_device, _depthImageView, nullptr);
+			_depthImageView = VK_NULL_HANDLE;
+		}
+
+		if (depthImageMemory != VK_NULL_HANDLE) {
+			vkFreeMemory(_device, depthImageMemory, nullptr);
+			depthImageMemory = VK_NULL_HANDLE;
+		}
+
+		if (depthImage != VK_NULL_HANDLE) {
+			vkDestroyImage(_device, depthImage, nullptr);
+			depthImage = VK_NULL_HANDLE;
+		}
+
 		_texDeletionQueue.flush();
 		_mainDeletionQueue.flush();
 
@@ -358,9 +373,9 @@ namespace Drizzle {
 				tex = create_image(data, VkExtent3D{ (unsigned int)width, (unsigned int)height, 1 }, VK_FORMAT_R8G8B8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
 			}
 
-			_texDeletionQueue.push_function([&]() {
-				if (textures.find(name) != textures.end()) {
-					destroy_image(tex);
+			_texDeletionQueue.push_function([&, name]() {
+				if (textures.count(name) > 0) {
+					destroy_image(textures[name]);
 				}
 			});
 		}

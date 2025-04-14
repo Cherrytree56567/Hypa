@@ -975,46 +975,34 @@ namespace Drizzle {
 
     class Camera {
     public:
-        Camera(glm::mat4* externalProjectionMatrix);
+        Drizzle_API Camera(glm::mat4 mat = glm::mat4(1.0f));
 
-        void MoveTo(const glm::vec3& newPos);
-        void LookAt(const glm::vec3& target);
-        void SetUp(const glm::vec3& newUp);
+        Drizzle_API void MoveTo(const glm::vec3& newPos);
+        Drizzle_API void LookAt(const glm::vec3& target);
+        Drizzle_API void SetUp(const glm::vec3& newUp);
 
-        void AddMoveTo(const glm::vec3& newPos);
-        void AddLookAt(const glm::vec3& target);
-        void AddSetUp(const glm::vec3& newUp);
+        Drizzle_API void AddMoveTo(const glm::vec3& newPos);
+        Drizzle_API void AddLookAt(const glm::vec3& target);
+        Drizzle_API void AddSetUp(const glm::vec3& newUp);
 
-        void SetPerspective(float fovDegrees, float aspect, float nearClip, float farClip);
-        void SetOrthographic(float orthoSize, float aspect, float nearClip, float farClip);
+        Drizzle_API void SetPerspective(float fovDegrees, float aspect, float nearClip, float farClip);
+        Drizzle_API void SetOrthographic(float orthoSize, float aspect, float nearClip, float farClip);
 
-        void SetFov(float fovDegrees);
-        void SetAspectRatio(float aspect);
-        void SetNearClip(float nearClip);
-        void SetFarClip(float farClip);
-        void SetOrthoSize(float size);
-        void SetProjectionType(ProjectionType type);
-        void AddFov(float fovDegrees);
-        void AddAspectRatio(float aspect);
-        void AddNearClip(float nearClip);
-        void AddFarClip(float farClip);
-        void AddOrthoSize(float size);
+        Drizzle_API void SetFov(float fovDegrees);
+        Drizzle_API void SetAspectRatio(float aspect);
+        Drizzle_API void SetNearClip(float nearClip);
+        Drizzle_API void SetFarClip(float farClip);
+        Drizzle_API void SetOrthoSize(float size);
+        Drizzle_API void SetProjectionType(ProjectionType type);
+        Drizzle_API void AddFov(float fovDegrees);
+        Drizzle_API void AddAspectRatio(float aspect);
+        Drizzle_API void AddNearClip(float nearClip);
+        Drizzle_API void AddFarClip(float farClip);
+        Drizzle_API void AddOrthoSize(float size);
+
+        Drizzle_API glm::mat4 GetMatrix() const;
     private:
-        void UpdateProjection();
-
-        glm::vec3 position;
-        glm::vec3 forward;
-        glm::vec3 up;
-
-        ProjectionType projectionType;
-
-        float fov;
-        float aspectRatio;
-        float nearClip;
-        float farClip;
-        float orthoSize;
-
-        glm::mat4* Matrix;
+        glm::mat4 Matrix;
     };
 
     /*
@@ -1039,13 +1027,18 @@ namespace Drizzle {
         Drizzle_API APIObject& GetObject(std::string name);
         Drizzle_API void LoadOBJ(std::string name, const std::string& filePath, const std::string& mtlPath = "");
 
-        Drizzle_API std::shared_ptr<Camera> GetCamera();
+        Drizzle_API void AddCamera(std::string name, Camera camera);
+        Drizzle_API void RemoveCamera(std::string name);
+        Drizzle_API Camera& GetCamera(std::string name);
+        Drizzle_API Camera& GetCurrentCamera();
+        Drizzle_API void SetCurrentCamera(std::string name);
     private:
         bool show = false;
         std::string name;
         std::shared_ptr<Window> pWindow = NULL;
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
-        std::shared_ptr<Camera> camera;
+        std::map<std::string, Camera> cameras;
+        std::string CurrentCamera = "Default";
         std::vector<APIObject> objects;
         Logging log;
     };
