@@ -1,4 +1,71 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Hypa.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  App.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'App.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'App.cpp')
+      D:\Drizzle\Drizzle\vendor\GLFW\include\GLFW\glfw3.h(123,11):
+      see previous definition of 'APIENTRY'
+  
+  Drizzle.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Drizzle.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'Drizzle.cpp')
+      D:\Drizzle\Drizzle\vendor\GLFW\include\GLFW\glfw3.h(123,11):
+      see previous definition of 'APIENTRY'
+  
+  Layer.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Layer.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  OpenGL.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'OpenGL.cpp')
+      D:\Drizzle\Drizzle\vendor\Glad1\include\glad\glad.h(897,9):
+      see previous definition of 'APIENTRY'
+  
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'OpenGL.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  Rendering3D.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Rendering3D.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  RenderingAPI.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'RenderingAPI.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  Vulkan.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'Vulkan.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+D:\Drizzle\Drizzle\Vulkan.cpp(84,89): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\Vulkan.cpp(85,86): warning C4244: '=': conversion from 'float' to 'uint32_t', possible loss of data
+  descriptor.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'descriptor.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+D:\Drizzle\Drizzle\descriptor.cpp(83,39): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\descriptor.cpp(122,31): warning C4244: '=': conversion from 'double' to 'uint32_t', possible loss of data
   engine.cpp
 D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
   (compiling source file 'engine.cpp')
@@ -17,6 +84,37 @@ D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:             _First=int
 D:\Drizzle\Drizzle\engine.cpp(114,17): warning C4838:         ]
 D:\Drizzle\Drizzle\engine.cpp(387,31): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
 D:\Drizzle\Drizzle\engine.cpp(388,32): warning C4244: '=': conversion from 'uint32_t' to 'float', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(469,49): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-D:\Drizzle\Drizzle\engine.cpp(472,60): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
+D:\Drizzle\Drizzle\engine.cpp(466,49): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+D:\Drizzle\Drizzle\engine.cpp(469,60): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
+  helper.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'helper.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  mesh.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'mesh.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  pipelines.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'pipelines.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  swapchain.cpp
+D:\Drizzle\Drizzle\base.h(2,9): warning C4005: 'Drizzle_EXPORTS': macro redefinition
+  (compiling source file 'swapchain.cpp')
+      D:\Drizzle\Drizzle\base.h(2,9):
+      'Drizzle_EXPORTS' previously declared on the command line
+  
+  Generating Code...
+D:\Drizzle\Drizzle\helper.cpp(370,1): warning C4715: 'Drizzle::find_memory_type': not all control paths return a value
+D:\Drizzle\Drizzle\Rendering3D.cpp(190,1): warning C4715: 'Drizzle::Rendering3D::GetObject': not all control paths return a value
+D:\Drizzle\Drizzle\Rendering3D.cpp(231,1): warning C4715: 'Drizzle::Rendering3D::GetLight': not all control paths return a value
+D:\Drizzle\Drizzle\Layer.cpp(96,1): warning C4715: 'Drizzle::LayerDispatch::GetLayer': not all control paths return a value
+     Creating library D:\Drizzle\x64\Debug\Drizzle.lib and object D:\Drizzle\x64\Debug\Drizzle.exp
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Drizzle.vcxproj -> D:\Drizzle\x64\Debug\Drizzle.dll

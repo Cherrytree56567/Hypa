@@ -365,7 +365,7 @@ namespace Drizzle {
 		});
 	}
 
-	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<Lighting> lights) {
+	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<std::shared_ptr<Lighting>> lights) {
 		/*
 		* Begin a render pass connected to our draw image
 		*/
@@ -406,21 +406,18 @@ namespace Drizzle {
 				lightData[i] = {};
 				continue;
 			}
-			lightData[i] = PointLight("Main", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 1.0f).GetLight();
+			lightData[i] = lights[i]->GetLight();
 		}
 
 		void* mappedMemory;
 		VkResult result = vmaMapMemory(_allocator, _lightBuffer.allocation, &mappedMemory);
 		if (result != VK_SUCCESS) {
-			// Handle error if mapping fails
+			log.Critical("Couldn't Map Uniform Buffer Memory for Lighting, ErrCode: " + result);
 			return;
 		}
 
-		// Step 2: Copy light data to the mapped memory
-		// Assuming `lightData` is an array of Light structs
 		memcpy(mappedMemory, lightData, sizeof(Light) * MAX_LIGHTS);
 
-		// Step 3: Unmap the memory after the write
 		vmaUnmapMemory(_allocator, _lightBuffer.allocation);
 
 		for (size_t i = 0; i < objects.size(); i++) {

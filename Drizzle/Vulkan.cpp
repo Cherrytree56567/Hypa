@@ -262,7 +262,7 @@ namespace Drizzle {
 		_frameNumber++;
 	}
 
-	void Vulkan::Render3D(std::vector<APIObject> objs, std::vector<Lighting> lights) {
+	void Vulkan::Render3D(std::vector<APIObject> objs, std::vector<std::shared_ptr<Lighting>> lights) {
 		if (renderBefore == false) {
 			log.Error("RenderBefore was not called before Render3D");
 			return;

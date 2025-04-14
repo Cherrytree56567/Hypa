@@ -34,9 +34,9 @@ namespace Drizzle {
         Drizzle_API Camera& GetCurrentCamera();
 		Drizzle_API void SetCurrentCamera(std::string name);
 
-        Drizzle_API void AddLight(Lighting light);
+        Drizzle_API void AddLight(std::shared_ptr<Lighting> light);
         Drizzle_API void RemoveLight(std::string name);
-		Drizzle_API Lighting& GetLight(std::string name);
+		Drizzle_API std::shared_ptr<Lighting> GetLight(std::string name);
     private:
         bool show = false;
         std::string name;
@@ -44,7 +44,7 @@ namespace Drizzle {
         std::shared_ptr<RenderingAPISystem> rAPISystem = NULL;
         std::map<std::string, Camera> cameras;
 		std::string CurrentCamera = "Default";
-        std::vector<Lighting> lights;
+        std::vector<std::shared_ptr<Lighting>> lights;
         std::vector<APIObject> objects;
         Logging log;
 	};

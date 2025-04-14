@@ -1159,9 +1159,9 @@ namespace Drizzle {
         Drizzle_API Camera& GetCurrentCamera();
         Drizzle_API void SetCurrentCamera(std::string name);
 
-        Drizzle_API void AddLight(Lighting light);
+        Drizzle_API void AddLight(std::shared_ptr<Lighting> light);
         Drizzle_API void RemoveLight(std::string name);
-        Drizzle_API Lighting& GetLight(std::string name);
+        Drizzle_API std::shared_ptr<Lighting> GetLight(std::string name);
     private:
         bool show = false;
         std::string name;

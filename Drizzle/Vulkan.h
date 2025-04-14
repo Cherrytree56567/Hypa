@@ -210,7 +210,7 @@ namespace Drizzle {
 		Drizzle_API void OnDetach() override;
         Drizzle_API void RenderBefore() override;
         Drizzle_API void RenderAfter() override;
-        Drizzle_API void Render3D(std::vector<APIObject> objs, std::vector<Lighting> lights) override;
+        Drizzle_API void Render3D(std::vector<APIObject> objs, std::vector<std::shared_ptr<Lighting>> lights) override;
 
 		Drizzle_API const std::string& GetName() const override;
         Drizzle_API void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) override;
@@ -240,7 +240,7 @@ namespace Drizzle {
         void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
         void create_swapchain(uint32_t width, uint32_t height);
         void destroy_swapchain();
-        void draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<Lighting> lights);
+        void draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<std::shared_ptr<Lighting>> lights);
         void resize_swapchain();
 
         VkPhysicalDevice pick_gpu(const std::vector<VkPhysicalDevice>& devices);

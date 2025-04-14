@@ -71,7 +71,7 @@ void main() {
             lightDir = normalize(vec3(toLight, 0.0));
         }
 
-        float NdotL = max(dot(normal, lightDir), 0.0);
+        float NdotL = max(dot(normal, lightDir), 1.0);
         vec3 lightContribution = light.color * light.intensity * NdotL * attenuation;
         finalColor += lightContribution;
     }
