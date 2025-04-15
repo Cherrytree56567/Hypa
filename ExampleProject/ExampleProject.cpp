@@ -8,7 +8,7 @@ int main() {
 	auto r3D = app.GetRendering3D();
 	auto rAPI = app.GetRenderingAPISystem()->GetCurrentRenderingAPI();
 
-	std::shared_ptr<Drizzle::PointLight> mainLight = std::make_shared<Drizzle::PointLight>("Main", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 1.0f);
+	std::shared_ptr<Drizzle::PointLight> mainLight = std::make_shared<Drizzle::PointLight>("Main", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 10.0f, 10.0f);
 
 	r3D->LoadOBJ("Buildings", "buildings.obj");
 	r3D->LoadOBJ("Duck", "duck.obj");

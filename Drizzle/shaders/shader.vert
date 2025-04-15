@@ -4,6 +4,7 @@
 layout (location = 0) out vec3 outColor;
 layout (location = 1) out vec2 outUV;
 layout (location = 2) out vec3 normal;
+layout (location = 3) out vec3 worldPos;
 
 struct Vertex {
 
@@ -14,7 +15,7 @@ struct Vertex {
 	vec4 color;
 }; 
 
-layout(buffer_reference, std430) readonly buffer VertexBuffer{ 
+layout(buffer_reference, std430) readonly buffer VertexBuffer { 
 	Vertex vertices[];
 };
 
@@ -27,13 +28,13 @@ layout( push_constant ) uniform constants
 
 void main() 
 {	
-	//load vertex data from device adress
 	Vertex v = PushConstants.vertexBuffer.vertices[gl_VertexIndex];
 
 	//output data
-	gl_Position = PushConstants.render_matrix *vec4(v.position, 1.0f);
+	gl_Position = PushConstants.render_matrix * vec4(v.position, 1.0f);
 	outColor = v.color.xyz;
 	outUV.x = v.uv_x;
 	outUV.y = v.uv_y;
 	normal = v.normal;
+	worldPos = v.position;
 }
