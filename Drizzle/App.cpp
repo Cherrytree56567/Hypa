@@ -29,12 +29,12 @@ namespace Drizzle {
 		window->Update();
 		Events->AddEvent(std::make_shared<AppTickEvent>());
 		Events->AddEvent(std::make_shared<AppUpdateEvent>());
-		Events->DispatchEvent();
 		window->ProcessEvents();
 		rAPIsystem->GetCurrentRenderingAPI()->RenderBefore();
 		Layerdispatch->DispatchLayerRender();
 		rAPIsystem->GetCurrentRenderingAPI()->RenderAfter();
 		Events->AddEvent(std::make_shared<AppRenderEvent>());
+		Events->DispatchEvent();
 		if (window->shouldClose()) {
 			rAPIsystem->GetCurrentRenderingAPI()->OnDetach();
 			Layerdispatch->DispatchLayerDetach();

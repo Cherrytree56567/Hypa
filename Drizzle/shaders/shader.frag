@@ -43,13 +43,13 @@ void main() {
             vec3 toLight = light.position - fragPos;
             if (light.radius <= 0.0) continue; // avoid divide-by-zero
 
-            float dist = length(toLight);
+            float dist = -length(toLight);
 
             attenuation = 1.0 / (1.0 + 0.1 * dist + 0.01 * dist * dist);
 
             lightDir = normalize(toLight);
 
-        }else if (light.lightType == 1) { // Directional
+        } else if (light.lightType == 1) { // Directional
             lightDir = normalize(-light.direction);
 
         } else if (light.lightType == 2) { // Spotlight

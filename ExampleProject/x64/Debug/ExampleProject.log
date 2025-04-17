@@ -1,3 +1,4 @@
-﻿  ExampleProject.cpp
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Hypa.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  ExampleProject.cpp
 D:\Drizzle\ExampleProject\ExampleProject.cpp(2,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   ExampleProject.vcxproj -> D:\Drizzle\x64\Debug\ExampleProject.exe

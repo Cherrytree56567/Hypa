@@ -200,6 +200,7 @@
     <ClInclude Include="base.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="FirstPersonController.h" />
     <ClInclude Include="Flags.h" />
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="KeyCodes.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="descriptor.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="EventSystem.cpp" />
+    <ClCompile Include="FirstPersonController.cpp" />
     <ClCompile Include="Flags.cpp" />
     <ClCompile Include="Drizzle.cpp" />
     <ClCompile Include="helper.cpp" />

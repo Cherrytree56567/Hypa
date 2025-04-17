@@ -73,6 +73,9 @@
     <Filter Include="Source Files\Vulkan\Shaders">
       <UniqueIdentifier>{89b5e09c-b7a2-4f80-b964-f2c5cfcaad12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\FirstPersonController">
+      <UniqueIdentifier>{eccceb00-305a-41ac-ab3c-e495341af525}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -174,6 +177,9 @@
     <ClCompile Include="Lighting.cpp">
       <Filter>Source Files\Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="FirstPersonController.cpp">
+      <Filter>Source Files\FirstPersonController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -232,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="Lighting.h">
       <Filter>Source Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="FirstPersonController.h">
+      <Filter>Source Files\FirstPersonController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
