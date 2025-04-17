@@ -230,7 +230,7 @@ namespace Drizzle {
 		globalDescriptorAllocator.init_pool(_device, 10, sizes);
 
 		/*
-		* Make the descriptor set layout for our compute draw
+		* Make the descriptor set layout for our draw
 		*/
 		{
 			DescriptorLayoutBuilder builder;
@@ -367,58 +367,28 @@ namespace Drizzle {
 
 	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<std::shared_ptr<Lighting>> lights) {
 		/*
-		* Begin a render pass connected to our draw image
+		* Dynamic Shadow Rendering START
 		*/
-		VkClearValue clearValue = {};
-		clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, &clearValue, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		/*
+		transition_image(cmd, _shadowImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL, VK_FORMAT_D32_SFLOAT, true);
+		VkRenderingAttachmentInfo shadowAttachment = attachment_info(_shadowView, nullptr, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
 
-		VkClearValue depthClear = {};
-		depthClear.depthStencil = {1.0f};
+		VkRenderingInfo shadowRenderingInfo = rendering_info({ _drawExtent.width, _drawExtent.height }, nullptr, &shadowAttachment);
 
-		VkRenderingAttachmentInfo depthAttachment = attachment_info(_depthImageView, &depthClear, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
-
-		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, &depthAttachment);
-		vkCmdBeginRendering(cmd, &renderInfo);
-
+		vkCmdBeginRendering(cmd, &shadowRenderingInfo);
 		VkViewport viewport = {};
 		viewport.x = 0;
 		viewport.y = 0;
-		viewport.width = _drawExtent.width;
-		viewport.height = _drawExtent.height;
+		viewport.width = _shadowExtent.width;
+		viewport.height = _shadowExtent.height;
 		viewport.minDepth = 0.f;
 		viewport.maxDepth = 1.f;
-
 		vkCmdSetViewport(cmd, 0, 1, &viewport);
 
 		VkRect2D scissor = {};
-		scissor.offset.x = 0;
-		scissor.offset.y = 0;
-		scissor.extent.width = _drawExtent.width;
-		scissor.extent.height = _drawExtent.height;
-
+		scissor.offset = { 0, 0 };
+		scissor.extent = { _shadowExtent.width, _shadowExtent.height };
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
-
-		Light lightData[MAX_LIGHTS];
-
-		for (int i = 0; i < MAX_LIGHTS; i++) {
-			if (i >= lights.size()) {
-				lightData[i] = {};
-				continue;
-			}
-			lightData[i] = lights[i]->GetLight();
-		}
-
-		void* mappedMemory;
-		VkResult result = vmaMapMemory(_allocator, _lightBuffer.allocation, &mappedMemory);
-		if (result != VK_SUCCESS) {
-			log.Critical("Couldn't Map Uniform Buffer Memory for Lighting, ErrCode: " + result);
-			return;
-		}
-
-		memcpy(mappedMemory, lightData, sizeof(Light) * MAX_LIGHTS);
-
-		vmaUnmapMemory(_allocator, _lightBuffer.allocation);
 
 		for (size_t i = 0; i < objects.size(); i++) {
 			if (objects[i].hidden) {
@@ -429,24 +399,12 @@ namespace Drizzle {
 				continue;
 			}
 
-			std::string shader = CurrentShaderName;
-			if (objects[i].shaderName != "" && shaders.find(shader) != shaders.end()) {
-				shader = objects[i].shaderName;
-			}
+			std::string shader = "DefaultDepth";
 			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].first);
 
 			VkDescriptorSet imageSet = get_current_frame()._frameDescriptors.allocate(_device, _singleImageDescriptorLayout);
 			{
 				DescriptorWriter writer;
-				if (objects[i].textureName != "") {
-					if (textures.find(objects[i].textureName) != textures.end()) {
-						writer.write_image(0, textures[objects[i].textureName].imageView, _defaultSamplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-					} else {
-						writer.write_image(0, _errorCheckerboardImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-					}
-				} else {
-					writer.write_image(0, _whiteImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-				}
 
 				writer.write_buffer(1, _lightBuffer.buffer, sizeof(Light) * 128, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 
@@ -470,10 +428,186 @@ namespace Drizzle {
 		}
 
 		vkCmdEndRendering(cmd);
+		//transition_image(cmd, _shadowImage.image, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_FORMAT_D32_SFLOAT, true);
+
+		/*
+		* Dynamic Shadow Rendering END
+		*/
+
+		VkClearValue clearValue = {};
+		clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		VkRenderingAttachmentInfo colorAttachment = attachment_info(_drawImage.imageView, &clearValue, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+		VkClearValue depthClear = {};
+		depthClear.depthStencil = {1.0f};
+
+		VkRenderingAttachmentInfo depthAttachment = attachment_info(_depthImageView, &depthClear, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+
+		VkRenderingInfo renderInfo = rendering_info(_drawExtent, &colorAttachment, &depthAttachment);
+		vkCmdBeginRendering(cmd, &renderInfo);
+		{
+			VkViewport viewport = {};
+			viewport.x = 0;
+			viewport.y = 0;
+			viewport.width = _drawExtent.width;
+			viewport.height = _drawExtent.height;
+			viewport.minDepth = 0.f;
+			viewport.maxDepth = 1.f;
+
+			vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+			VkRect2D scissor = {};
+			scissor.offset.x = 0;
+			scissor.offset.y = 0;
+			scissor.extent.width = _drawExtent.width;
+			scissor.extent.height = _drawExtent.height;
+
+			vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+			Light lightData[MAX_LIGHTS];
+
+			for (int i = 0; i < MAX_LIGHTS; i++) {
+				if (i >= lights.size()) {
+					lightData[i] = {};
+					continue;
+				}
+				lightData[i] = lights[i]->GetLight();
+			}
+
+			void* mappedMemory;
+			VkResult result = vmaMapMemory(_allocator, _lightBuffer.allocation, &mappedMemory);
+			if (result != VK_SUCCESS) {
+				log.Critical("Couldn't Map Uniform Buffer Memory for Lighting, ErrCode: " + result);
+				return;
+			}
+
+			memcpy(mappedMemory, lightData, sizeof(Light) * MAX_LIGHTS);
+
+			vmaUnmapMemory(_allocator, _lightBuffer.allocation);
+
+			for (size_t i = 0; i < objects.size(); i++) {
+				if (objects[i].hidden) {
+					continue;
+				}
+
+				if (!IsBoxVisible(objects[i].minBound, objects[i].maxBound, glm::mat4(1.0f), pushConstants.worldMatrix)) {
+					continue;
+				}
+
+				std::string shader = CurrentShaderName;
+				if (objects[i].shaderName != "" && shaders.find(shader) != shaders.end()) {
+					shader = objects[i].shaderName;
+				}
+				vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].first);
+
+				VkDescriptorSet imageSet = get_current_frame()._frameDescriptors.allocate(_device, _singleImageDescriptorLayout);
+				{
+					DescriptorWriter writer;
+					if (objects[i].textureName != "") {
+						if (textures.find(objects[i].textureName) != textures.end()) {
+							writer.write_image(0, textures[objects[i].textureName].imageView, _defaultSamplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+						}
+						else {
+							writer.write_image(0, _errorCheckerboardImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+						}
+					}
+					else {
+						writer.write_image(0, _whiteImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+					}
+
+					writer.write_buffer(1, _lightBuffer.buffer, sizeof(Light) * 128, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+
+					writer.update_set(_device, imageSet);
+				}
+
+				vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].second, 0, 1, &imageSet, 0, nullptr);
+
+				GPUDrawPushConstants push_constants;
+				push_constants.worldMatrix = pushConstants.worldMatrix;
+
+				push_constants.vertexBuffer = meshes[objects[i].name].vertexBufferAddress;
+
+				vkCmdPushConstants(cmd, shaders[shader].second, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
+				vkCmdBindIndexBuffer(cmd, meshes[objects[i].name].indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+
+				vkCmdDrawIndexed(cmd, objects[i].indices.size(), 1, 0, 0, 0);
+
+				engineStats.drawcall_count++;
+				engineStats.triangle_count += objects[i].indices.size() / 3;
+			}
+		}
+
+		vkCmdEndRendering(cmd);
+	}
+
+	void Vulkan::CreateDepthShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {
+		VkPipeline pipeline;
+		VkPipelineLayout pipelineLayout;
+		VkShaderModule FragShader;
+		if (!load_shader_module(FragShaderPath.c_str(), _device, &FragShader)) {
+			log.Error("Couldn't Build the fragment shader module.");
+		}
+		else {
+			log.Info("Fragment shader succesfully loaded.");
+		}
+
+		VkShaderModule VertexShader;
+		if (!load_shader_module(VertShaderPath.c_str(), _device, &VertexShader)) {
+			log.Error("Couldn't build the vertex shader module");
+		}
+		else {
+			log.Info("Vertex shader succesfully loaded.");
+		}
+
+		/*
+		* Build the pipeline layout that controls the inputs / outputs of the shader
+		* We are not using descriptor sets or other systems yet, so no need to use anything other than empty default
+		*/
+		VkPushConstantRange bufferRange{};
+		bufferRange.offset = 0;
+		bufferRange.size = sizeof(GPUDrawPushConstants);
+		bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+		VkDescriptorSetLayout setLayouts[] = {
+			_singleImageDescriptorLayout
+		};
+
+		VkPipelineLayoutCreateInfo pipeline_layout_info = pipeline_layout_create_info();
+		pipeline_layout_info.pPushConstantRanges = &bufferRange;
+		pipeline_layout_info.pushConstantRangeCount = 1;
+		pipeline_layout_info.pSetLayouts = setLayouts;
+		pipeline_layout_info.setLayoutCount = 1;
+		VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &pipelineLayout));
+
+		PipelineBuilder pipelineBuilder;
+
+		pipelineBuilder._pipelineLayout = pipelineLayout;
+		pipelineBuilder.set_shaders(VertexShader, FragShader);
+		pipelineBuilder.set_input_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+		pipelineBuilder.set_polygon_mode(VK_POLYGON_MODE_FILL);
+		pipelineBuilder.set_cull_mode(VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE);
+		pipelineBuilder.set_multisampling_none();
+		pipelineBuilder.disable_blending();
+		pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_LESS);
+
+		pipelineBuilder.set_depth_format(VK_FORMAT_D32_SFLOAT);
+
+		pipeline = pipelineBuilder.build_pipeline(_device);
+
+		vkDestroyShaderModule(_device, FragShader, nullptr);
+		vkDestroyShaderModule(_device, VertexShader, nullptr);
+
+		shaders.insert(std::make_pair(name, std::make_pair(pipeline, pipelineLayout)));
+
+		_mainDeletionQueue.push_function([name, this]() {
+			vkDestroyPipelineLayout(_device, shaders[name].second, nullptr);
+			vkDestroyPipeline(_device, shaders[name].first, nullptr);
+		});
 	}
 
 	void Vulkan::init_background_pipelines() {
 		CreateShader("Default", "vert.spv", "frag.spv");
+		CreateDepthShader("DefaultDepth", "depthvert.spv", "depthfrag.spv");
 	}
 
 	void Vulkan::init_default_data() {
@@ -559,6 +693,20 @@ namespace Drizzle {
 		if (depthImage != VK_NULL_HANDLE) {
 			vkDestroyImage(_device, depthImage, nullptr);
 			depthImage = VK_NULL_HANDLE;
+		}
+
+		if (_shadowView != VK_NULL_HANDLE) {
+			vkDestroyImageView(_device, _shadowView, nullptr);
+			_shadowView = VK_NULL_HANDLE;
+		}
+
+		if (_shadowMemory != VK_NULL_HANDLE) {
+			vkFreeMemory(_device, _shadowMemory, nullptr);
+			_shadowMemory = VK_NULL_HANDLE;
+		}
+
+		if (_shadowImage.allocation != VK_NULL_HANDLE) {
+			destroy_image(_shadowImage);
 		}
 
 		destroy_swapchain();

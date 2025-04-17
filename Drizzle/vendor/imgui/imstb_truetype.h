@@ -22,7 +22,7 @@
 //        render glyphs to one-channel bitmaps with antialiasing (box filter)
 //        render glyphs to one-channel SDF bitmaps (signed-distance field/function)
 //
-//   Todo:
+//   IMGUITODO:
 //        non-MS cmaps
 //        crashproof on bad data
 //        hinting? (no longer patented)
@@ -925,7 +925,7 @@ STBTT_DEF void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo *font, int glyph, fl
 STBTT_DEF void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo *font, int glyph, float scale_x, float scale_y,float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1);
 
 
-// @TODO: don't expose this structure
+// @IMGUITODO: don't expose this structure
 typedef struct
 {
    int w,h,stride;
@@ -1420,7 +1420,7 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
       info->fontdicts = stbtt__new_buf(NULL, 0);
       info->fdselect = stbtt__new_buf(NULL, 0);
 
-      // @TODO this should use size from table (not 512MB)
+      // @IMGUITODO this should use size from table (not 512MB)
       info->cff = stbtt__new_buf(data+cff, 512*1024*1024);
       b = info->cff;
 
@@ -1428,7 +1428,7 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
       stbtt__buf_skip(&b, 2);
       stbtt__buf_seek(&b, stbtt__buf_get8(&b)); // hdrsize
 
-      // @TODO the name INDEX could list multiple fonts,
+      // @IMGUITODO the name INDEX could list multiple fonts,
       // but we just use the first one.
       stbtt__cff_get_index(&b);  // name INDEX
       topdictidx = stbtt__cff_get_index(&b);
@@ -1467,7 +1467,7 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
    info->svg = -1;
 
    // find a cmap encoding table we understand *now* to avoid searching
-   // later. (todo: could make this installable)
+   // later. (IMGUITODO: could make this installable)
    // the same regardless of glyph.
    numTables = ttUSHORT(data + cmap + 2);
    info->index_map = 0;
@@ -1516,7 +1516,7 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
          return ttUSHORT(data + index_map + 10 + (unicode_codepoint - first)*2);
       return 0;
    } else if (format == 2) {
-      STBTT_assert(0); // @TODO: high-byte mapping for japanese/chinese/korean
+      STBTT_assert(0); // @IMGUITODO: high-byte mapping for japanese/chinese/korean
       return 0;
    } else if (format == 4) { // standard mapping for windows fonts: binary search collection of ranges
       stbtt_uint16 segcount = ttUSHORT(data+index_map+6) >> 1;
@@ -1586,7 +1586,7 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
       }
       return 0; // not found
    }
-   // @TODO
+   // @IMGUITODO
    STBTT_assert(0);
    return 0;
 }
@@ -1839,7 +1839,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             }
          }
          else {
-            // @TODO handle matching point
+            // @IMGUITODO handle matching point
             STBTT_assert(0);
          }
          if (flags & (1<<3)) { // WE_HAVE_A_SCALE
@@ -2029,7 +2029,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
       clear_stack = 1;
       b0 = stbtt__buf_get8(&b);
       switch (b0) {
-      // @TODO implement hinting
+      // @IMGUITODO implement hinting
       case 0x13: // hintmask
       case 0x14: // cntrmask
          if (in_header)
@@ -2171,7 +2171,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          float dx, dy;
          int b1 = stbtt__buf_get8(&b);
          switch (b1) {
-         // @TODO These "flex" implementations ignore the flex-depth and resolution,
+         // @IMGUITODO These "flex" implementations ignore the flex-depth and resolution,
          // and always draw beziers.
          case 0x22: // hflex
             if (sp < 7) return STBTT__CSERR("hflex stack");
@@ -2496,7 +2496,7 @@ static stbtt_int32  stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
 }
 
 // Define to STBTT_assert(x) if you want to break on unimplemented formats.
-#define STBTT_GPOS_TODO_assert(x)
+#define STBTT_GPOS_IMGUITODO_assert(x)
 
 static stbtt_int32 stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, int glyph1, int glyph2)
 {
@@ -3186,7 +3186,7 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
                // goal is to measure the area covered by '.' in each pixel
 
                // if x2 is right at the right edge of x1, y_crossing can blow up, github #1057
-               // @TODO: maybe test against sy1 rather than y_bottom?
+               // @IMGUITODO: maybe test against sy1 rather than y_bottom?
                if (y_crossing > y_bottom)
                   y_crossing = y_bottom;
 
@@ -3559,7 +3559,7 @@ static void stbtt__add_point(stbtt__point *points, int n, float x, float y)
    points[n].y = y;
 }
 
-// tessellate until threshold p is happy... @TODO warped to compensate for non-linear stretching
+// tessellate until threshold p is happy... @IMGUITODO warped to compensate for non-linear stretching
 static int stbtt__tesselate_curve(stbtt__point *points, int *num_points, float x0, float y0, float x1, float y1, float x2, float y2, float objspace_flatness_squared, int n)
 {
    // midpoint
@@ -3582,7 +3582,7 @@ static int stbtt__tesselate_curve(stbtt__point *points, int *num_points, float x
 
 static void stbtt__tesselate_cubic(stbtt__point *points, int *num_points, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float objspace_flatness_squared, int n)
 {
-   // @TODO this "flatness" calculation is just made-up nonsense that seems to work well enough
+   // @IMGUITODO this "flatness" calculation is just made-up nonsense that seems to work well enough
    float dx0 = x1-x0;
    float dy0 = y1-y0;
    float dx1 = x2-x1;
@@ -4889,7 +4889,7 @@ static int stbtt__matchpair(stbtt_uint8 *fc, stbtt_uint32 nm, stbtt_uint8 *name,
             }
          }
 
-         // @TODO handle other encodings
+         // @IMGUITODO handle other encodings
       }
    }
    return 0;

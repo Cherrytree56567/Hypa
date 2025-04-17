@@ -4,3 +4,9 @@ C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\shader.vert -o ..\x64\Release\ver
 C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\shader.frag -o ..\x64\Release\frag.spv
 C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\shader.vert -o ..\ExampleProject\vert.spv
 C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\shader.frag -o ..\ExampleProject\frag.spv
+C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\depth.vert -o ..\x64\Debug\depthvert.spv
+C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\depth.frag -o ..\x64\Debug\depthfrag.spv
+C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\depth.vert -o ..\x64\Release\depthvert.spv
+C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\depth.frag -o ..\x64\Release\depthfrag.spv
+C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\depth.vert -o ..\ExampleProject\depthvert.spv
+C:\ronit\VulkanSDK\1.4.304.1\Bin\glslc shaders\depth.frag -o ..\ExampleProject\depthfrag.spv

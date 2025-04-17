@@ -68,6 +68,20 @@ namespace Drizzle {
 			depthImage = VK_NULL_HANDLE;
 		}
 
+		if (_shadowView != VK_NULL_HANDLE) {
+			vkDestroyImageView(_device, _shadowView, nullptr);
+			_shadowView = VK_NULL_HANDLE;
+		}
+
+		if (_shadowMemory != VK_NULL_HANDLE) {
+			vkFreeMemory(_device, _shadowMemory, nullptr);
+			_shadowMemory = VK_NULL_HANDLE;
+		}
+
+		if (_shadowImage.allocation != VK_NULL_HANDLE) {
+			destroy_image(_shadowImage);
+		}
+
 		_texDeletionQueue.flush();
 		_mainDeletionQueue.flush();
 

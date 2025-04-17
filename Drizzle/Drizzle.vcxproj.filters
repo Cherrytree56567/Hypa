@@ -76,6 +76,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="shaders\depth.frag">
+      <Filter>Source Files\Vulkan\Shaders</Filter>
+    </None>
+    <None Include="shaders\depth.vert">
+      <Filter>Source Files\Vulkan\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drizzle.cpp">

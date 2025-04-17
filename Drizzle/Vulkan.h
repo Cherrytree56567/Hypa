@@ -243,6 +243,8 @@ namespace Drizzle {
         void draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<std::shared_ptr<Lighting>> lights);
         void resize_swapchain();
 
+        void CreateDepthShader(std::string name, std::string VertShaderPath, std::string FragShaderPath);
+
         VkPhysicalDevice pick_gpu(const std::vector<VkPhysicalDevice>& devices);
 
         FrameData& get_current_frame();
@@ -267,6 +269,7 @@ namespace Drizzle {
 
         GPUMeshBuffers uploadMesh(std::span<uint16_t> indices, std::span<Vertex> vertices);
 
+        void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout, VkFormat format, bool isDepth = false);
         void transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout);
         VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspectMask);
         void copy_image_to_image(VkCommandBuffer cmd, VkImage source, VkImage destination, VkExtent2D srcSize, VkExtent2D dstSize);
@@ -308,6 +311,10 @@ namespace Drizzle {
         VkDescriptorSetLayout _singleImageDescriptorLayout;
         VkImageView _depthImageView;
         AllocatedBuffer _lightBuffer;
+        VkExtent3D _shadowExtent;
+        AllocatedImage _shadowImage;
+        VkDeviceMemory _shadowMemory;
+        VkImageView _shadowView;
         /*
         * ImGUI
         */

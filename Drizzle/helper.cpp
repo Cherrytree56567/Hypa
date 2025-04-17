@@ -53,6 +53,25 @@ namespace Drizzle {
         return info;
     }
 
+    VkImageAspectFlags get_aspect_mask(VkFormat format) {
+        switch (format) {
+        case VK_FORMAT_D16_UNORM:
+        case VK_FORMAT_X8_D24_UNORM_PACK32:
+        case VK_FORMAT_D32_SFLOAT:
+            return VK_IMAGE_ASPECT_DEPTH_BIT;
+
+        case VK_FORMAT_S8_UINT:
+            return VK_IMAGE_ASPECT_STENCIL_BIT;
+
+        case VK_FORMAT_D24_UNORM_S8_UINT:
+        case VK_FORMAT_D32_SFLOAT_S8_UINT:
+            return VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+
+        default:
+            return VK_IMAGE_ASPECT_COLOR_BIT;
+        }
+    }
+
     void Vulkan::transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout) {
         VkImageMemoryBarrier2 imageBarrier{ .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 };
         imageBarrier.pNext = nullptr;
@@ -67,6 +86,39 @@ namespace Drizzle {
 
         VkImageAspectFlags aspectMask = (newLayout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
         imageBarrier.subresourceRange = image_subresource_range(aspectMask);
+        imageBarrier.image = image;
+
+        VkDependencyInfo depInfo{};
+        depInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+        depInfo.pNext = nullptr;
+
+        depInfo.imageMemoryBarrierCount = 1;
+        depInfo.pImageMemoryBarriers = &imageBarrier;
+
+        vkCmdPipelineBarrier2(cmd, &depInfo);
+    }
+
+    void Vulkan::transition_image(VkCommandBuffer cmd, VkImage image, VkImageLayout currentLayout, VkImageLayout newLayout, VkFormat format, bool isDepth) {
+        VkImageMemoryBarrier2 imageBarrier{ .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 };
+        imageBarrier.pNext = nullptr;
+
+        if (isDepth) {
+            imageBarrier.srcStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
+            imageBarrier.srcAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+            imageBarrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+            imageBarrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
+        } else {
+            imageBarrier.srcStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+            imageBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
+            imageBarrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+            imageBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT | VK_ACCESS_2_MEMORY_READ_BIT;
+        }
+
+        imageBarrier.oldLayout = currentLayout;
+        imageBarrier.newLayout = newLayout;
+
+        imageBarrier.subresourceRange = image_subresource_range(get_aspect_mask(format));
         imageBarrier.image = image;
 
         VkDependencyInfo depInfo{};
@@ -300,7 +352,12 @@ namespace Drizzle {
 
         renderInfo.renderArea = VkRect2D{ VkOffset2D { 0, 0 }, renderExtent };
         renderInfo.layerCount = 1;
-        renderInfo.colorAttachmentCount = 1;
+		if (colorAttachment) {
+			renderInfo.colorAttachmentCount = 1;
+		}
+		else {
+			renderInfo.colorAttachmentCount = 0;
+		}
         renderInfo.pColorAttachments = colorAttachment;
         renderInfo.pDepthAttachment = depthAttachment;
         renderInfo.pStencilAttachment = nullptr;

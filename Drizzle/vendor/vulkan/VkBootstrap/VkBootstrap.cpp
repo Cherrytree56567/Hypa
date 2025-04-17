@@ -980,7 +980,7 @@ uint32_t get_present_queue_index(
         VkBool32 presentSupport = false;
         if (surface != VK_NULL_HANDLE) {
             VkResult res = detail::vulkan_functions().fp_vkGetPhysicalDeviceSurfaceSupportKHR(phys_device, i, surface, &presentSupport);
-            if (res != VK_SUCCESS) return QUEUE_INDEX_MAX_VALUE; // TODO: determine if this should fail another way
+            if (res != VK_SUCCESS) return QUEUE_INDEX_MAX_VALUE; // VKBTODO: determine if this should fail another way
         }
         if (presentSupport == VK_TRUE) return i;
     }

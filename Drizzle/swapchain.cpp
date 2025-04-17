@@ -29,6 +29,26 @@ namespace Drizzle {
 		VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
 
 		_depthImageView = create_depth_image_view(_device, _chosenGPU, depthImageMemory, depthImage, depthFormat, width, height);
+
+		/*
+		* TODO: Change shadow quality based on flags
+		* 1024 = Fast
+		* 2048 = Balanced
+		* 4096 = High Quality
+		*/
+		_shadowExtent = {
+			.width = 2048,
+			.height = 2048,
+			.depth = 1
+		};
+
+		_shadowImage = create_image(_shadowExtent, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+
+		VkMemoryPropertyFlags memoryFlags;
+
+		vmaGetAllocationMemoryProperties(_allocator, _shadowImage.allocation, &memoryFlags);
+
+		_shadowView = create_depth_image_view(_device, _chosenGPU, _shadowMemory, _shadowImage.image, VK_FORMAT_D32_SFLOAT, _shadowExtent.width, _shadowExtent.height);
 	}
 	
 	void Vulkan::destroy_swapchain() {
