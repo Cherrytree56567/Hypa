@@ -18,7 +18,8 @@ namespace Drizzle {
 	};
 
 	struct PushConstants {
-		glm::mat4 worldMatrix;
+		glm::mat4 viewMatrix;
+		glm::mat4 projMatrix;
 	};
 
 	struct APIObject {
@@ -43,7 +44,7 @@ namespace Drizzle {
 		Drizzle_API virtual void OnDetach() { }
 		Drizzle_API virtual void RenderBefore() {}
 		Drizzle_API virtual void RenderAfter() {}
-		Drizzle_API virtual void Render3D(std::vector<APIObject> objs, std::vector<std::shared_ptr<Lighting>> lights) {}
+		Drizzle_API virtual void Render3D(std::vector<APIObject> objs, std::vector<std::shared_ptr<Lighting>> lights, std::string SkyTex) {}
 
 		Drizzle_API virtual void CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {}
 		Drizzle_API virtual void RemoveShader(std::string name) {}

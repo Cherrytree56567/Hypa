@@ -179,14 +179,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <FxCompile Include="shaders\shader.frag">
+    <Text Include="shaders\shader.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
-    </FxCompile>
-    <FxCompile Include="shaders\shader.vert">
+    </Text>
+    <Text Include="shaders\shader.vert">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
-    </FxCompile>
+    </Text>
     <None Include="shaders\depth.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
@@ -213,6 +213,7 @@
     <ClInclude Include="OpenGL.h" />
     <ClInclude Include="Rendering3D.h" />
     <ClInclude Include="RenderingAPI.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Vulkan.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -235,6 +236,7 @@
     <ClCompile Include="pipelines.cpp" />
     <ClCompile Include="Rendering3D.cpp" />
     <ClCompile Include="RenderingAPI.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="swapchain.cpp" />
     <ClCompile Include="vendor\Glad1\src\glad.c" />
     <ClCompile Include="vendor\Glad1\src\glad_wgl.c" />

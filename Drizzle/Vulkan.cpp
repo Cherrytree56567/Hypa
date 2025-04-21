@@ -111,10 +111,10 @@ namespace Drizzle {
 			ImGui::Text("Selected shader: ", CurrentShaderName);
 
 			ImGui::SliderFloat("Render Scale", &renderScale, 0.3f, 1.f);
-			ImGui::InputFloat4("data1", (float*)&pushConstants.worldMatrix[0]);
-			ImGui::InputFloat4("data2", (float*)&pushConstants.worldMatrix[1]);
-			ImGui::InputFloat4("data3", (float*)&pushConstants.worldMatrix[2]);
-			ImGui::InputFloat4("data4", (float*)&pushConstants.worldMatrix[3]);
+			ImGui::InputFloat4("data1", (float*)&pushConstants.viewMatrix[0]);
+			ImGui::InputFloat4("data2", (float*)&pushConstants.viewMatrix[1]);
+			ImGui::InputFloat4("data3", (float*)&pushConstants.viewMatrix[2]);
+			ImGui::InputFloat4("data4", (float*)&pushConstants.viewMatrix[3]);
 
 			float fps = 1000.0f / engineStats.frametime;
 			ImGui::Text("frametime %f ms", engineStats.frametime);
@@ -276,12 +276,12 @@ namespace Drizzle {
 		_frameNumber++;
 	}
 
-	void Vulkan::Render3D(std::vector<APIObject> objs, std::vector<std::shared_ptr<Lighting>> lights) {
+	void Vulkan::Render3D(std::vector<APIObject> objs, std::vector<std::shared_ptr<Lighting>> lights, std::string SkyTex) {
 		if (renderBefore == false) {
 			log.Error("RenderBefore was not called before Render3D");
 			return;
 		}
-		draw_geometry(command, objs, lights);
+		draw_geometry(command, objs, lights, SkyTex);
 	}
 
 	void Vulkan::CreateShader(std::string name, std::string VertShaderPath, std::string FragShaderPath) {

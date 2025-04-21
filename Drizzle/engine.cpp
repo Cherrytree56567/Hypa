@@ -240,7 +240,8 @@ namespace Drizzle {
 		{
 			DescriptorLayoutBuilder builder;
 			builder.add_binding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-			builder.add_binding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+			builder.add_binding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+			builder.add_binding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 			_singleImageDescriptorLayout = builder.build(_device, VK_SHADER_STAGE_FRAGMENT_BIT);
 		}
 
@@ -365,7 +366,7 @@ namespace Drizzle {
 		});
 	}
 
-	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<std::shared_ptr<Lighting>> lights) {
+	void Vulkan::draw_geometry(VkCommandBuffer cmd, std::vector<APIObject> objects, std::vector<std::shared_ptr<Lighting>> lights, std::string SkyTex) {
 		/*
 		* Dynamic Shadow Rendering START
 		*/
@@ -490,7 +491,7 @@ namespace Drizzle {
 					continue;
 				}
 
-				if (!IsBoxVisible(objects[i].minBound, objects[i].maxBound, glm::mat4(1.0f), pushConstants.worldMatrix)) {
+				if (!IsBoxVisible(objects[i].minBound, objects[i].maxBound, objects[i].modelMatrix, pushConstants.projMatrix * pushConstants.viewMatrix)) {
 					continue;
 				}
 
@@ -515,7 +516,9 @@ namespace Drizzle {
 						writer.write_image(0, _whiteImage.imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 					}
 
-					writer.write_buffer(1, _lightBuffer.buffer, sizeof(Light) * 128, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+					writer.write_image(1, textures[SkyTex.c_str()].imageView, _defaultSamplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+
+					writer.write_buffer(2, _lightBuffer.buffer, sizeof(Light) * 128, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 
 					writer.update_set(_device, imageSet);
 				}
@@ -523,8 +526,14 @@ namespace Drizzle {
 				vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shaders[shader].second, 0, 1, &imageSet, 0, nullptr);
 
 				GPUDrawPushConstants push_constants;
-				push_constants.worldMatrix = pushConstants.worldMatrix;
-
+				push_constants.modelMatrix = objects[i].modelMatrix;
+				push_constants.viewMatrix = pushConstants.viewMatrix;
+				push_constants.projMatrix = pushConstants.projMatrix;
+				if (objects[i].groupName == "SkyBox") {
+					push_constants.isSkyBox = 1;
+				}  else {
+					push_constants.isSkyBox = 0;
+				}
 				push_constants.vertexBuffer = meshes[objects[i].name].vertexBufferAddress;
 
 				vkCmdPushConstants(cmd, shaders[shader].second, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
@@ -630,7 +639,8 @@ namespace Drizzle {
 		*/
 		projection[1][1] *= -1;
 
-		pushConstants.worldMatrix = projection * view * model;
+		pushConstants.viewMatrix = view;
+		pushConstants.projMatrix = projection;
 
 		uint32_t white = glm::packUnorm4x8(glm::vec4(1, 1, 1, 1));
 		_whiteImage = create_image((void*)&white, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);

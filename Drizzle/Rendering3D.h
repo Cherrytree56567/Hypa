@@ -25,7 +25,7 @@ namespace Drizzle {
 
         Drizzle_API void CreateObject(std::string name, APIObject obj);
 		Drizzle_API void RemoveObject(std::string name, bool grouped = false);
-        Drizzle_API APIObject& GetObject(std::string name);
+        Drizzle_API APIObject& Getobject(std::string name);
         Drizzle_API void LoadOBJ(std::string name, const std::string& filePath, const std::string& mtlPath = "");
 
 		Drizzle_API void AddCamera(std::string name, Camera camera);

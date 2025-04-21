@@ -6,7 +6,7 @@ namespace Drizzle {
 	}
 
 	Rendering3D::Rendering3D(std::shared_ptr<Window> window, std::shared_ptr<RenderingAPISystem> rAPIsys) : name("3DLayer"), pWindow(window), rAPISystem(rAPIsys), show(true) {
-		cameras["Default"] = rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix;
+		cameras["Default"] = Camera(rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().viewMatrix, rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().projMatrix);
 	}
 
 	void Rendering3D::OnAttach() {
@@ -19,8 +19,9 @@ namespace Drizzle {
 
     void Rendering3D::Render() {
 		if (show) {
-			rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().worldMatrix = cameras[CurrentCamera].GetMatrix();
-			rAPISystem->GetCurrentRenderingAPI()->Render3D(objects, lights);
+			rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().viewMatrix = cameras[CurrentCamera].GetViewMatrix();
+			rAPISystem->GetCurrentRenderingAPI()->GetPushConstants().projMatrix = cameras[CurrentCamera].GetProjectionMatrix();
+			rAPISystem->GetCurrentRenderingAPI()->Render3D(objects, lights, "SkyboxTex");
 		}
 	}
 
@@ -139,6 +140,7 @@ namespace Drizzle {
 			obj.minBound = minBound;
 			obj.maxBound = maxBound;
 			obj.center = center;
+			obj.modelMatrix = glm::mat4(1.0f);
 
 			if (MtlExists) {
 				aiString texPath;
@@ -181,7 +183,7 @@ namespace Drizzle {
 		}
 	}
 
-	APIObject& Rendering3D::GetObject(std::string name) {
+	APIObject& Rendering3D::Getobject(std::string name) {
 		for (auto it = objects.begin(); it != objects.end(); ++it) {
 			if (it->name == name) {
 				return *it;

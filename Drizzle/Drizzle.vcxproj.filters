@@ -76,6 +76,9 @@
     <Filter Include="Source Files\FirstPersonController">
       <UniqueIdentifier>{eccceb00-305a-41ac-ab3c-e495341af525}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\SkyBox">
+      <UniqueIdentifier>{60ef9a34-ad58-4760-91f1-160215a677d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -180,6 +183,9 @@
     <ClCompile Include="FirstPersonController.cpp">
       <Filter>Source Files\FirstPersonController</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files\SkyBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -242,13 +248,16 @@
     <ClInclude Include="FirstPersonController.h">
       <Filter>Source Files\FirstPersonController</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Source Files\SkyBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\shader.frag">
+    <Text Include="shaders\shader.vert">
       <Filter>Source Files\Vulkan\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\shader.vert">
+    </Text>
+    <Text Include="shaders\shader.frag">
       <Filter>Source Files\Vulkan\Shaders</Filter>
-    </FxCompile>
+    </Text>
   </ItemGroup>
 </Project>

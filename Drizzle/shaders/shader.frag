@@ -16,10 +16,12 @@ layout (location = 0) in vec3 inColor;
 layout (location = 1) in vec2 inUV;
 layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec3 world_pos;
+layout (location = 4) flat in int isSky;
 layout (location = 0) out vec4 outFragColor;
 
 layout(set = 0, binding = 0) uniform sampler2D displayTexture;
-layout(set = 0, binding = 1, std140) uniform LightBuffer {
+layout(set = 0, binding = 1) uniform sampler2D ambientTex;
+layout(set = 0, binding = 2, std140) uniform LightBuffer {
     Light lights[128];
 };
 
@@ -28,7 +30,12 @@ const int MAX_LIGHTS = 128;
 void main() {
 	vec4 baseColor = texture(displayTexture, inUV);
     vec3 finalColor = vec3(0.0);
+    vec3 ambientLight = texture(ambientTex, inUV).rgb * 0.4;
 
+    if (isSky == 1) {
+        outFragColor = baseColor;
+        return;
+    }
     vec3 fragPos = world_pos;
     vec3 normal = normalize(inNormal);
 
@@ -84,6 +91,6 @@ void main() {
         //outFragColor = vec4(vec3(NdotL), 1.0);
     }
 
-    finalColor = baseColor.rgb * finalColor;
+    finalColor = baseColor.rgb * finalColor + ambientLight;
     outFragColor = vec4(finalColor, baseColor.a);
 }

@@ -9,12 +9,14 @@ int main() {
 	auto r3D = app->GetRendering3D();
 	auto rAPI = app->GetRenderingAPISystem()->GetCurrentRenderingAPI();
 
+	Drizzle::Skybox sky(app, "SkyBox.png");
+
 	std::shared_ptr<Drizzle::PointLight> mainLight = std::make_shared<Drizzle::PointLight>("Main", glm::vec3(-25.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 10.0f, 10.0f);
 
 	r3D->LoadOBJ("Buildings", "buildings.obj");
 	r3D->LoadOBJ("Duck", "duck.obj");
 
-	Drizzle::APIObject& duck = r3D->GetObject("Duck");
+	Drizzle::APIObject& duck = r3D->Getobject("Duck");
 
 	rAPI->CreateTexture("DuckTex", "ios.png");
 

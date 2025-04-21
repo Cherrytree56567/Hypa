@@ -16,6 +16,7 @@ D:\Drizzle\Drizzle\OpenGL.cpp;D:\Drizzle\Drizzle\x64\Debug\OpenGL.obj
 D:\Drizzle\Drizzle\pipelines.cpp;D:\Drizzle\Drizzle\x64\Debug\pipelines.obj
 D:\Drizzle\Drizzle\Rendering3D.cpp;D:\Drizzle\Drizzle\x64\Debug\Rendering3D.obj
 D:\Drizzle\Drizzle\RenderingAPI.cpp;D:\Drizzle\Drizzle\x64\Debug\RenderingAPI.obj
+D:\Drizzle\Drizzle\Skybox.cpp;D:\Drizzle\Drizzle\x64\Debug\Skybox.obj
 D:\Drizzle\Drizzle\swapchain.cpp;D:\Drizzle\Drizzle\x64\Debug\swapchain.obj
 D:\Drizzle\Drizzle\vendor\Glad1\src\glad.c;D:\Drizzle\Drizzle\x64\Debug\glad.obj
 D:\Drizzle\Drizzle\vendor\Glad1\src\glad_wgl.c;D:\Drizzle\Drizzle\x64\Debug\glad_wgl.obj
