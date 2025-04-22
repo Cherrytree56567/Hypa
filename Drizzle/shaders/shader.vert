@@ -6,6 +6,9 @@ layout (location = 1) out vec2 outUV;
 layout (location = 2) out vec3 normal;
 layout (location = 3) out vec3 worldPos;
 layout (location = 4) flat out int isSky;
+layout (location = 5) out float metalness;
+layout (location = 6) out float roughness;
+layout (location = 7) out mat4 viewMat;
 
 struct Vertex {
 
@@ -26,6 +29,8 @@ layout( push_constant ) uniform constants
 	mat4 proj_matrix;
 	mat4 view_matrix;
 	mat4 model_matrix;
+	float roughness;
+	float metalness;
 	int isSkyBox;
 	VertexBuffer vertexBuffer;
 } PushConstants;
@@ -41,4 +46,7 @@ void main()
 	normal = v.normal;
 	worldPos = v.position;
 	isSky = PushConstants.isSkyBox;
+	metalness = PushConstants.metalness;
+	roughness = PushConstants.roughness;
+	viewMat = PushConstants.view_matrix;
 }

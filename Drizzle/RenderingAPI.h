@@ -33,6 +33,8 @@ namespace Drizzle {
 		std::string shaderName;
 		std::string textureName;
 		std::string groupName;
+		float metalness;
+		float roughness;
 		bool hidden = false;
 	};
 

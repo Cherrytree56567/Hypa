@@ -108,6 +108,17 @@ namespace Drizzle {
 				vertices.push_back(vertex);
 			}
 
+			float metalness;
+			float roughness;
+
+			if (material->Get(AI_MATKEY_METALLIC_FACTOR, metalness) != AI_SUCCESS) {
+				metalness = 0.0f; // Default fallback
+			}
+
+			if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) != AI_SUCCESS) {
+				roughness = 0.0f; // Default fallback
+			}
+
 			glm::vec3 minBound = { FLT_MAX, FLT_MAX, FLT_MAX };
 			glm::vec3 maxBound = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 
@@ -141,6 +152,7 @@ namespace Drizzle {
 			obj.maxBound = maxBound;
 			obj.center = center;
 			obj.modelMatrix = glm::mat4(1.0f);
+			obj.metalness = metalness;
 
 			if (MtlExists) {
 				aiString texPath;

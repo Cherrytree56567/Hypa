@@ -164,6 +164,8 @@ namespace Drizzle {
         glm::mat4 projMatrix;
 		glm::mat4 viewMatrix;
 		glm::mat4 modelMatrix;
+        float roughness;
+        float metalness;
         int isSkyBox;
         VkDeviceAddress vertexBuffer;
     };

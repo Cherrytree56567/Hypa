@@ -529,6 +529,8 @@ namespace Drizzle {
 				push_constants.modelMatrix = objects[i].modelMatrix;
 				push_constants.viewMatrix = pushConstants.viewMatrix;
 				push_constants.projMatrix = pushConstants.projMatrix;
+				push_constants.metalness = objects[i].metalness;
+				push_constants.roughness = objects[i].roughness;
 				if (objects[i].groupName == "SkyBox") {
 					push_constants.isSkyBox = 1;
 				}  else {
