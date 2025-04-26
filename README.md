@@ -1,4 +1,17 @@
-# Hypa
-![Hypa Logo](https://github.com/Cherrytree56567/Hypa/blob/f084cdd7a7086971830e027069446273b49af19f/media/Logo.gif)
+# Drizzle
 <br>
-Hypa is a 3D Game Engine that is designed to be Fast, Simple and Stable.
+Drizzle is a simple 3D Game Engine that supports Vulkan and PBR Lighting. It is made in C++.
+
+## Features
+ - PBR Lighting
+ - Custom Lighting Shaders
+ - Custom Textures
+ - OBJ and MTL Support
+ - SkyBox
+ - Simple First Person Camera
+
+## Goals
+ - Better PBR
+ - Shadows
+ - Ray Tracing
+ - Custom Rendering Format
