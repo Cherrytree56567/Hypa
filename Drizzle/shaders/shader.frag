@@ -42,13 +42,6 @@ float DistributionGGX(vec3 N, vec3 H, float rough) {
     return a2 / (PI * denom * denom);
 }
 
-// Schlick‐GGX geometry term (single‐direction)
-float GeometrySchlickGGX(float NdotV, float rough) {
-    float r = rough + 1.0;
-    float k = (r*r) / 8.0;
-    return NdotV / (NdotV * (1.0 - k) + k);
-}
-
 // Smith’s method to combine geometry for both light & view
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float rough) {
     float NdotV = max(dot(N, V), 0.0);
